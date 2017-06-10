@@ -4,8 +4,8 @@ By Adam Badke: www.AdamBadke.com
 --------------------
 Repository contents:
 --------------------
-README.txt						This file
-src/							The project C++ source files and the QT 5 project file
+README.txt				This file
+src/					The project C++ source files and the QT 5 project file
 WorkingDir/				Contains pre-configured scenes constructed from .simp and .obj files
 
 ---------
@@ -18,7 +18,7 @@ Once compiled, this program accepts a command line filename argument, and will l
 ---------------------
 Instructions for use:
 -----------------------------------------------
-Compilation requires QT version 5.8 for Windows
+Compilation requires QT version 5.8 for Windows.
 Get it here:  https://www.qt.io/download/
 -----------------------------------------------
 1) Download the respository
