@@ -1,4 +1,5 @@
 A Software 3D Renderer written in C++
+-------------------------------------
 By Adam Badke: www.AdamBadke.com
 -------------------------------------
 --------------------
@@ -17,10 +18,9 @@ Once compiled, this program accepts a command line filename argument, and will l
 
 ---------------------
 Instructions for use:
------------------------------------------------
-Compilation requires QT version 5.8 for Windows.
-Get it here:  https://www.qt.io/download/
------------------------------------------------
+----------------------------------------------------------------------------
+Compilation requires QT version 5.8 for Windows: https://www.qt.io/download/
+----------------------------------------------------------------------------
 1) Download the respository
 
 2) Load the /src/qtqt.pro file to load the project into QT Creator
