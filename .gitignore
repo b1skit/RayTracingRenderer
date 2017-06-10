@@ -1,0 +1,14 @@
+# Blacklist everything
+*
+
+# Whitelist all directories
+!*/src
+!*/workingDir
+
+# Whitelist the files to include
+!*.cpp
+!*.h
+!*.pro
+!*.simp
+!*.obj
+!.gitignore
