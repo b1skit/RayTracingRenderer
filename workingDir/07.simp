@@ -1,0 +1,102 @@
+phong
+ambient 0.75 0.75 0.75
+depth 1 200 0 0 0
+
+#wire
+
+# Default Camera
+{
+	translate 0 0 -5
+	camera -1, -1, 1, 1, 1, 200
+}
+
+# Meshes
+{
+	scale 1.5 1.5 1.5
+	
+	# Cube 1
+	{
+		rotate Z 0
+		translate 0 1.8  0
+		rotate X 17
+		rotate Y 26
+		
+		surface 0.5 0.5 0.5 1 10		
+		obj "unitCubeColored"
+	}
+
+	# Cube 2
+	{
+		rotate Z 60
+		translate 0 1.8  0
+		rotate X 35
+		rotate Y 19
+		
+		surface 0.5 0.5 0.5 1 10		
+		obj "unitCubeColored"
+	}
+
+	# Cube 3
+	{
+		rotate Z 120
+		translate 0 1.8  0
+		rotate X 42
+		rotate Y 63
+		
+		surface 0.5 0.5 0.5 1 10		
+		obj "unitCubeColored"
+	}
+
+	# Cube 4
+	{
+		rotate Z 180
+		translate 0 1.8  0
+		rotate X 84
+		rotate Y 99
+		
+		surface 0.5 0.5 0.5 1 10		
+		obj "unitCubeColored"
+	}
+
+	# Cube 5
+	{
+		rotate Z 240
+		translate 0 1.8  0
+		rotate X 160
+		rotate Y 122
+		
+		surface 0.5 0.5 0.5 1 10		
+		obj "unitCubeColored"
+	}
+
+	# Cube 6
+	{
+		rotate Z 300
+		translate 0 1.8  0
+		rotate X 150
+		rotate Y 45
+		
+		surface 0.5 0.5 0.5 1 10		
+		obj "unitCubeColored"
+	}
+	
+	# Cube 6
+	{
+		rotate X 225
+		rotate Y 315
+		
+		surface 0.5 0.5 0.5 1 10		
+		obj "unitCubeColored"
+	}
+	
+	# Backdrop
+	{
+		
+		translate 0 0 2
+		scale 11 11 1
+		rotate X 90
+		
+		surface 0.5 0.5 0.5 1 10		
+		obj "unitPlaneColored"
+	}
+}

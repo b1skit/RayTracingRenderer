@@ -1,0 +1,51 @@
+phong
+ambient 0.22 0.2 0.27
+depth 1 12 0 0 0
+
+# Default Camera
+{
+	translate 0 1.4 -3.6
+	rotate X -19
+	camera -1, -1, 1, 1, 0.1, 100
+}
+
+# Key Light
+{
+	translate 27 9 -10
+	light 13 16 19 1 1
+	
+}
+
+# Fill Light
+{
+	translate -50 8 -5
+	light 8 16 32 1 1
+	
+}
+
+# Rim Light
+{
+	translate 22 10 30
+	light 18 23 26 1 1.5
+}
+
+# Car
+{
+	translate 0.5 0 -1
+	scale 1.3 1.3 1.3
+	#rotate X 20
+	rotate Y 223
+	
+	surface .75 .75 .75 1 150		
+	obj "car"
+}
+
+# Backdrop
+{
+	
+	scale 10 10 10
+	
+	surface 0.3 0.3 0.3 0.1 2
+	obj lightscene_A
+}
+

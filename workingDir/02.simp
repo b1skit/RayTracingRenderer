@@ -1,0 +1,258 @@
+# This scene renders a grid of spheres to demonstrate various specular settings for the phong shading model
+
+ambient 0 0 0
+depth 1 35 0 0 0
+
+# Camera
+{
+	translate 0 13 0
+	rotate X -90
+    
+	camera -0.5, -0.5, 0.5, 0.5, 1, 200
+}
+
+#Key Light
+{
+        translate 3000 5000 3000
+        light 15 15 15 0.001 0.003
+}
+
+
+# Phong Shaded Ground Plane
+{
+		surface 0.35 0.99 0.86 0 1
+		translate 0 0 1
+        scale 75 1 50
+        obj "unitPlane"
+}
+
+phong
+
+# Phong Shaded Spheres
+
+# Row 1: Back row
+{
+		surface 1 1 1 0.1 1
+        translate -4.5 0.75 3.75
+        obj "unitSphere"
+}
+{
+		surface 1 1 1 0.25 1
+        translate -3 0.75 3.75
+        obj "unitSphere"
+}
+{
+		surface 1 1 1 0.4 1
+        translate -1.5 0.75 3.75
+        obj "unitSphere"
+}
+{
+		surface 1 1 1 0.55 1
+        translate 0 0.75 3.75
+        obj "unitSphere"
+}
+{
+		surface 1 1 1 0.7 1
+        translate 1.5 0.75 3.75
+        obj "unitSphere"
+}
+{
+		surface 1 1 1 0.85 1
+        translate 3 0.75 3.75
+        obj "unitSphere"
+}
+{
+		surface 1 1 1 1.0 1
+        translate 4.5 0.75 3.75
+        obj "unitSphere"
+}
+
+
+# Row 2
+{
+		surface 1 1 1 0.1 5
+        translate -4.5 0.75 2.25
+        obj "unitSphere"
+}
+{
+		surface 1 1 1 0.25 5
+        translate -3 0.75 2.25
+        obj "unitSphere"
+}
+{
+		surface 1 1 1 0.4 5
+        translate -1.5 0.75 2.25
+        obj "unitSphere"
+}
+{
+		surface 1 1 1 0.55 5
+        translate 0 0.75 2.25
+        obj "unitSphere"
+}
+{
+		surface 1 1 1 0.7 5
+        translate 1.5 0.75 2.25
+        obj "unitSphere"
+}
+{
+		surface 1 1 1 0.85 5
+        translate 3 0.75 2.25
+        obj "unitSphere"
+}
+{
+		surface 1 1 1 1.0 5
+        translate 4.5 0.75 2.25
+        obj "unitSphere"
+}
+
+
+# Row 3
+{
+		surface 1 1 1 0.1 10
+        translate -4.5 0.75 0.75
+        obj "unitSphere"
+}
+{
+		surface 1 1 1 0.25 10
+        translate -3 0.75 0.75
+        obj "unitSphere"
+}
+{
+		surface 1 1 1 0.4 10
+        translate -1.5 0.75 0.75
+        obj "unitSphere"
+}
+{
+		surface 1 1 1 0.55 10
+        translate 0 0.75 0.75
+        obj "unitSphere"
+}
+{
+		surface 1 1 1 0.7 10
+        translate 1.5 0.75 0.75
+        obj "unitSphere"
+}
+{
+		surface 1 1 1 0.85 10
+        translate 3 0.75 0.75
+        obj "unitSphere"
+}
+{
+		surface 1 1 1 1.0 10
+        translate 4.5 0.75 0.75
+        obj "unitSphere"
+}
+
+
+# Row 4
+{
+		surface 1 1 1 0.1 20
+        translate -4.5 0.75 -0.75
+        obj "unitSphere"
+}
+{
+		surface 1 1 1 0.25 20
+        translate -3 0.75 -0.75
+        obj "unitSphere"
+}
+{
+		surface 1 1 1 0.4 20
+        translate -1.5 0.75 -0.75
+        obj "unitSphere"
+}
+{
+		surface 1 1 1 0.55 20
+        translate 0 0.75 -0.75
+        obj "unitSphere"
+}
+{
+		surface 1 1 1 0.7 20
+        translate 1.5 0.75 -0.75
+        obj "unitSphere"
+}
+{
+		surface 1 1 1 0.85 20
+        translate 3 0.75 -0.75
+        obj "unitSphere"
+}
+{
+		surface 1 1 1 1.0 20
+        translate 4.5 0.75 -0.75
+        obj "unitSphere"
+}
+
+
+# Row 5
+{
+		surface 1 1 1 0.1 60
+        translate -4.5 0.75 -2.25
+        obj "unitSphere"
+}
+{
+		surface 1 1 1 0.25 60
+        translate -3 0.75 -2.25
+        obj "unitSphere"
+}
+{
+		surface 1 1 1 0.4 60
+        translate -1.5 0.75 -2.25
+        obj "unitSphere"
+}
+{
+		surface 1 1 1 0.45 60
+        translate 0 0.75 -2.25
+        obj "unitSphere"
+}
+{
+		surface 1 1 1 0.55 60
+        translate 1.5 0.75 -2.25
+        obj "unitSphere"
+}
+{
+		surface 1 1 1 0.85 60
+        translate 3 0.75 -2.25
+        obj "unitSphere"
+}
+{
+		surface 1 1 1 1.0 60
+        translate 4.5 0.75 -2.25
+        obj "unitSphere"
+}
+
+
+# Row 6
+{
+		surface 1 1 1 0.1 120
+        translate -4.5 0.75 -3.75
+        obj "unitSphere"
+}
+{
+		surface 1 1 1 0.25 120
+        translate -3 0.75 -3.75
+        obj "unitSphere"
+}
+{
+		surface 1 1 1 0.4 120
+        translate -1.5 0.75 -3.75
+        obj "unitSphere"
+}
+{
+		surface 1 1 1 0.45 120
+        translate 0 0.75 -3.75
+        obj "unitSphere"
+}
+{
+		surface 1 1 1 0.55 120
+        translate 1.5 0.75 -3.75
+        obj "unitSphere"
+}
+{
+		surface 1 1 1 0.85 120
+        translate 3 0.75 -3.75
+        obj "unitSphere"
+}
+{
+		surface 1 1 1 1.0 120
+        translate 4.5 0.75 -3.75
+        obj "unitSphere"
+}

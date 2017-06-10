@@ -1,0 +1,50 @@
+{
+	translate 0 0 10
+	scale 10 10 10
+	obj "unitCube"
+}
+{
+	translate 0 0 190
+	scale 10 10 10
+	obj "unitCube"
+}
+{
+	translate 0 0 30
+	scale 10 10 10
+	obj "unitCube"
+}
+{
+	translate 0 0 50
+	scale 10 10 10
+	obj "unitCube"
+}
+{
+	translate 0 0 70
+	scale 10 10 10
+	obj "unitCube"
+}
+{
+	translate 0 0 90
+	scale 10 10 10
+	obj "unitCube"
+}
+{
+	translate 0 0 110
+	scale 10 10 10
+	obj "unitCube"
+}
+{
+	translate 0 0 130
+	scale 10 10 10
+	obj "unitCube"
+}
+{
+	translate 0 0 150
+	scale 10 10 10
+	obj "unitCube"
+}
+{
+	translate 0 0 170
+	scale 10 10 10
+	obj "unitCube"
+}
