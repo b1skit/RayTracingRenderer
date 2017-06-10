@@ -6,7 +6,9 @@ By Adam Badke: www.AdamBadke.com
 Repository contents:
 --------------------
 README.txt				This file
+
 src/					The project C++ source files and the QT 5 project file
+
 WorkingDir/				Contains pre-configured scenes constructed from .simp and .obj files
 
 ---------
