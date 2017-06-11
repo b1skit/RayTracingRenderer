@@ -1,16 +1,16 @@
 # Blacklist everything
 *
 
-# Whitelist all directories
-!*/src
-!*/workingDir
+# Whitelist directories
+!/src
+!/workingDir
 
 # Whitelist the files to include
 !/src/*.cpp
 !/src/*.h
 !/src/*.pro
 
-!/workingDir/*.simp
-!/workingDir/*.obj
+!*/workingDir/*.simp
+!*/workingDir/*.obj
 
 !.gitignore
