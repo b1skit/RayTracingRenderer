@@ -6,9 +6,11 @@
 !*/workingDir
 
 # Whitelist the files to include
-!*.cpp
-!*.h
-!*.pro
-!*.simp
-!*.obj
+!/src/*.cpp
+!/src/*.h
+!/src/*.pro
+
+!/workingDir/*.simp
+!/workingDir/*.obj
+
 !.gitignore
