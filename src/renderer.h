@@ -32,6 +32,13 @@ public:
     // If theLine's p1.color != p2.color, the line color will be LERP'd. Updates the Z-Buffer.
     void drawLine(Line theLine, ShadingModel theShadingModel, bool doAmbient, double specularCoefficient, double specularExponent);
 
+
+
+//    // Draw a line (Bresenham's Algorithm)
+//    void draw_lineBRES(Line theLine, unsigned int color, bool doLerp);
+
+
+
     // Draw a polygon. Calls the rasterize Polygon helper function
     // If thePolygon vertices are all not the same color, the color will be LERP'd
     // Assumption: All polygons are in world space
@@ -133,16 +140,16 @@ private:
     // Return: An unsigned int, representing a blended translucent pixel value
     unsigned int blendPixelValues(int x, int y, unsigned int color, float opacity);
 
-    // Lerp between the color values of 2 points (Perspective correct: Takes Z-Depth into account)
+    // Override: Lerp between the color values of 2 points (Perspective correct: Takes Z-Depth into account)
     // Return: An unsigned int color value, calculated based on a LERP of the current position between the 2 provided points
-    unsigned int getPerspCorrectLerpColor(Vertex* p1, Vertex* p2, double x, double y, double z) const;
+    unsigned int getPerspCorrectLerpColor(Vertex* p1, Vertex* p2, double ratio) const;
 
     // Calculate a lighting value for a given pixel on a line between 2 points
     // Assumption: Ambient lighting has already been applied to the vertex color values
-    unsigned int getFogPixelValue(Vertex* p1, Vertex* p2, double x, double y, double z);
+    unsigned int getFogPixelValue(Vertex* p1, Vertex* p2, double ratio, double correctZ);
 
     // Calculate interpolated pixel and depth fog value
-    unsigned int getDistanceFoggedColor(unsigned int pixelColor, double z);
+    unsigned int getDistanceFoggedColor(unsigned int pixelColor, double correctZ);
 
     // Set a pixel on the raster
     // Assumption: Point is a valid coordinate on the raster canvas and has been previously checked against the z-buffer

@@ -138,7 +138,7 @@ void Renderer::drawLine(Line theLine, ShadingModel theShadingModel, bool doAmbie
                     currentPosition.normal.zn = getPerspCorrectLerpValue(theLine.p1.normal.zn, theLine.p1.z, theLine.p2.normal.zn, theLine.p2.z, ratio);
                     currentPosition.normal.normalize(); // Normalize
 
-                    currentPosition.color = getPerspCorrectLerpColor(&theLine.p1, &theLine.p2, theLine.p1.x, y, z); // Get the (perspective correct) base color
+                    currentPosition.color = getPerspCorrectLerpColor(&theLine.p1, &theLine.p2, ratio); // Get the (perspective correct) base color
 
                     // Calculate the lit pixel value, apply distance fog then attempt to set it:
                     lightPointInCameraSpace(&currentPosition, doAmbient, specularExponent, specularCoefficient);
@@ -146,7 +146,7 @@ void Renderer::drawLine(Line theLine, ShadingModel theShadingModel, bool doAmbie
 
                 }
                 else
-                    setPixel((int)theLine.p1.x, (int)y, correctZ, getFogPixelValue(&theLine.p1, &theLine.p2, theLine.p1.x, y, correctZ) );
+                    setPixel((int)theLine.p1.x, (int)y, correctZ, getFogPixelValue(&theLine.p1, &theLine.p2, ratio, correctZ) );
             } // End z-check
 
             y++;
@@ -221,14 +221,14 @@ void Renderer::drawLine(Line theLine, ShadingModel theShadingModel, bool doAmbie
                         currentPosition.normal.zn = getPerspCorrectLerpValue(lowest.normal.zn, lowest.z, highest.normal.zn, highest.z, ratio);
                         currentPosition.normal.normalize(); // Normalize
 
-                        currentPosition.color = getPerspCorrectLerpColor(&theLine.p1, &theLine.p2, x, y, z); // Get the (perspective correct) base color
+                        currentPosition.color = getPerspCorrectLerpColor(&theLine.p1, &theLine.p2, ratio); // Get the (perspective correct) base color
 
                         // Calculate the lit pixel value, apply distance fog then attempt to set it:
                         lightPointInCameraSpace(&currentPosition, doAmbient, specularExponent, specularCoefficient);
                         setPixel(round_x, y, correctZ, getDistanceFoggedColor( currentPosition.color, correctZ ) );
                     }
                     else
-                        setPixel(round_x, y, correctZ, getFogPixelValue(&theLine.p1, &theLine.p2, round_x, y, correctZ) );
+                        setPixel(round_x, y, correctZ, getFogPixelValue(&theLine.p1, &theLine.p2, ratio, correctZ) );
                 }
 
                 y++;
@@ -268,14 +268,14 @@ void Renderer::drawLine(Line theLine, ShadingModel theShadingModel, bool doAmbie
                         currentPosition.normal.zn = getPerspCorrectLerpValue(theLine.p1.normal.zn, theLine.p1.z, theLine.p2.normal.zn, theLine.p2.z, ratio);
                         currentPosition.normal.normalize(); // Normalize
 
-                        currentPosition.color = getPerspCorrectLerpColor(&theLine.p1, &theLine.p2, x, y, z); // Get the (perspective correct) base color
+                        currentPosition.color = getPerspCorrectLerpColor(&theLine.p1, &theLine.p2, ratio); // Get the (perspective correct) base color
 
                         // Calculate the lit pixel value, apply distance fog then attempt to set it:
                         lightPointInCameraSpace(&currentPosition, doAmbient, specularExponent, specularCoefficient);
                         setPixel(x, round_y, correctZ, getDistanceFoggedColor( currentPosition.color, correctZ ) );
                     }
                     else
-                        setPixel(x, round_y, correctZ, getFogPixelValue(&theLine.p1, &theLine.p2, x, round_y, correctZ) );
+                        setPixel(x, round_y, correctZ, getFogPixelValue(&theLine.p1, &theLine.p2, ratio, correctZ) );
                 }
 
                 y += slope;
@@ -287,6 +287,168 @@ void Renderer::drawLine(Line theLine, ShadingModel theShadingModel, bool doAmbie
     // Update the screen:
     drawable->updateScreen();
 }
+
+
+
+
+//// Draw a line (Bresenham's Algorithm)
+//void Renderer::draw_lineBRES(Line theLine, unsigned int color, bool doLerp){
+
+//    Vertex *p1 = &theLine.p1;
+//    Vertex *p2 = &theLine.p2;
+
+//    // TO DO:
+//    // ******
+//    // Z-Buffer checks
+//    // Pass pointers instead of value
+//    // Incremental ratio values (for correct z)
+//    // Bresenham's incrementation of Z values...?
+
+//    double z, ZDiff;
+
+//    // Handle vertical lines:
+//    if (p1->x == p2->x){
+//        if (p1->y < p2->y){ // p1 is lower
+
+//            z = p1->z;
+
+//            for (int y = (int)p1->y; y < (int)p2->y; y++){
+
+//               // ZDiff =
+
+//                double ratio = (y - p1->y)/(double)(p2->y - p1->y); // Get our current position as a ratio
+//                double correctZ = getPerspCorrectLerpValue(p1->z, p1->z, p2->z, p2->z, ratio);
+
+//                setPixel((int)p1->x, y, correctZ, getPerspCorrectLerpColor(p1, p2, p1->x, y, p1->z) );
+
+//            }
+//        } else { // p2 is lower
+//            for (int y = (int)p2->y; y < (int)p1->y; y++){
+
+//                double ratio = (y - p2->y)/(double)(p1->y - p2->y); // Get our current position as a ratio
+//                double correctZ = getPerspCorrectLerpValue(p2->z, p2->z, p1->z, p1->z, ratio); // IS THIS CORRECT?????????????????????????
+
+
+//                drawable->setPixel(p1->x, y, correctZ, getPerspCorrectLerpColor(p1, p2, p1->x, y)); // ??????????????
+//            }
+//        }
+//        return; // We're done! No need to continue.
+//    }
+
+//    // Handle non-vertical lines:
+//    // Flip the points, so we're always drawing left to right
+//    if (p1->x > p2->x){
+//        int temp = p1->x;
+//        p1->x = p2->x;
+//        p2->x = temp;
+//        temp = p1->y;
+//        p1->y = p2->y;
+//        p2->y = temp;
+
+//        unsigned int colorTemp = p1->color;
+//        p1->color = p2->color;
+//        p2->color = colorTemp;
+//    }
+
+//    // Determine which octant we're in:
+//    int diff_x = p2->x - p1->x;
+//    int diff_y = p2->y - p1->y;
+//    int abs_x = abs(diff_x);
+//    int abs_y = abs(diff_y);
+
+//    // Octants I, V, II, VI
+//    if (diff_y >= 0){
+
+//        // Handle Octants II, VI
+//        bool isOctII_VI = false;
+//        if (abs_x <= abs_y){
+//            // Transpose from II or VI into Octant I:
+//            int temp = p1->x;
+//            p1->x = p1->y;
+//            p1->y = temp;
+//            temp = p2->x;
+//            p2->x = p2->y;
+//            p2->y = temp;
+
+//            isOctII_VI = true;
+//        }
+
+//        // Draw the line:
+//        int dx = p2->x - p1->x;
+//        int two_dx = 2 * dx;
+//        int two_dy = 2 * (p2->y - p1->y);
+//        int two_dy_minus_two_dx = two_dy - two_dx;
+//        int error = two_dy - dx;
+//        int y = p1->y;
+//        for (int x = p1->x; x <= p2->x; x++){ // DRAWING LOOP
+//            if (isOctII_VI) // Flip x, y for Octant II and VI
+//                drawable->setPixel(y, x, getLerpColor(p1, p2, x, y)); // y, x !
+
+//            else{ // Don't flip x, y for Octant I, V
+//                    drawable->setPixel(x, y, getLerpColor(p1, p2, x, y)); // y, x !
+//            }
+//            if (error >= 0){
+//                error += two_dy_minus_two_dx;
+//                y++;
+//            }
+//            else{
+//                error += two_dy;
+//            }
+//        } // End for
+//    } // End octants I, V, II, VI
+
+//    else { // Octants III, VII, IV, VIII
+
+//        // Detect Octants III, VII
+//        bool isOctIII_VII = false;
+//        if (abs_x < abs_y){
+//            // Transpose to Octant VIII (maintaining left to right point order):
+//            int temp = p1->x;
+//            p1->x = p2->y;
+//            p2->y = temp;
+//            temp = p1->y;
+//            p1->y = p2->x;
+//            p2->x = temp;
+
+//            unsigned int colorTemp = p1->color;
+//            p1->color = p2->color;
+//            p2->color = colorTemp;
+
+//            isOctIII_VII = true;
+//        }
+
+//        // Draw the line:
+//        int dx = p2->x - p1->x;
+//        int two_dx = 2 * dx;
+//        int two_dy = 2 * (p1->y - p2->y); // Swapped order
+//        int two_dy_minus_two_dx = two_dy - two_dx;
+//        int error = two_dy - dx;
+//        int y = p1->y;
+//        for (int x = p1->x; x <= p2->x; x++){ // DRAWING LOOP
+//            if (isOctIII_VII)
+//                    drawable->setPixel(y, x, getLerpColor(p1, p2, x, y));
+//            else {
+//                    drawable->setPixel(x, y, getLerpColor(p1, p2, x, y));
+//            }
+
+//            if (error >= 0){
+//                error += two_dy_minus_two_dx;
+//                y--; // y--
+//            }
+//            else{
+//                error += two_dy;
+//            }
+//        } // End for
+//    } // End octants III, VII, IV, VIII
+
+//    // Update the screen:
+//    drawable->updateScreen();
+//}
+
+
+
+
+
 
 // Draw a polygon. Calls the rasterize Polygon helper function
 // If thePolygon vertices are all not the same color, the color will be LERP'd
@@ -438,16 +600,18 @@ void Renderer::rasterizePolygon(Polygon* thePolygon){
 
         if (thePolygon->getShadingModel() == phong){
 
-            Vertex lhs(xLeft_rounded, (double)y, leftCorrectZ, getPerspCorrectLerpColor(topLeftVertex, botLeftVertex, xLeft_rounded, y, leftCorrectZ));
+            Vertex lhs(xLeft_rounded, (double)y, leftCorrectZ, getPerspCorrectLerpColor(topLeftVertex, botLeftVertex, leftRatio));
             lhs.normal = normalVector(topLeftVertex->normal, topLeftVertex->z, botLeftVertex->normal, botLeftVertex->z, y, topLeftVertex->y, botLeftVertex->y);
 
-            Vertex rhs(xRight_rounded, (double)y, rightCorrectZ, getPerspCorrectLerpColor(topRightVertex, botRightVertex, xRight_rounded, y, rightCorrectZ));
+            Vertex rhs(xRight_rounded, (double)y, rightCorrectZ, getPerspCorrectLerpColor(topRightVertex, botRightVertex, rightRatio));
             rhs.normal = normalVector(topRightVertex->normal, topRightVertex->z, botRightVertex->normal, botRightVertex->z, y, topRightVertex->y, botRightVertex->y);
 
             drawPerPxLitScanlineIfVisible( &lhs, &rhs, thePolygon->isAffectedByAmbientLight(), thePolygon->getSpecularCoefficient(), thePolygon->getSpecularExponent());
         }
         else
-            drawScanlineIfVisible( new Vertex(xLeft_rounded, (double)y, leftCorrectZ, getPerspCorrectLerpColor(topLeftVertex, botLeftVertex, xLeft_rounded, y, leftCorrectZ)), new Vertex(xRight_rounded, (double)y, rightCorrectZ, getPerspCorrectLerpColor(topRightVertex, botRightVertex, xRight_rounded, y, rightCorrectZ)) );
+            drawScanlineIfVisible( new Vertex(xLeft_rounded, (double)y, leftCorrectZ, getPerspCorrectLerpColor(topLeftVertex, botLeftVertex, leftRatio)),
+                                   new Vertex(xRight_rounded, (double)y, rightCorrectZ, getPerspCorrectLerpColor(topRightVertex, botRightVertex, rightRatio))
+                                   );
 
 
         y--; // Move to the next line, and handle transitions between vertices if neccessary:
@@ -702,7 +866,7 @@ void Renderer::drawScanlineIfVisible(Vertex* start, Vertex* end){
         double correctZ = getPerspCorrectLerpValue(start->z, start->z, end->z, end->z, ratio);
 
         if (isVisible(x, y_rounded, correctZ) ){
-            setPixel(x, y_rounded, correctZ, getFogPixelValue(start, end, x, y_rounded, correctZ) );
+            setPixel(x, y_rounded, correctZ, getFogPixelValue(start, end, ratio, correctZ) );
         }
 
         z += z_slope;
@@ -756,7 +920,7 @@ void Renderer::drawPerPxLitScanlineIfVisible(Vertex* start, Vertex* end, bool do
             currentPosition.normal.zn = getPerspCorrectLerpValue(start->normal.zn, start->z, end->normal.zn, end->z, ratio);
             currentPosition.normal.normalize(); // Normalize
 
-            currentPosition.color = getPerspCorrectLerpColor(start, end, x, y_rounded, zCameraSpace); // Get the (perspective correct) base color
+            currentPosition.color = getPerspCorrectLerpColor(start, end, ratio); // Get the (perspective correct) base color
 
             // Calculate the lit pixel value, apply distance fog then set it:
             lightPointInCameraSpace(&currentPosition, doAmbient, specularExponent, specularCoefficient);
@@ -865,31 +1029,16 @@ unsigned int Renderer::blendPixelValues(int x, int y, unsigned int color, float 
     return addColors (multiplyColorChannels(color, opacity), multiplyColorChannels(currentColor, (1 - opacity) ) ); // Calculate the blended colors
 }
 
-// Lerp between the color values of 2 points (Perspective correct: Takes Z-Depth into account)
+// Override: Lerp between the color values of 2 points (Perspective correct: Takes Z-Depth into account)
 // Assumption: Recieved points are ordered left to right
 // Return: An unsigned int color value, calculated based on a LERP of the current position between the 2 points
-unsigned int Renderer::getPerspCorrectLerpColor(Vertex* p1, Vertex* p2, double x, double y, double z) const {
+unsigned int Renderer::getPerspCorrectLerpColor(Vertex* p1, Vertex* p2, double ratio) const {
     // Handle solidly colored objects:
-    if (p1->color == p2->color)
+    if (p1->color == p2->color || ratio <= 0)
         return p1->color;
 
-    // Calculate parameters: Doesn't matter if they're negative, since we square them all
-    double xDist = x - p1->x;
-    double yDist = y - p1->y;
-    double zDist = z - p1->z;
-
-    double dx = p2->x - p1->x;
-    double dy = p2->y - p1->y;
-    double dz = p2->z - p1->z;
-
-
-    double ratio;
-    if ((dx * dx) + (dy * dy) + (dz * dz) == 0)
-        ratio = 0;
-    else
-        ratio = sqrt( ( (xDist * xDist) + (yDist * yDist) + (zDist * zDist) )
-                       / ( (dx * dx) + (dy * dy) + (dz * dz) )
-                       );
+    if (ratio >= 1)
+        return p2->color;
 
     double red = getPerspCorrectLerpValue(extractColorChannel(p1->color, 1), p1->z, extractColorChannel(p2->color, 1), p2->z, ratio);
     double green = getPerspCorrectLerpValue(extractColorChannel(p1->color, 2), p1->z, extractColorChannel(p2->color, 2), p2->z, ratio);
@@ -900,26 +1049,26 @@ unsigned int Renderer::getPerspCorrectLerpColor(Vertex* p1, Vertex* p2, double x
 
 // Calculate fogged pixel value for a given pixel on a line between 2 points
 // Assumption: Ambient lighting has already been applied to the vertex color values. All points/coords are in screen space
-unsigned int Renderer::getFogPixelValue(Vertex* p1, Vertex* p2, double x, double y, double z) {
+unsigned int Renderer::getFogPixelValue(Vertex* p1, Vertex* p2, double ratio, double correctZ) {
 
     // Apply distance fog to the base lerped color, and return the final value:
-    return getDistanceFoggedColor( getPerspCorrectLerpColor(p1, p2, x, y, z) , z );
+    return getDistanceFoggedColor( getPerspCorrectLerpColor(p1, p2, ratio) , correctZ );
 }
 
 // Calculate interpolated pixel and depth fog value
 // Assumption: Z is in camera space
-unsigned int Renderer::getDistanceFoggedColor(unsigned int pixelColor, double z){
+unsigned int Renderer::getDistanceFoggedColor(unsigned int pixelColor, double correctZ){
 
     // Handle objects too close for fog:
-    if (z <= fogHither)
+    if (correctZ <= fogHither)
         return pixelColor;
 
     // Handle objects past the max fog distance:
-    if (z >= fogYon)
+    if (correctZ >= fogYon)
         return fogColor;
 
     // Lerp, based on the fog distance:
-    double ratio = (z - fogHither) / (fogYon - fogHither);
+    double ratio = (correctZ - fogHither) / (fogYon - fogHither);
 
     return addColors( multiplyColorChannels(pixelColor, (1 - ratio) ), multiplyColorChannels(fogColor, ratio) );
 }

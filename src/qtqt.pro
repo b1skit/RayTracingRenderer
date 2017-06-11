@@ -27,7 +27,8 @@ SOURCES += main.cpp\
     transformationmatrix.cpp \
     renderutilities.cpp \
     normalvector.cpp \
-    light.cpp
+    light.cpp \
+    scene.cpp
 
 HEADERS  += \
     drawable.h \
@@ -44,5 +45,6 @@ HEADERS  += \
     transformationmatrix.h \
     renderutilities.h \
     normalvector.h \
-    light.h
+    light.h \
+    scene.h
 
