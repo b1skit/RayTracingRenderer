@@ -41,13 +41,15 @@ depth 1 12 0 0 0
 	
 	scale 1.9 1.9 1.9
 
-	surface 0.51 0.505 0.6 0.05 4
+	surface 0.51 0.505 0.6
+	specular 0.05 4
 	obj "elephant"
 }
 
 # Backdrop
 {
-	surface 0.55 0.55 0.55 0.1 2
+	surface 0.55 0.55 0.55
+	specular 0.1 2
 
 	scale 10 5.5 5.5
 	

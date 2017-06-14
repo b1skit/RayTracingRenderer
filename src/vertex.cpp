@@ -70,7 +70,6 @@ Vertex::Vertex(const Vertex &currentVertex){
     this->color = currentVertex.color;
     this->vertexNumber = currentVertex.vertexNumber;
     this->w = currentVertex.w;
-    this->hasColor = currentVertex.hasColor;
 
     // Vertex normals:
     this->normal = currentVertex.normal;
@@ -87,7 +86,6 @@ Vertex& Vertex::operator=(const Vertex& rhs){
     this->color = rhs.color;
     this->vertexNumber = rhs.vertexNumber;
     this->w = rhs.w;
-    this->hasColor = rhs.hasColor;
 
     // Vertex normals:
     this->normal = rhs.normal;

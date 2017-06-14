@@ -4,7 +4,6 @@ phong
 
 ambient 0.3 0.3 0.3
 depth 1 6 0 0 0
-surface 0.6 0.6 0.6 0.5 2.5
 
 # Default Camera
 {
@@ -35,12 +34,19 @@ wire
 {
         translate -2.55 0.75 0
 		scale 1.5 1.5 1.5
+		
+		surface 0.6 0.6 0.6
+		specular 0.5 2.5
+		
         obj "unitSphere_20"
 }
 # Wireframe Plane
 {
         translate -2.55 0 0
         scale 1.5 1.5 1.5
+		
+		surface 0.6 0.6 0.6
+		specular 0.5 2.5
         obj "unitPlane"
 }
 
@@ -51,12 +57,18 @@ flat
 {
         translate -0.85 0.75 0
 		scale 1.5 1.5 1.5
+		
+		surface 0.6 0.6 0.6
+		specular 0.5 2.5
         obj "unitSphere_20"
 }
 # Flat Shaded Plane
 {
         translate -0.85 0 0
         scale 1.5 1.5 1.5
+		
+		surface 0.6 0.6 0.6
+		specular 0.5 2.5
         obj "unitPlane"
 }
 
@@ -65,12 +77,18 @@ gouraud
 {
         translate 0.85 0.75 0
 		scale 1.5 1.5 1.5
+		
+		surface 0.6 0.6 0.6
+		specular 0.5 2.5
         obj "unitSphere_20"
 }
 # Gouraud Shaded Plane
 {
 		translate 0.85 0 0
         scale 1.5 1.5 1.5
+
+		surface 0.6 0.6 0.6
+		specular 0.5 2.5
         obj "unitPlane"
 }
 
@@ -79,11 +97,17 @@ phong
 {
         translate 2.55 0.75 0
 		scale 1.5 1.5 1.5
+
+		surface 0.6 0.6 0.6
+		specular 0.5 2.5
         obj "unitSphere_20"
 }
 # Phong Shaded Plane
 {
         translate 2.55 0 0
         scale 1.5 1.5 1.5
+
+		surface 0.6 0.6 0.6
+		specular 0.5 2.5
         obj "unitPlane"
 }

@@ -36,7 +36,8 @@ depth 1 12 0 0 0
 	#rotate X 20
 	rotate Y 223
 	
-	surface .75 .75 .75 1 150		
+	surface .75 .75 .75 
+	specular 1 150		
 	obj "car"
 }
 
@@ -45,7 +46,8 @@ depth 1 12 0 0 0
 	
 	scale 10 10 10
 	
-	surface 0.3 0.3 0.3 0.1 2
+	surface 0.3 0.3 0.3 
+	specular 0.1 2
 	obj lightscene_A
 }
 

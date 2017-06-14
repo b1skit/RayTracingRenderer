@@ -108,7 +108,6 @@ void Polygon::addVertex(Vertex newPoint){
     if (currentVertices < vertexArraySize){
 
         vertices[currentVertices] = Vertex(newPoint.x, newPoint.y, newPoint.z, newPoint.color, currentVertices);
-        vertices[currentVertices].hasColor = newPoint.hasColor;
         vertices[currentVertices].normal = newPoint.normal;
 
         currentVertices++;
@@ -191,7 +190,6 @@ Vertex* Polygon::getLast(){
 // Set all of the vertices in this polygon to a single color
 void Polygon::setSurfaceColor(unsigned int solidColor){
     for (unsigned int i = 0; i < currentVertices; i++)
-        if (!vertices[i].hasColor)
             vertices[i].color = solidColor;
 }
 

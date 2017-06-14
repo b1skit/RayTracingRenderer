@@ -21,7 +21,7 @@ wire
 
 # Ground plane
 {
-	surface 1 1 1 0.3 8
+	specular 0.3 8
 	scale 2000 1 2000
 	obj "unitPlane"
 }

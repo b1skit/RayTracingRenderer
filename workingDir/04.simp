@@ -2,7 +2,6 @@ phong
 
 ambient .25 .25 .3
 depth 1 40 0.0 0.0 0.0
-surface 0.7 0.7 0.7 .6 12
 
 #wire
 
@@ -41,7 +40,8 @@ surface 0.7 0.7 0.7 .6 12
 	
 	# Backdrop
 	{
-			surface 0.7 0.7 0.7 .6 12
+			surface 0.7 0.7 0.7 
+			specular 0.6 12
 			
 			
 			obj "lightScene_A"
@@ -49,69 +49,79 @@ surface 0.7 0.7 0.7 .6 12
 
 	# Big cube
 	{
-			surface 0 0.7 0.7 0.75 200
+			surface 0 0.7 0.7 
+			specular 0.75 200
 
 			obj "lightScene_B"
 	}
 	
 	# Middle cube
 	{
-			surface 0.7 0 0.7 0.99 300
+			surface 0.7 0 0.7 
+			specular 0.99 300
 
 			obj "lightScene_C"
 	}
 	
 	# Small cube
 	{
-			surface 0.7 0.7 0 .6 12
+			surface 0.7 0.7 0 
+			specular 0.6 12
 
 			obj "lightScene_D"
 	}
 	
 	# 5 sided pyramid
 	{
-			surface 0.2 0.3 0.7 0.45 1.9
+			surface 0.2 0.3 0.7 
+			specular 0.45 1.9
 
 			obj "lightScene_E"
 	}
 	
 	# Big cylinder
 	{
-			surface 0.75 0.25 0.45 .4 10
+			surface 0.75 0.25 0.45 
+			specular 0.4 10
 			obj "lightScene_F"
 	}
 	
 	# Med cylinder
 	{
-			surface 0.5 0.3 0.9 0.39 20
+			surface 0.5 0.3 0.9 
+			specular 0.39 20
 
 			obj "lightScene_G"
 	}
 	
 	# Small cylinder
 	{
-			surface 0.7 0.4 0.2 0.25 93
+			surface 0.7 0.4 0.2 
+			specular 0.25 93
 
 			obj "lightScene_H"
 	}
 	
 	# Torus
 	{
-			surface 0.1 0.7 0.15 1 160
+			surface 0.1 0.7 0.15 
+			specular 1 160
 
 			obj "lightScene_I"
 	}
 	
 	# Cone
 	{
-			surface 0.95 0.7 0.2 1 115
+			surface 0.95 0.7 0.2 
+			specular 1 115
 
 			obj "lightScene_J"
 	}
 	
 	# Capsule
 	{
-			surface 0.7 0 0 8 75
+			surface 0.7 0 0 
+			specular 8 75
 
 			obj "lightScene_K"
 	}
@@ -119,21 +129,24 @@ surface 0.7 0.7 0.7 .6 12
 	# Large Sphere
 	{
 	
-			surface 1 1 1 1 200
+			surface 1 1 1 
+			specular 1 200
 
 			obj "lightScene_L"
 	}
 	
 	# Small sphere
 	{
-			surface 0 0 0 1 200
+			surface 0 0 0 
+			specular 1 200
 
 			obj "lightScene_M"
 	}
 	
 	# Teapot
 	{
-			surface 0.8 0.8 0.9 0.6 22
+			surface 0.8 0.8 0.9 
+			specular 0.6 22
 
 			obj "lightScene_N"
 	}

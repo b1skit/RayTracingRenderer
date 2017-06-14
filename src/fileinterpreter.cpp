@@ -226,6 +226,11 @@ vector<Polygon> FileInterpreter::getMeshHelper(string filename, bool currentDraw
                         double blue = stod(*theIterator++);
 
                         theSurfaceColor = combineColorChannels(red, green, blue);
+                    }
+
+                    // Handle specular commands:
+                    else if (theIterator->compare("specular") == 0){
+                        theIterator++;
 
                         // Store the spec settings
                         theSpecCoefficient = stod(*theIterator++);
@@ -253,8 +258,11 @@ vector<Polygon> FileInterpreter::getMeshHelper(string filename, bool currentDraw
                     // Handle obj commands
                     else if (theIterator->compare("obj") == 0){
                         theIterator++;
+
+                        // Extract the polygons:
                         vector<Polygon> objContents = getPolysFromObj("./" + *theIterator + ".obj");
 
+                        // Process the polygons:
                         for (unsigned int i = 0; i < objContents.size(); i++){
                             objContents[i].transform(&CTM);
 
@@ -365,7 +373,6 @@ vector<Polygon> FileInterpreter::getMeshHelper(string filename, bool currentDraw
                             double green = stod(*theIterator++);
                             double blue = stod(*theIterator++);
                             v1.color = combineColorChannels(red, green, blue); // Combine the channels into a single unsigned int
-                            v1.hasColor = true;
 
                             v2.x = stod(*theIterator++);
                             v2.y = stod(*theIterator++);
@@ -374,7 +381,6 @@ vector<Polygon> FileInterpreter::getMeshHelper(string filename, bool currentDraw
                             green = stod(*theIterator++);
                             blue = stod(*theIterator++);
                             v2.color = combineColorChannels(red, green, blue); // Combine the channels into a single unsigned int
-                            v2.hasColor = true;
 
                             v3.x = stod(*theIterator++);
                             v3.y = stod(*theIterator++);
@@ -383,7 +389,6 @@ vector<Polygon> FileInterpreter::getMeshHelper(string filename, bool currentDraw
                             green = stod(*theIterator++);
                             blue = stod(*theIterator);
                             v3.color = combineColorChannels(red, green, blue); // Combine the channels into a single unsigned int
-                            v3.hasColor = true;
                         }
 
                         // Handle surface color calls
@@ -430,6 +435,9 @@ vector<Polygon> FileInterpreter::getMeshHelper(string filename, bool currentDraw
                         // Insert the processed faces into the final vector:
                         processedFaces.insert(processedFaces.end(), currentFaces.begin(), currentFaces.end() );
                         currentFaces.clear();
+
+                        if (!currentUseSurfaceColor) // Handle recursive cases where we've inherited a color and it needs to apply to the loaded file
+                            usesSurfaceColor = false;
 
                     } else
                         theIterator++;
@@ -623,7 +631,6 @@ vector<Polygon> FileInterpreter::getPolysFromObj(string filename){
                         double green = stod(*theIterator++);
                         double blue = stod(*theIterator++);
                         v1.color = combineColorChannels( red, green, blue );
-                        v1.hasColor = true;
                     }
                     // Vertex: XYZWRGB
                     else if (currentLineTokens.size() == 8){
@@ -634,7 +641,6 @@ vector<Polygon> FileInterpreter::getPolysFromObj(string filename){
                         double green = stod(*theIterator++);
                         double blue = stod(*theIterator++);
                         v1.color = combineColorChannels( red, green, blue );
-                        v1.hasColor = true;
                     }
 
                     // Convert to LHS coordinate system:

@@ -33,37 +33,44 @@ phong
 
 # Row 1: Back row
 {
-		surface 1 1 1 0.1 1
+		surface 1 1 1
+		specular 0.1 1
         translate -4.5 0.75 3.75
         obj "unitSphere"
 }
 {
-		surface 1 1 1 0.25 1
+		surface 1 1 1
+		specular 0.25 1
         translate -3 0.75 3.75
         obj "unitSphere"
 }
 {
-		surface 1 1 1 0.4 1
+		surface 1 1 1
+		specular 0.4 1
         translate -1.5 0.75 3.75
         obj "unitSphere"
 }
 {
-		surface 1 1 1 0.55 1
+		surface 1 1 1 
+		specular 0.55 1
         translate 0 0.75 3.75
         obj "unitSphere"
 }
 {
-		surface 1 1 1 0.7 1
+		surface 1 1 1 
+		specular 0.7 1
         translate 1.5 0.75 3.75
         obj "unitSphere"
 }
 {
-		surface 1 1 1 0.85 1
+		surface 1 1 1 
+		specular 0.85 1
         translate 3 0.75 3.75
         obj "unitSphere"
 }
 {
-		surface 1 1 1 1.0 1
+		surface 1 1 1 
+		specular 1.0 1
         translate 4.5 0.75 3.75
         obj "unitSphere"
 }
@@ -71,37 +78,44 @@ phong
 
 # Row 2
 {
-		surface 1 1 1 0.1 5
+		surface 1 1 1
+		specular 0.1 5
         translate -4.5 0.75 2.25
         obj "unitSphere"
 }
 {
-		surface 1 1 1 0.25 5
+		surface 1 1 1
+		specular 0.25 5
         translate -3 0.75 2.25
         obj "unitSphere"
 }
 {
-		surface 1 1 1 0.4 5
+		surface 1 1 1
+		specular 0.4 5
         translate -1.5 0.75 2.25
         obj "unitSphere"
 }
 {
-		surface 1 1 1 0.55 5
+		surface 1 1 1
+		specular 0.55 5
         translate 0 0.75 2.25
         obj "unitSphere"
 }
 {
-		surface 1 1 1 0.7 5
+		surface 1 1 1
+		specular 0.7 5
         translate 1.5 0.75 2.25
         obj "unitSphere"
 }
 {
-		surface 1 1 1 0.85 5
+		surface 1 1 1
+		specular 0.85 5
         translate 3 0.75 2.25
         obj "unitSphere"
 }
 {
-		surface 1 1 1 1.0 5
+		surface 1 1 1
+		specular 1.0 5
         translate 4.5 0.75 2.25
         obj "unitSphere"
 }
@@ -109,37 +123,44 @@ phong
 
 # Row 3
 {
-		surface 1 1 1 0.1 10
+		surface 1 1 1 
+		specular 0.1 10
         translate -4.5 0.75 0.75
         obj "unitSphere"
 }
 {
-		surface 1 1 1 0.25 10
+		surface 1 1 1 
+		specular 0.25 10
         translate -3 0.75 0.75
         obj "unitSphere"
 }
 {
-		surface 1 1 1 0.4 10
+		surface 1 1 1 
+		specular 0.4 10
         translate -1.5 0.75 0.75
         obj "unitSphere"
 }
 {
-		surface 1 1 1 0.55 10
+		surface 1 1 1 
+		specular 0.55 10
         translate 0 0.75 0.75
         obj "unitSphere"
 }
 {
-		surface 1 1 1 0.7 10
+		surface 1 1 1 
+		specular 0.7 10
         translate 1.5 0.75 0.75
         obj "unitSphere"
 }
 {
-		surface 1 1 1 0.85 10
+		surface 1 1 1 
+		specular 0.85 10
         translate 3 0.75 0.75
         obj "unitSphere"
 }
 {
-		surface 1 1 1 1.0 10
+		surface 1 1 1 
+		specular 1.0 10
         translate 4.5 0.75 0.75
         obj "unitSphere"
 }
@@ -147,37 +168,44 @@ phong
 
 # Row 4
 {
-		surface 1 1 1 0.1 20
+		surface 1 1 1 
+		specular 0.1 20
         translate -4.5 0.75 -0.75
         obj "unitSphere"
 }
 {
-		surface 1 1 1 0.25 20
+		surface 1 1 1 
+		specular 0.25 20
         translate -3 0.75 -0.75
         obj "unitSphere"
 }
 {
-		surface 1 1 1 0.4 20
+		surface 1 1 1 
+		specular 0.4 20
         translate -1.5 0.75 -0.75
         obj "unitSphere"
 }
 {
-		surface 1 1 1 0.55 20
+		surface 1 1 1 
+		specular 0.55 20
         translate 0 0.75 -0.75
         obj "unitSphere"
 }
 {
-		surface 1 1 1 0.7 20
+		surface 1 1 1
+		specular 0.7 20
         translate 1.5 0.75 -0.75
         obj "unitSphere"
 }
 {
-		surface 1 1 1 0.85 20
+		surface 1 1 1 
+		specular 0.85 20
         translate 3 0.75 -0.75
         obj "unitSphere"
 }
 {
-		surface 1 1 1 1.0 20
+		surface 1 1 1 
+		specular 1.0 20
         translate 4.5 0.75 -0.75
         obj "unitSphere"
 }
@@ -185,37 +213,44 @@ phong
 
 # Row 5
 {
-		surface 1 1 1 0.1 60
+		surface 1 1 1 
+		specular 0.1 60
         translate -4.5 0.75 -2.25
         obj "unitSphere"
 }
 {
-		surface 1 1 1 0.25 60
+		surface 1 1 1 
+		specular 0.25 60
         translate -3 0.75 -2.25
         obj "unitSphere"
 }
 {
-		surface 1 1 1 0.4 60
+		surface 1 1 1
+		specular 0.4 60
         translate -1.5 0.75 -2.25
         obj "unitSphere"
 }
 {
-		surface 1 1 1 0.45 60
+		surface 1 1 1 
+		specular 0.45 60
         translate 0 0.75 -2.25
         obj "unitSphere"
 }
 {
-		surface 1 1 1 0.55 60
+		surface 1 1 1 
+		specular 0.55 60
         translate 1.5 0.75 -2.25
         obj "unitSphere"
 }
 {
-		surface 1 1 1 0.85 60
+		surface 1 1 1 
+		specular 0.85 60
         translate 3 0.75 -2.25
         obj "unitSphere"
 }
 {
-		surface 1 1 1 1.0 60
+		surface 1 1 1 
+		specular 1.0 60
         translate 4.5 0.75 -2.25
         obj "unitSphere"
 }
@@ -223,37 +258,44 @@ phong
 
 # Row 6
 {
-		surface 1 1 1 0.1 120
+		surface 1 1 1 
+		specular 0.1 120
         translate -4.5 0.75 -3.75
         obj "unitSphere"
 }
 {
-		surface 1 1 1 0.25 120
+		surface 1 1 1 
+		specular 0.25 120
         translate -3 0.75 -3.75
         obj "unitSphere"
 }
 {
-		surface 1 1 1 0.4 120
+		surface 1 1 1
+		specular 0.4 120
         translate -1.5 0.75 -3.75
         obj "unitSphere"
 }
 {
-		surface 1 1 1 0.45 120
+		surface 1 1 1 
+		specular 0.45 120
         translate 0 0.75 -3.75
         obj "unitSphere"
 }
 {
-		surface 1 1 1 0.55 120
+		surface 1 1 1 
+		specular 0.55 120
         translate 1.5 0.75 -3.75
         obj "unitSphere"
 }
 {
-		surface 1 1 1 0.85 120
+		surface 1 1 1
+		specular 0.85 120
         translate 3 0.75 -3.75
         obj "unitSphere"
 }
 {
-		surface 1 1 1 1.0 120
+		surface 1 1 1 
+		specular 1.0 120
         translate 4.5 0.75 -3.75
         obj "unitSphere"
 }
