@@ -20,6 +20,9 @@ public:
     // Copy Constructor
     TransformationMatrix(const TransformationMatrix& existingMatrix);
 
+    // Overloaded assignment "=" operator
+    TransformationMatrix& operator=(const TransformationMatrix& rhs);
+
     // Destructor
     ~TransformationMatrix();
 
@@ -37,9 +40,6 @@ public:
 
     // Overloaded *= operator
     TransformationMatrix& operator*=(const TransformationMatrix& rhs);
-
-    // Overloaded assignment "=" operator
-    TransformationMatrix& operator=(const TransformationMatrix& rhs);
 
     // Get the size of this matrix
     int size();
@@ -59,6 +59,7 @@ private:
     static const int DIMENSION = 4;
 
     double** CTM; // The transformation matrix array
+
 
     // Calculate the determinant of this matrix: Invokes the recursive helper function
     double getDeterminant();

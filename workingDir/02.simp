@@ -3,6 +3,8 @@
 ambient 0 0 0
 depth 1 35 0 0 0
 
+phong
+
 # Camera
 {
 	translate 0 13 0
@@ -26,7 +28,6 @@ depth 1 35 0 0 0
         obj "unitPlane"
 }
 
-phong
 
 # Phong Shaded Spheres
 

@@ -27,29 +27,22 @@ FileInterpreter::FileInterpreter(){
     // Does nothing
 }
 
-// Constructor
-FileInterpreter::FileInterpreter(Renderer* newRenderer){
-   this->theFileRenderer = newRenderer;
-}
-
 // Read a file and assemble a mesh, given the filename
 // Return: A mesh object contstructed from the .simp file descriptions
-Mesh FileInterpreter::getMeshFromFile(string filename){
+Scene FileInterpreter::buildSceneFromFile(string filename){
 
-    // Purge the renderer's list of lights, if it has any
-    theFileRenderer->flushLights();
+    // Assemble the resulting polys into a scene, and return it
+    Scene theScene;
+    currentScene = &theScene; // Save the address of the scene being constructed
 
-    // Call the recursive helper function
-    vector<Polygon> allFaces = getMeshHelper(filename, true, false, false, false, 0xffffffff, phong , 0.3, 8); // Set the default values to start
+    Mesh newMesh;
+    newMesh.faces = getMeshHelper(filename, true, false, false, false, 0xffffffff, phong , 0.3, 8); // Set the default values to start
 
-    // Assemble the resulting polys into a mesh, and return it
-    Mesh result;
-        for (unsigned int i = 0; i < allFaces.size(); i++){
-            result.addFace(allFaces[i]);
-        }
+    theScene.theMeshes.emplace_back( newMesh );
 
-    return result;
+    currentScene = nullptr; // Remove the reference to the local object for safety
 
+    return theScene;
 }
 
 // Recursive helper function: Extracts polygons
@@ -164,31 +157,29 @@ vector<Polygon> FileInterpreter::getMeshHelper(string filename, bool currentDraw
                     // Handle camera commands:
                     else if (theIterator->compare("camera") == 0){
                         theIterator++;
-                        double xLow = stod(*theIterator++);
-                        double yLow = stod(*theIterator++);
 
-                        double xHigh = stod(*theIterator++);
-                        double yHigh = stod(*theIterator++);
+                        currentScene->xLow = stod(*theIterator++);
+                        currentScene->yLow = stod(*theIterator++);
 
-                        double hither = stod(*theIterator++);
-                        double yon = stod(*theIterator++);
+                        currentScene->xHigh = stod(*theIterator++);
+                        currentScene->yHigh = stod(*theIterator++);
 
-                        // Pass the information to the renderer
-                        theFileRenderer->transformCamera( xLow, yLow, xHigh, yHigh, hither, yon, CTM );
+                        currentScene->camHither = stod(*theIterator++);
+                        currentScene->camYon = stod(*theIterator++);
+
+                        currentScene->cameraMovement = CTM;
                     }
 
                     // Handle ambient commands:
                     else if (theIterator->compare("ambient") == 0){
                         theIterator++;
-                        double red = stod(*theIterator++);
-                        double green = stod(*theIterator++);
-                        double blue = stod(*theIterator++);
+                        currentScene->ambientRedIntensity = stod(*theIterator++);
+                        currentScene->ambientGreenIntensity = stod(*theIterator++);
+                        currentScene->ambientBlueIntensity = stod(*theIterator++);
 
                         // Update the ambient flag
                         usesAmbientLighting = true;
 
-                        // Pass the intensity values to the renderer:
-                        theFileRenderer->setAmbientIntensities( red, green, blue );
                     }
 
                     // Handle depth commands:
@@ -197,12 +188,13 @@ vector<Polygon> FileInterpreter::getMeshHelper(string filename, bool currentDraw
                         usesDepthFog = true;
 
                         // Update the renderer with the new parameters
-                        double newHither = stod(*theIterator++);
-                        double newYon = stod(*theIterator++);
-                        double redIntensity = stod(*theIterator++);
-                        double greenIntensity = stod(*theIterator++);
-                        double blueIntensity = stod(*theIterator++);
-                        theFileRenderer->setDistanceFog(newHither, newYon, redIntensity, greenIntensity, blueIntensity);
+                        currentScene->fogHither = stod(*theIterator++);
+                        currentScene->fogYon = stod(*theIterator++);
+                        currentScene->fogRedIntensity = stod(*theIterator++);
+                        currentScene->fogGreenIntensity = stod(*theIterator++);
+                        currentScene->fogBlueIntensity = stod(*theIterator++);
+
+                        currentScene->fogColor = combineColorChannels(currentScene->fogRedIntensity, currentScene->fogGreenIntensity, currentScene->fogBlueIntensity);
                     }
 
                     // Handle light commands
@@ -219,7 +211,8 @@ vector<Polygon> FileInterpreter::getMeshHelper(string filename, bool currentDraw
                         // Create a light, transform it using the CTM and pass it to the renderer
                         Light newLight(redIntensity, greenIntensity, blueIntensity, attenuationA, attenuationB);
                         newLight.position.transform( &CTM );
-                        theFileRenderer->addLight( newLight );
+
+                        currentScene->theLights.emplace_back(newLight);
                     }
 
                     // Handle surface commands:
@@ -419,6 +412,7 @@ vector<Polygon> FileInterpreter::getMeshHelper(string filename, bool currentDraw
                             newFace.vertices[i].normal = faceNormal;
                         }
 
+
                         // Place the new face in the vector:
                         currentFaces.emplace_back(newFace);
                     }
@@ -455,7 +449,6 @@ vector<Polygon> FileInterpreter::getMeshHelper(string filename, bool currentDraw
 
     // Insert the last faces into the vector of processed faces:
     processedFaces.insert(processedFaces.end(), currentFaces.begin(), currentFaces.end() );
-
 
     return processedFaces;
 }

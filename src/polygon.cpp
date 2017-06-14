@@ -58,14 +58,14 @@ Polygon::Polygon(const Polygon& currentPoly){
     this->isDepthFogged = currentPoly.isDepthFogged;
     this->isAmbientLit = currentPoly.isAmbientLit;
 
-    this->vertices = new Vertex[vertexArraySize];
-    for (unsigned int i = 0; i < vertexArraySize; i++){
-        this->vertices[i] = currentPoly.vertices[i];
-    }
-
     this->theShadingModel = currentPoly.theShadingModel;
     this->specularCoefficient = currentPoly.specularCoefficient;
     this->specularExponent = currentPoly.specularExponent;
+
+    this->vertices = new Vertex[vertexArraySize];
+    for (unsigned int i = 0; i < vertexArraySize; i++){
+        this->vertices[i] = currentPoly.vertices[i];
+    }   
 }
 
 // Overloaded assignment operator
@@ -74,8 +74,9 @@ Polygon& Polygon::operator=(const Polygon& rhs){
         return *this;
 
     this->vertexArraySize = rhs.vertexArraySize;
-    this->isDrawnFilled = rhs.isDrawnFilled;
     this->currentVertices = rhs.currentVertices;
+
+    this->isDrawnFilled = rhs.isDrawnFilled;
     this->isDepthFogged = rhs.isDepthFogged;
     this->isAmbientLit = rhs.isAmbientLit;
 
@@ -84,7 +85,7 @@ Polygon& Polygon::operator=(const Polygon& rhs){
     this->specularExponent = rhs.specularExponent;
 
     delete[] vertices;
-    vertices = new Vertex[vertexArraySize];
+    this->vertices = new Vertex[vertexArraySize];
     for (unsigned int i = 0; i < currentVertices; i++)
         this->vertices[i] = rhs.vertices[i];
 
@@ -536,8 +537,9 @@ Vertex Polygon::getFaceCenter(){
 }
 
 // Get the (normalized) face normal of this polygon
-// Assumption: The polygon is a triangle
+// Assumption: The polygon is a triangle (ie. vertex_i != vertex_j)
 normalVector Polygon::getFaceNormal(){
+
     // Calculate vectors originating at vertex 0, and pointing towards vertices 1 & 2
     normalVector lhs(vertices[1].x - vertices[0].x, vertices[1].y - vertices[0].y, vertices[1].z - vertices[0].z);
     normalVector rhs(vertices[2].x - vertices[0].x, vertices[2].y - vertices[0].y, vertices[2].z - vertices[0].z);
@@ -545,6 +547,7 @@ normalVector Polygon::getFaceNormal(){
     // Perform a cross product, and normalize the result:
     lhs = lhs.crossProduct(rhs);
     lhs.normalize();
+
     return lhs;
 }
 

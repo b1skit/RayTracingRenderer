@@ -8,7 +8,6 @@
 #include <iostream>
 
 // STL includes:
-#define _USE_MATH_DEFINES       // Allow use of M_PI (3.14159265358979323846)
 #include "math.h"               // The STL math library
 
 using std::round;
@@ -22,13 +21,6 @@ Renderer::Renderer(Drawable* newDrawable, int newXRes, int newYRes, int borderWi
     xRes = newXRes;
     yRes = newYRes;
 
-    // Calculate pixel clipping values
-    xDrawMin = border;
-    xDrawMax = xRes - border;
-    yDrawMin = border;
-    yDrawMax = yRes - border;
-
-
     // Initialize the ZBuffer:
     ZBuffer = new int*[yRes];
     for (int row = 0; row < yRes; row++){
@@ -41,32 +33,6 @@ Renderer::Renderer(Drawable* newDrawable, int newXRes, int newYRes, int borderWi
     // Create a perspective transformation matrix:
     cameraToPerspective.arrayVal(3, 3) = 0; // Removes w component
     cameraToPerspective.arrayVal(3, 2) = 1; // Replaces w component with a copy of the z component
-
-    // Calculate highest resolution
-    int highestResolution;
-    if (xRes > yRes)
-        highestResolution = xRes;
-    else
-        highestResolution = yRes;
-
-    double highestXYDelta;
-    if ((xHigh - xLow) > (yHigh - yLow))
-        highestXYDelta = xHigh - xLow;
-    else
-        highestXYDelta = yHigh - yLow;
-
-    // We build our matrix in reverse here, so each new xForm is on the right  [currentxForms] * [newXform]
-    // Ie. Last xForm added is the first applied when we use this to transform a vector
-    perspectiveToScreen.addTranslation(xRes/2, yRes/2, 0); // Shift local space origin to be centered at center of raster
-
-    // Scale:
-    perspectiveToScreen.addNonUniformScale( (highestResolution - (2 * border)) / (highestXYDelta), ( (highestResolution - (2 * border)) / (highestXYDelta) ), 1 ); // Scale
-
-    // Center the camera within the xlow/ylow/xhigh/yhigh view window:
-    perspectiveToScreen.addTranslation(-(xHigh + xLow)/2.0, -(yHigh + yLow)/2.0, 0);
-
-    // Store the inverse, to return points back to perspective space:
-    screenToPerspective = perspectiveToScreen.getInverse();
 }
 
 // Destructor
@@ -454,20 +420,21 @@ void Renderer::drawLine(Line theLine, ShadingModel theShadingModel, bool doAmbie
 // If thePolygon vertices are all not the same color, the color will be LERP'd
 // Assumption: All polygons are in world space
 void Renderer::drawPolygon(Polygon thePolygon){
-    // Handle malformed polygons: Don't attempt to render them
-    if (!thePolygon.isValid())
-        return;
+
+//    // Handle malformed polygons: Don't attempt to render them
+//    if (!thePolygon.isValid())
+//        return;
 
     // Transform to camera space
     thePolygon.transform(&worldToCamera);
 
     // Cull polygons outside of hither/yon
-    if (!thePolygon.isInDepth(hither, yon)){
+    if (!thePolygon.isInDepth(currentScene->camHither, currentScene->camYon)){
         return;
     }
 
     // Clip polygon to intersection with hither/yon
-    thePolygon.clipHitherYon(hither, yon);
+    thePolygon.clipHitherYon(currentScene->camHither, currentScene->camYon);
 
     // Handle polygons that have been rendered invalid by clipping
     if(!thePolygon.isValid())
@@ -475,7 +442,8 @@ void Renderer::drawPolygon(Polygon thePolygon){
 
     // Apply ambient lighting to Lines, if neccessary:
     if (thePolygon.isLine() && thePolygon.isAffectedByAmbientLight() ){
-        thePolygon.lightAmbiently(ambientRedIntensity, ambientGreenIntensity, ambientBlueIntensity);
+        thePolygon.lightAmbiently( currentScene->ambientRedIntensity, currentScene->ambientGreenIntensity, currentScene->ambientBlueIntensity);
+
     }
 
     // Calculate flat/gouraud lighting (while we're still in camera space)
@@ -497,12 +465,12 @@ void Renderer::drawPolygon(Polygon thePolygon){
     }
 
     // Polygon frustum culling: Cull polygons outside of xLow/xHigh/yLow/yHigh
-    if (!thePolygon.isInFrustum(xLow, xHigh, yLow, yHigh)){
+    if (!thePolygon.isInFrustum(currentScene->xLow, currentScene->xHigh, currentScene->yLow, currentScene->yHigh)){
         return;
     }
 
     // Frustum clipping: Clip polygon to 4 sides of view window:
-    thePolygon.clipToScreen(xLow, xHigh, yLow, yHigh);
+    thePolygon.clipToScreen(currentScene->xLow, currentScene->xHigh, currentScene->yLow, currentScene->yHigh);
 
     // Handle polygons that have been rendered invalid by clipping
     if(!thePolygon.isValid())
@@ -536,7 +504,6 @@ void Renderer::drawPolygon(Polygon thePolygon){
     delete theFaces;
 }
 
-
 // Rasterize a polygon
 // Assumption: Received polygon is a triange, is in screen space, and all 3 vertices have been rounded to integer coordinates
 void Renderer::rasterizePolygon(Polygon* thePolygon){
@@ -546,6 +513,20 @@ void Renderer::rasterizePolygon(Polygon* thePolygon){
 
     Vertex* botLeftVertex = thePolygon->getNext(topLeftVertex->vertexNumber); // Get the next/left vertex (using counter-clockwise ordering)
     Vertex* botRightVertex = thePolygon->getPrev(topRightVertex->vertexNumber); // Get the prev/right vertex
+
+    // Set the starting vertices: Handle multiple "top" vertices with the same y coordinate - Slide down the edge
+    int count = thePolygon->getVertexCount(); // Track how many times we've moved, to prevent infinite loops when all vertices have the same y-coord.
+    while (topLeftVertex->y == botLeftVertex->y && count > 0){
+        count--;
+        topLeftVertex = botLeftVertex;
+        botLeftVertex = thePolygon->getNext(botLeftVertex->vertexNumber);
+    }
+    count = thePolygon->getVertexCount();
+    while (topRightVertex->y == botRightVertex->y && count > 0){
+        count--;
+        topRightVertex = botRightVertex;
+        botRightVertex = thePolygon->getPrev(botRightVertex->vertexNumber);
+    }
 
     // Get the starting coords: No need to round, as recieved polygon verts should already have been rounded
     int y = (int)(topLeftVertex->y);
@@ -612,7 +593,6 @@ void Renderer::rasterizePolygon(Polygon* thePolygon){
             drawScanlineIfVisible( new Vertex(xLeft_rounded, (double)y, leftCorrectZ, getPerspCorrectLerpColor(topLeftVertex, botLeftVertex, leftRatio)),
                                    new Vertex(xRight_rounded, (double)y, rightCorrectZ, getPerspCorrectLerpColor(topRightVertex, botRightVertex, rightRatio))
                                    );
-
 
         y--; // Move to the next line, and handle transitions between vertices if neccessary:
 
@@ -705,7 +685,7 @@ void Renderer::flatShadePolygon(Polygon* thePolygon){
 
         // Calculate the ambient component:
         if (thePolygon->isAffectedByAmbientLight() ){
-            ambientValues[i] = multiplyColorChannels(thePolygon->vertices[i].color, 1.0, ambientRedIntensity, ambientGreenIntensity, ambientBlueIntensity );
+            ambientValues[i] = multiplyColorChannels(thePolygon->vertices[i].color, 1.0, currentScene->ambientRedIntensity, currentScene->ambientGreenIntensity, currentScene->ambientBlueIntensity );
         }
     }
 
@@ -716,10 +696,10 @@ void Renderer::flatShadePolygon(Polygon* thePolygon){
     normalVector faceNormal = thePolygon->getNormalAverage();
 
     // Loop through each light:
-    for (unsigned int i = 0; i < theLights.size(); i++){
+    for (unsigned int i = 0; i < currentScene->theLights.size(); i++){
 
         // Get the (normalized) light direction vector: Points from the face towards the light
-        normalVector lightDirection(theLights[i].position.x - faceCenter.x, theLights[i].position.y - faceCenter.y, theLights[i].position.z - faceCenter.z);
+        normalVector lightDirection(currentScene->theLights[i].position.x - faceCenter.x, currentScene->theLights[i].position.y - faceCenter.y, currentScene->theLights[i].position.z - faceCenter.z);
         lightDirection.normalize();
 
         // Get the cosine of the angle between the face normal and the light direction
@@ -728,12 +708,12 @@ void Renderer::flatShadePolygon(Polygon* thePolygon){
         if (faceNormalDotLightDirection > 0){ // Only proceed if the angle < 90 degrees
 
             // Get the attenuation factor of the current light:
-            double attenuationFactor = theLights[i].getAttenuationFactor(faceCenter);
+            double attenuationFactor = currentScene->theLights[i].getAttenuationFactor(faceCenter);
 
             // Mutliply the light intensities by the attenuation:
-            double redDiffuseIntensity = theLights[i].redIntensity * attenuationFactor;
-            double greenDiffuseIntensity = theLights[i].greenIntensity * attenuationFactor;
-            double blueDiffuseIntensity = theLights[i].blueIntensity * attenuationFactor;
+            double redDiffuseIntensity = currentScene->theLights[i].redIntensity * attenuationFactor;
+            double greenDiffuseIntensity = currentScene->theLights[i].greenIntensity * attenuationFactor;
+            double blueDiffuseIntensity = currentScene->theLights[i].blueIntensity * attenuationFactor;
 
             // Factor the cosine value into the light intensity values:
             redDiffuseIntensity *= faceNormalDotLightDirection;
@@ -762,9 +742,9 @@ void Renderer::flatShadePolygon(Polygon* thePolygon){
 
             viewDotReflection = pow(viewDotReflection, thePolygon->getSpecularExponent() );
 
-            redSpecIntensity *= (theLights[i].redIntensity * attenuationFactor * viewDotReflection);
-            greenSpecIntensity *= (theLights[i].greenIntensity * attenuationFactor * viewDotReflection);
-            blueSpecIntensity *= (theLights[i].blueIntensity * attenuationFactor * viewDotReflection);
+            redSpecIntensity *= (currentScene->theLights[i].redIntensity * attenuationFactor * viewDotReflection);
+            greenSpecIntensity *= (currentScene->theLights[i].greenIntensity * attenuationFactor * viewDotReflection);
+            blueSpecIntensity *= (currentScene->theLights[i].blueIntensity * attenuationFactor * viewDotReflection);
 
             // Loop through each vertex, adding the sum of the light values to the vertex's total light
             for (int i = 0; i < thePolygon->getVertexCount(); i++){
@@ -831,10 +811,30 @@ void Renderer::drawPolygonWireframe(Polygon* thePolygon){
 }
 
 // Draw a mesh object
-void Renderer::drawMesh(Mesh theMesh){
-    vector<Polygon> theFaces = theMesh.getFaces();
-    for (unsigned int i = 0; i < theFaces.size(); i++)
-        drawPolygon(theFaces[i]);
+void Renderer::drawMesh(Mesh* theMesh){
+    for (unsigned int i = 0; i < theMesh->faces.size(); i++)
+        drawPolygon(theMesh->faces[i]);
+}
+
+// Render a scene
+void Renderer::renderScene(Scene theScene){
+    // Store a pointer to the current scene (for accessing various render settings)
+    currentScene = &theScene;
+
+    // Transform the render camera (also resets depth buffer):
+    transformCamera(theScene.cameraMovement);
+
+    // Transform lights from world space to camera space:
+    for (auto &currentLight : theScene.theLights){
+        currentLight.position.transform(&worldToCamera); // THIS MODIFIES THE ORIGINAL SCENE LIGHTS!!!!! NEED TO FIX THIS!!!!!!!!!!!!!!!!!!!!!!!!
+    }
+
+    // Process and draw each mesh in the scene:
+    for (auto &currentMesh : theScene.theMeshes)
+        drawMesh(&currentMesh);
+
+    // Remove the pointer to the current scene
+    currentScene = nullptr;
 }
 
 // Draw a scanline, with consideration to the Z-Buffer
@@ -943,14 +943,14 @@ void Renderer::lightPointInCameraSpace(Vertex* currentPosition, bool doAmbient, 
 
     // Calculate the ambient component:
     if (doAmbient ){
-        ambientValue = multiplyColorChannels(currentPosition->color, 1.0, ambientRedIntensity, ambientGreenIntensity, ambientBlueIntensity );
+        ambientValue = multiplyColorChannels(currentPosition->color, 1.0, currentScene->ambientRedIntensity, currentScene->ambientGreenIntensity, currentScene->ambientBlueIntensity );
     }
 
-    // Loop through each light the renderer is holding:
-    for (unsigned int i = 0; i < theLights.size(); i++){
+    // Loop through each light in the scene:
+    for (unsigned int i = 0; i < currentScene->theLights.size(); i++){
 
         // Get the (normalized) light direction vector: Points from the face towards the light
-        normalVector lightDirection(theLights[i].position.x - currentPosition->x, theLights[i].position.y - currentPosition->y, theLights[i].position.z - currentPosition->z);
+        normalVector lightDirection(currentScene->theLights[i].position.x - currentPosition->x, currentScene->theLights[i].position.y - currentPosition->y, currentScene->theLights[i].position.z - currentPosition->z);
         lightDirection.normalize();
 
         // Get the cosine of the angle between the face normal and the light direction
@@ -959,12 +959,12 @@ void Renderer::lightPointInCameraSpace(Vertex* currentPosition, bool doAmbient, 
         if (currentNormalDotLightDirection > 0){
 
             // Get the attenuation factor of the current light:
-            double attenuationFactor = theLights[i].getAttenuationFactor(*currentPosition);
+            double attenuationFactor = currentScene->theLights[i].getAttenuationFactor(*currentPosition);
 
             // Mutliply the light intensities by the attenuation:
-            double redDiffuseIntensity = theLights[i].redIntensity * attenuationFactor;
-            double greenDiffuseIntensity = theLights[i].greenIntensity * attenuationFactor;
-            double blueDiffuseIntensity = theLights[i].blueIntensity * attenuationFactor;
+            double redDiffuseIntensity = currentScene->theLights[i].redIntensity * attenuationFactor;
+            double greenDiffuseIntensity = currentScene->theLights[i].greenIntensity * attenuationFactor;
+            double blueDiffuseIntensity = currentScene->theLights[i].blueIntensity * attenuationFactor;
 
             // Factor the cosine value into the light intensity values:
             redDiffuseIntensity *= currentNormalDotLightDirection;
@@ -998,9 +998,9 @@ void Renderer::lightPointInCameraSpace(Vertex* currentPosition, bool doAmbient, 
 
             viewDotReflection = pow(viewDotReflection, specularExponent );
 
-            redSpecIntensity *= (theLights[i].redIntensity * attenuationFactor * viewDotReflection);
-            greenSpecIntensity *= (theLights[i].greenIntensity * attenuationFactor * viewDotReflection);
-            blueSpecIntensity *= (theLights[i].blueIntensity * attenuationFactor * viewDotReflection);
+            redSpecIntensity *= (currentScene->theLights[i].redIntensity * attenuationFactor * viewDotReflection);
+            greenSpecIntensity *= (currentScene->theLights[i].greenIntensity * attenuationFactor * viewDotReflection);
+            blueSpecIntensity *= (currentScene->theLights[i].blueIntensity * attenuationFactor * viewDotReflection);
 
 
             // Add the final diffuse/spec values to the running totals:
@@ -1060,22 +1060,17 @@ unsigned int Renderer::getFogPixelValue(Vertex* p1, Vertex* p2, double ratio, do
 unsigned int Renderer::getDistanceFoggedColor(unsigned int pixelColor, double correctZ){
 
     // Handle objects too close for fog:
-    if (correctZ <= fogHither)
+    if (correctZ <= currentScene->fogHither)
         return pixelColor;
 
     // Handle objects past the max fog distance:
-    if (correctZ >= fogYon)
-        return fogColor;
+    if (correctZ >= currentScene->fogYon)
+        return currentScene->fogColor;
 
     // Lerp, based on the fog distance:
-    double ratio = (correctZ - fogHither) / (fogYon - fogHither);
+    double ratio = (correctZ - currentScene->fogHither) / (currentScene->fogYon - currentScene->fogHither);
 
-    return addColors( multiplyColorChannels(pixelColor, (1 - ratio) ), multiplyColorChannels(fogColor, ratio) );
-}
-
-// Get the renderer's clip depth
-double Renderer::getClipDepth(){
-    return yon;
+    return addColors( multiplyColorChannels(pixelColor, (1 - ratio) ), multiplyColorChannels(currentScene->fogColor, ratio) );
 }
 
 // Reset the depth buffer
@@ -1108,19 +1103,12 @@ bool Renderer::isVisible(int x, int y, double z){
 
 // Get a scaled z-buffer value for a given Z
 int Renderer::getScaledZVal(double correctZ){
-    return (int)( (correctZ - hither)/(double)(yon - hither) * std::numeric_limits<int>::max() );
+    return (int)( (correctZ - currentScene->camHither)/(double)(currentScene->camYon - currentScene->camHither) * std::numeric_limits<int>::max() );
 }
 
 // Change the frustum shape
-void Renderer::transformCamera(double newXLow, double newYLow, double newXHigh, double newYHigh, double newHither, double newYon, TransformationMatrix cameraMovement){
-
-    // Store the recieved values
-    xLow = newXLow;
-    yLow = newYLow;
-    xHigh = newXHigh;
-    yHigh = newYHigh;
-    hither = newHither;
-    yon = newYon;
+// Precondition: currentScene != nullptr
+void Renderer::transformCamera(TransformationMatrix cameraMovement){
 
     // Reset the depth buffer
     resetDepthBuffer();
@@ -1138,10 +1126,10 @@ void Renderer::transformCamera(double newXLow, double newYLow, double newXHigh, 
         highestResolution = yRes;
 
     double highestXYDelta;
-    if ((xHigh - xLow) > (yHigh - yLow))
-        highestXYDelta = xHigh - xLow;
+    if ((currentScene->xHigh - currentScene->xLow) > (currentScene->yHigh - currentScene->yLow))
+        highestXYDelta = currentScene->xHigh - currentScene->xLow;
     else
-        highestXYDelta = yHigh - yLow;
+        highestXYDelta = currentScene->yHigh - currentScene->yLow;
 
     // We build our matrix in reverse here, so each new xForm is on the right  [currentxForms] * [newXform]
     // Ie. Last xForm added is the first applied when we use this to transform a vector
@@ -1151,63 +1139,57 @@ void Renderer::transformCamera(double newXLow, double newYLow, double newXHigh, 
     perspectiveToScreen.addNonUniformScale( (highestResolution - (2 * border)) / (highestXYDelta), ( (highestResolution - (2 * border)) / (highestXYDelta) ), 1 ); // Scale
 
     // Center the camera within the xlow/ylow/xhigh/yhigh view window:
-    perspectiveToScreen.addTranslation(-(xHigh + xLow)/2.0, -(yHigh + yLow)/2.0, 0);
+    perspectiveToScreen.addTranslation(-(currentScene->xHigh + currentScene->xLow)/2.0, -(currentScene->yHigh + currentScene->yLow)/2.0, 0);
 
     // Rebuild the matrix that transforms points from screen space back to perspective space:
     screenToPerspective = TransformationMatrix();        // Reset the matrix back to the identity
     screenToPerspective *= perspectiveToScreen;
     screenToPerspective = screenToPerspective.getInverse();
 
-}
 
-// Set the ambient color
-void Renderer::setAmbientIntensities(double newRed, double newGreen, double newBlue){
-    ambientRedIntensity = newRed;
-    ambientGreenIntensity = newGreen;
-    ambientBlueIntensity = newBlue;
-}
+//    // Reset the depth buffer
+//    resetDepthBuffer();
 
-// Set the distance fog parameters
-void Renderer::setDistanceFog(double newHither, double newYon, double redIntensity, double greenIntensity, double blueIntensity){
-    fogHither = newHither;
-    fogYon = newYon;
+//    worldToCamera = cameraMovement.getInverse(); // Store the inverse of the camera movements as the world->camera xform
 
-    fogRedIntensity = redIntensity;
-    fogGreenIntensity = greenIntensity;
-    fogBlueIntensity = blueIntensity;
+//    // Rebuild the toScreen matrix:
+//    perspectiveToScreen = TransformationMatrix(); // Reset to the identity matrix
 
-    // Compute and store the fog color, based on the recieved color channel intensities:
-    fogColor = combineColorChannels(redIntensity, greenIntensity, blueIntensity );
-}
+//    // Calculate highest resolution
+//    int highestResolution;
+//    if (xRes > yRes)
+//        highestResolution = xRes;
+//    else
+//        highestResolution = yRes;
 
-// Flush the vector of light object that the renderer is currently holding
-void Renderer::flushLights(){
-    theLights.clear();
+//    double highestXYDelta;
+//    if ((newXHigh - newXLow) > (newYHigh - newYLow))
+//        highestXYDelta = newXHigh - newXLow;
+//    else
+//        highestXYDelta = newYHigh - newYLow;
 
-    // Reset the default near/far clip planes, in terms of Z:
-    hither = 1;
-    yon = 200;
+//    // We build our matrix in reverse here, so each new xForm is on the right  [currentxForms] * [newXform]
+//    // Ie. Last xForm added is the first applied when we use this to transform a vector
+//    perspectiveToScreen.addTranslation(xRes/2, yRes/2, 0); // Shift local space origin to be centered at center of raster
 
-    // Default values used for the depth command
-    fogHither = yon;   // Set fogHither to current yon by default (ie. Don't apply depth fog)
-    fogYon = yon;
-}
+//    // Scale:
+//    perspectiveToScreen.addNonUniformScale( (highestResolution - (2 * border)) / (highestXYDelta), ( (highestResolution - (2 * border)) / (highestXYDelta) ), 1 ); // Scale
 
-// Add a new light to the renderer
-// Assumption: The light is in world space
-void Renderer::addLight(Light newLight){
+//    // Center the camera within the xlow/ylow/xhigh/yhigh view window:
+//    perspectiveToScreen.addTranslation(-(newXHigh + newXLow)/2.0, -(newYHigh + newYLow)/2.0, 0);
 
-    // Transform the light from world space to camera space:
-    newLight.position.transform(&worldToCamera);
+//    // Rebuild the matrix that transforms points from screen space back to perspective space:
+//    screenToPerspective = TransformationMatrix();        // Reset the matrix back to the identity
+//    screenToPerspective *= perspectiveToScreen;
+//    screenToPerspective = screenToPerspective.getInverse();
 
-    theLights.emplace_back(newLight);
 }
 
 // Visually debug lights:
 void Renderer::debugLights(){
 
-    for (unsigned int i = 0; i < theLights.size(); i++){
-        Light debug = theLights[i];
+    for (unsigned int i = 0; i < currentScene->theLights.size(); i++){
+        Light debug = currentScene->theLights[i];
         debug.position.transform(&cameraToPerspective);
         debug.position.transform(&perspectiveToScreen);
         drawLine( Line(Vertex(debug.position.x - 15, debug.position.y, debug.position.z, 0xffff0000), Vertex(debug.position.x + 15, debug.position.y, debug.position.z, 0xffff0000) ), ambientOnly, true, 0, 0);

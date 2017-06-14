@@ -30,6 +30,15 @@ normalVector::normalVector(const normalVector& rhs){
     this->zn = rhs.zn;
 }
 
+// Overloaded assignment operator
+normalVector& normalVector::operator=(const normalVector& rhs){
+    this->xn = rhs.xn;
+    this->yn = rhs.yn;
+    this->zn = rhs.zn;
+
+    return *this;
+}
+
 // Interpolation constructor: Builds an interpolated normal vector based on current position between start and end positions
 normalVector::normalVector(const normalVector& lhs, double lhsZ, const normalVector& rhs, double rhsZ, double current, double start, double end){
 
@@ -88,15 +97,6 @@ normalVector& normalVector::operator*=(const double rhs){
     this->xn *= rhs;
     this->yn *= rhs;
     this->zn *= rhs;
-
-    return *this;
-}
-
-// Overloaded assignment operator
-normalVector& normalVector::operator=(const normalVector& rhs){
-    this->xn = rhs.xn;
-    this->yn = rhs.yn;
-    this->zn = rhs.zn;
 
     return *this;
 }

@@ -10,8 +10,13 @@
 #include "mesh.h"
 
 #include "polygon.h"
-#include "renderer.h"
+
+
+//#include "renderer.h"
+#include "scene.h"
+
 #include <vector>
+
 
 using std::string;
 using std::list;
@@ -24,16 +29,21 @@ public:
     // No arg constructor
     FileInterpreter();
 
-    // Constructor
-    FileInterpreter(Renderer* newRenderer);
+
+//    // Constructor
+//    FileInterpreter(Renderer* newRenderer);
+
+
 
     // Read a file and assemble a mesh, given the filename. Invokes the recursive helper function
     // Return: A mesh object contstructed from the .simp file descriptions
-    Mesh getMeshFromFile(string fileName);
+    Scene buildSceneFromFile(string fileName);
 
 private:
-    // Pointer to the client's renderer object
-    Renderer* theFileRenderer; // A renderer object, used to render the contents of the file
+//    // Pointer to the client's renderer object
+//    Renderer* theFileRenderer; // A renderer object, used to render the contents of the file
+
+    Scene* currentScene; // A Scene object: Used to insert values during construction
 
     // Recursive helper function: Extracts polygons
     vector<Polygon> getMeshHelper(string filename, bool currentDrawFilled, bool currentDepthFog, bool currentAmbientLighting, bool currentUseSurfaceColor, unsigned int currentSurfaceColor, ShadingModel currentShadingModel, double currentSpecCoef, double currentSpecExponent);

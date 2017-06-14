@@ -30,11 +30,11 @@ public:
     // Copy constructor
     Polygon(const Polygon &existingPolygon);
 
-    // Destructor;
-    ~Polygon();
-
     // Overloaded assignment operator
     Polygon& operator=(const Polygon& rhs);
+
+    // Destructor;
+    ~Polygon();
 
     // Add a vertex to the polygon.
     // Vertices are always added behind the head (as the head's CW_neighbour), hence polygons MUST be initialized by providing vertices in a Counter Clockwise sequence

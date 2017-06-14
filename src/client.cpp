@@ -13,6 +13,7 @@
 #include <iostream>
 
 
+
 #include <chrono>
 using std::chrono::high_resolution_clock;
 using std::chrono::duration_cast;
@@ -37,7 +38,7 @@ Client::Client(Drawable *drawable){
 
     std::srand((unsigned int)std::time(0));   // Seed the random number generator
 
-    clientFileInterpreter = FileInterpreter(clientRenderer);
+    clientFileInterpreter = FileInterpreter();
 
     commandLineMode = false;
     filename = "";
@@ -52,7 +53,7 @@ Client::Client(Drawable *drawable, string filename){
 
     std::srand((unsigned int)std::time(0));   // Seed the random number generator
 
-    clientFileInterpreter = FileInterpreter(clientRenderer);
+    clientFileInterpreter = FileInterpreter();
 
     commandLineMode = true;
     this->filename = filename;
@@ -67,20 +68,17 @@ void Client::nextPage() {
     // Panel setup:
     //*************
 
-    // Clear the depth buffer:
-    clientRenderer->resetDepthBuffer();
-
     // Draw white background
-    clientRenderer->drawRectangle(0, 0, 749, 749, 0xffffffff);
+    clientRenderer->drawRectangle(0, 0, xRes - 1, yRes - 1, 0xffffffff);
 
     // Draw black panel:
-    clientRenderer->drawRectangle(PANEL_BORDER_WIDTH, PANEL_BORDER_WIDTH, xRes - PANEL_BORDER_WIDTH, yRes - PANEL_BORDER_WIDTH, 0xff000000);
+    clientRenderer->drawRectangle(PANEL_BORDER_WIDTH, PANEL_BORDER_WIDTH, xRes - PANEL_BORDER_WIDTH - 1, yRes - PANEL_BORDER_WIDTH - 1, 0xff000000);
 
 
-//    // Test/debug:
+//    // Test/debug: Comment/Uncomment to test a single mesh
 //    high_resolution_clock::time_point t1 = high_resolution_clock::now();
 
-//    Mesh testMesh = clientFileInterpreter.getMeshFromFile("./06.simp");
+//    Scene theScene = clientFileInterpreter.buildSceneFromFile("./debug.simp");
 
 //    high_resolution_clock::time_point t2 = high_resolution_clock::now();
 //    auto duration = duration_cast<microseconds>( t2 - t1 ).count();
@@ -88,7 +86,7 @@ void Client::nextPage() {
 
 //    t1 = high_resolution_clock::now();
 
-//    clientRenderer->drawMesh(testMesh);
+//    clientRenderer->renderScene(theScene);
 
 //    t2 = high_resolution_clock::now();
 //    duration = duration_cast<microseconds>( t2 - t1 ).count();
@@ -97,14 +95,30 @@ void Client::nextPage() {
 //    // End Test/debug
 
 
+
+
+
+
+
+
+
+//    Scene scene2 = clientFileInterpreter.buildSceneFromFile("./07.simp");
+//    clientRenderer->renderScene(scene2);
+
+
+
+
+
+
+
     // Handle command line mode:
     if (commandLineMode){
-        Mesh cmdLineMesh = clientFileInterpreter.getMeshFromFile("./" + filename + ".simp");
-        clientRenderer->drawMesh(cmdLineMesh);
+        Scene cmdLineScene = clientFileInterpreter.buildSceneFromFile("./" + filename + ".simp");
+        clientRenderer->renderScene(cmdLineScene);
     }
     else{ // Handle standard mode:
 
-        Mesh theMesh;
+        Scene theScene;
         high_resolution_clock::time_point t1, t2;
 
         t1 = high_resolution_clock::now();
@@ -112,37 +126,37 @@ void Client::nextPage() {
         // Load the appropriate mesh:
         switch(pageNumber % 7) {
         case 0:{ // Page 1:
-            theMesh = clientFileInterpreter.getMeshFromFile("./01.simp");
+            theScene = clientFileInterpreter.buildSceneFromFile("./01.simp");
         }
             break;
 
         case 1:{ // Page 2:
-            theMesh = clientFileInterpreter.getMeshFromFile("./02.simp");
+            theScene = clientFileInterpreter.buildSceneFromFile("./02.simp");
         }
             break;
 
         case 2:{ // Page 3:
-            theMesh = clientFileInterpreter.getMeshFromFile("./03.simp");
+            theScene = clientFileInterpreter.buildSceneFromFile("./03.simp");
             }
             break;
 
         case 3:{ // Page 4:
-            theMesh = clientFileInterpreter.getMeshFromFile("./04.simp");
+            theScene = clientFileInterpreter.buildSceneFromFile("./04.simp");
         }
             break;
 
         case 4:{ // Page 5:
-            theMesh = clientFileInterpreter.getMeshFromFile("./05.simp");
+            theScene = clientFileInterpreter.buildSceneFromFile("./05.simp");
         }
             break;
 
         case 5: { // Page 6:
-            theMesh = clientFileInterpreter.getMeshFromFile("./06.simp");
+            theScene = clientFileInterpreter.buildSceneFromFile("./06.simp");
             }
             break;
 
         case 6: { // Page 7:
-            theMesh = clientFileInterpreter.getMeshFromFile("./07.simp");
+            theScene = clientFileInterpreter.buildSceneFromFile("./07.simp");
             }
             break;
 
@@ -160,7 +174,7 @@ void Client::nextPage() {
 
         // Draw the mesh:
         t1 = high_resolution_clock::now();
-        clientRenderer->drawMesh(theMesh);
+        clientRenderer->renderScene(theScene);
         t2 = high_resolution_clock::now();
         duration = duration_cast<microseconds>( t2 - t1 ).count();
         cout << "Mesh drawn in:\t" << duration << "ms\n\n";

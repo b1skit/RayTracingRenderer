@@ -19,12 +19,12 @@ public:
     // Copy Constructor
     Mesh(const Mesh &existingMesh);
 
+    // Overloaded assignment operator
+    Mesh& operator=(const Mesh& rhs);
+
     // Add a polygon face to the mesh
     // Assumption: The face is not already contained in the mesh
     void addFace(Polygon newFace);
-
-    // Get the vector of faces for this mesh. Used by the renderer
-    vector<Polygon> getFaces();
 
     // Transform this Mesh by a transformation matrix
     void transform(TransformationMatrix* theMatrix);
@@ -36,8 +36,11 @@ public:
     // Debug this mesh
     void debug();
 
-private:
+
     vector<Polygon> faces; // This mesh's collection of faces
+
+private:
+
     bool isFilled; // Whether or not this mesh's polygons are to be rendered as a wireframes, or filled
 };
 

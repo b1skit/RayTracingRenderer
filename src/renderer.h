@@ -14,6 +14,7 @@
 #include "mesh.h"
 #include "transformationmatrix.h"
 #include "light.h"
+#include "scene.h"
 
 // Custom renderer class
 class Renderer{
@@ -33,87 +34,30 @@ public:
     void drawLine(Line theLine, ShadingModel theShadingModel, bool doAmbient, double specularCoefficient, double specularExponent);
 
 
-
 //    // Draw a line (Bresenham's Algorithm)
 //    void draw_lineBRES(Line theLine, unsigned int color, bool doLerp);
 
 
-
-    // Draw a polygon. Calls the rasterize Polygon helper function
-    // If thePolygon vertices are all not the same color, the color will be LERP'd
-    // Assumption: All polygons are in world space
-    void drawPolygon(Polygon thePolygon);
-
-    // Draw a polygon in wireframe only
-    void drawPolygonWireframe(Polygon* thePolygon);
-
-    // Draw a mesh object
-    void drawMesh(Mesh theMesh);
-
-    // Get the renderer's clip depth
-    double getClipDepth();
-
-    // Reset the depth buffer
-    void resetDepthBuffer();
-
-    // Change the frustum shape
-    void transformCamera(double newXLow, double newYLow, double newXHigh, double newYHigh, double newHither, double newYon, TransformationMatrix cameraMovement);
-
-    // Set the ambient color
-    void setAmbientIntensities(double newRed, double newGreen, double newBlue);
-
-    // Set the distance fog parameters
-    void setDistanceFog(double newHither, double newYon, double redIntensity, double greenIntensity, double blueIntensity);
-
-    // Flush the vector of light object that the renderer is currently holding
-    void flushLights();
-
-    // Add a new light to the renderer
-    // Assumption: The light is in world space
-    void addLight(Light newLight);
+    // Render a scene
+    void renderScene(Scene theScene);
 
     // Visually debug the renderer's collection of lights
     void debugLights();
 
 private:
-    Drawable* drawable; // A drawable object, used to interface with QT  
+    Drawable* drawable; // A drawable object, used to interface with QT framework
 
     // Raster settings:
     int border;         // Screen border width
     int xRes;           // Calculated horizontal raster resolution
     int yRes;           // Calculated vertical raster resolution
-    int xDrawMin, xDrawMax, yDrawMin, yDrawMax; // Calculated draw boundaries
-
-    // Render view settings:
-    // Default near/far clip planes, in terms of Z:
-    double hither = 1;
-    double yon = 200;
 
     int** ZBuffer;               // Z Depth buffer
     int maxZVal = std::numeric_limits<int>::max();    // Max possible z-depth value
 
-    // View window settings: Default to 90 degree view angle
-    double xLow = -1;
-    double xHigh = 1;
-    double yLow = -1;
-    double yHigh = 1;
 
-    // Lighting settings
-    double ambientRedIntensity = 0; // Default ambient light intensity values
-    double ambientGreenIntensity = 0;
-    double ambientBlueIntensity = 0;
-
-    // Default values used for the depth command
-    double fogHither = yon;   // Set fogHither to current yon by default (ie. Don't apply depth fog)
-    double fogYon = yon;
-
-    double fogRedIntensity = 0;
-    double fogGreenIntensity = 0;
-    double fogBlueIntensity = 0;
-    unsigned int fogColor = 0xff000000; // Combined color, assembled from the recieved fog intensities. Default to black.
-
-    // Lights
-    vector<Light> theLights;
+    // The current scene being drawn (used to access various render variables)
+    Scene* currentScene;
 
     // A transformation matrix from world to camera space
     TransformationMatrix worldToCamera;
@@ -127,6 +71,18 @@ private:
     // A transformation matrix from screen space back to perspective space
     TransformationMatrix screenToPerspective;
 
+
+    // Draw a polygon. Calls the rasterize Polygon helper function
+    // If thePolygon vertices are all not the same color, the color will be LERP'd
+    // Assumption: All polygons are in world space
+    void drawPolygon(Polygon thePolygon);
+
+    // Draw a polygon in wireframe only
+    void drawPolygonWireframe(Polygon* thePolygon);
+
+    // Draw a mesh object
+    void drawMesh(Mesh* theMesh);
+
     // Draw a scanline, with consideration to the Z-Buffer.
     // Assumption: start and end vertices are in left to right order
     // Note: LERP's if start.color != end.color. Does NOT update the screen!
@@ -134,6 +90,13 @@ private:
 
     // Draw a scanline with per-pixel phong lighting, with consideration to the Z-Buffer
     void drawPerPxLitScanlineIfVisible(Vertex* start, Vertex* end, bool doAmbient, double specularCoefficient, double specularExponent);
+
+    // Reset the depth buffer
+    void resetDepthBuffer();
+
+    // Change the frustum shape
+    // Precondition: currentScene != nullptr
+    void transformCamera(TransformationMatrix cameraMovement);
 
     // Calculate result of overlaying a pixel
     // Written color = opacity * color + (1 - opacity) * color at (x, y)

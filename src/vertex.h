@@ -73,7 +73,7 @@ public:
     double x;
     double y;
     double z;
-    unsigned int color;
+    unsigned int color = 0xffff00ff;    // Assign vertex a default color of hot pink (Overridden by vertex colors and/or surface commands)
     unsigned int vertexNumber; // This vertex's index in its containing polygon vertex array
 
     bool hasColor = false; // Whether or not this vertex has been assigned a custom color, or initialized to a default color. Used to assist the "surface" command.

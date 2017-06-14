@@ -17,15 +17,18 @@ Mesh::Mesh(const Mesh &existingMesh){
     isFilled = existingMesh.isFilled;
 }
 
+// Overloaded assignment operator
+Mesh& Mesh::operator=(const Mesh& rhs){
+    this->faces = rhs.faces;
+    this->isFilled = rhs.isFilled;
+
+    return *this;
+}
+
 // Add a polygon face to the mesh
 // Assumption: The face is not already contained in the mesh
 void Mesh::addFace(Polygon newFace){
     faces.push_back(newFace);
-}
-
-// Get the vector of faces for this mesh. Used by the renderer
-vector<Polygon> Mesh::getFaces(){
-    return faces;
 }
 
 // Transform this polygon by a transformation matrix

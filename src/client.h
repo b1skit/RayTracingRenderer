@@ -7,7 +7,9 @@
 #include "pageturner.h"
 
 #include "renderer.h"
-#include "polygon.h"
+
+#include "polygon.h" // REMOVE THIS ?????????????????????????????????????????????
+
 #include "fileinterpreter.h"
 
 using std::string;
@@ -25,6 +27,13 @@ public:
     // Command Line Constructor:
     Client(Drawable *drawable, string filename);
 
+
+
+    // Destructor
+    // TBC!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
     // Turn the window's page
     void nextPage();
 
@@ -40,7 +49,7 @@ private:
     const int xRes = 1000; // Must be the same as the values in renderarea361.cpp
     const int yRes = 1000;
 
-    const int PANEL_BORDER_WIDTH = 1;  // The width of the panel borders. Must be > 0
+    const int PANEL_BORDER_WIDTH = 1;  // The width of the panel borders. Must be > 0 ????????????????
 
     // Command line arguments:
     bool commandLineMode;

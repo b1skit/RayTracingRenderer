@@ -18,6 +18,9 @@ public:
     // Copy Constructor
     normalVector(const normalVector& rhs);
 
+    // Overloaded assignment operator
+    normalVector& operator=(const normalVector& rhs);
+
     // Interpolation constructor: Builds an interpolated normal vector based on current between start and end
     normalVector(const normalVector& lhs, double lhsZ, const normalVector& rhs, double rhsZ, double current, double start, double end);
 
@@ -35,9 +38,6 @@ public:
 
     // Overloaded scalar multiplication operator
     normalVector& operator*=(const double rhs);
-
-    // Overloaded assignment operator
-    normalVector& operator=(const normalVector& rhs);
 
     // Overloaded (friend) subtraction operator
     friend normalVector& operator-(const normalVector& lhs, const normalVector& rhs);

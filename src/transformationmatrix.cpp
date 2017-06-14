@@ -37,6 +37,16 @@ TransformationMatrix::TransformationMatrix(const TransformationMatrix& existingM
     }
 }
 
+// Overloaded assignment operator
+TransformationMatrix& TransformationMatrix::operator=(const TransformationMatrix& rhs){
+    for (int row = 0; row < DIMENSION; row++){
+        for (int col = 0; col < DIMENSION; col++){
+            this->CTM[row][col] = rhs.CTM[row][col];
+        }
+    }
+    return *this;
+}
+
 // Destructor
 TransformationMatrix::~TransformationMatrix(){
     if (CTM != nullptr){
@@ -177,16 +187,6 @@ TransformationMatrix operator*(TransformationMatrix& lhs, TransformationMatrix& 
         }
     }
     return result; // Return the result
-}
-
-// Overloaded assignment operator
-TransformationMatrix& TransformationMatrix::operator=(const TransformationMatrix& rhs){
-    for (int row = 0; row < DIMENSION; row++){
-        for (int col = 0; col < DIMENSION; col++){
-            this->CTM[row][col] = rhs.CTM[row][col];
-        }
-    }
-    return *this;
 }
 
 // Get inverse: Calculate this Matrix's inverse, and return int
