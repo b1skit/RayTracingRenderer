@@ -6,7 +6,7 @@
 
 // Constructor
 Mesh::Mesh(){
-    isFilled = true; // Default to filled
+    isWireframe = true; // Default to filled
 
     faces.reserve(3);
 }
@@ -14,21 +14,15 @@ Mesh::Mesh(){
 // Copy Constructor
 Mesh::Mesh(const Mesh &existingMesh){
     faces = existingMesh.faces;
-    isFilled = existingMesh.isFilled;
+    isWireframe = existingMesh.isWireframe;
 }
 
 // Overloaded assignment operator
 Mesh& Mesh::operator=(const Mesh& rhs){
     this->faces = rhs.faces;
-    this->isFilled = rhs.isFilled;
+    this->isWireframe = rhs.isWireframe;
 
     return *this;
-}
-
-// Add a polygon face to the mesh
-// Assumption: The face is not already contained in the mesh
-void Mesh::addFace(Polygon newFace){
-    faces.push_back(newFace);
 }
 
 // Transform this polygon by a transformation matrix

@@ -29,24 +29,19 @@ public:
     // No arg constructor
     FileInterpreter();
 
-
-//    // Constructor
-//    FileInterpreter(Renderer* newRenderer);
-
-
-
     // Read a file and assemble a mesh, given the filename. Invokes the recursive helper function
     // Return: A mesh object contstructed from the .simp file descriptions
     Scene buildSceneFromFile(string fileName);
 
 private:
-//    // Pointer to the client's renderer object
-//    Renderer* theFileRenderer; // A renderer object, used to render the contents of the file
-
     Scene* currentScene; // A Scene object: Used to insert values during construction
 
     // Recursive helper function: Extracts polygons
-    vector<Polygon> getMeshHelper(string filename, bool currentDrawFilled, bool currentDepthFog, bool currentAmbientLighting, bool currentUseSurfaceColor, unsigned int currentSurfaceColor, ShadingModel currentShadingModel, double currentSpecCoef, double currentSpecExponent);
+    vector<Mesh> getMeshHelper(string filename, bool currentDrawFilled, bool currentDepthFog, bool currentAmbientLighting, bool currentUseSurfaceColor, unsigned int currentSurfaceColor, ShadingModel currentShadingModel, double currentSpecCoef, double currentSpecExponent);
+
+    // Read an obj file
+    // Return: A vector<Polygon> containing all of the faces described by the obj
+    vector<Polygon> getPolysFromObj(string filename);
 
     // Interpret a string that has been read
     // Return: A list of split and cleansed tokens
@@ -59,10 +54,6 @@ private:
     // Cleanse a list of tokens of any formatting characters. Used after split has extracted tokens from a line
     // Return: A list<string> containing tokens cleansed of formatting characters
     list<string> cleanseTokens(list<string> tokens);
-
-    // Read an obj file
-    // Return: A vector<Polygon> containing all of the faces described by the obj
-    vector<Polygon> getPolysFromObj(string filename);
 };
 
 #endif // FILEINTERPRETER_H

@@ -419,11 +419,7 @@ void Renderer::drawLine(Line theLine, ShadingModel theShadingModel, bool doAmbie
 // Draw a polygon. Calls the rasterize Polygon helper function
 // If thePolygon vertices are all not the same color, the color will be LERP'd
 // Assumption: All polygons are in world space
-void Renderer::drawPolygon(Polygon thePolygon){
-
-//    // Handle malformed polygons: Don't attempt to render them
-//    if (!thePolygon.isValid())
-//        return;
+void Renderer::drawPolygon(Polygon thePolygon, bool isWireframe){
 
     // Transform to camera space
     thePolygon.transform(&worldToCamera);
@@ -448,11 +444,11 @@ void Renderer::drawPolygon(Polygon thePolygon){
 
     // Calculate flat/gouraud lighting (while we're still in camera space)
     // Handle flat:
-    else if (thePolygon.getShadingModel() == flat && thePolygon.isFilled() && !thePolygon.isLine() ){ // Only light the polygon if it's not wireframe or a line
+    else if (thePolygon.getShadingModel() == flat && !isWireframe && !thePolygon.isLine() ){ // Only light the polygon if it's not wireframe or a line
         flatShadePolygon( &thePolygon );
     }
     // Handle gouraud:
-    else if (thePolygon.getShadingModel() == gouraud && thePolygon.isFilled() && !thePolygon.isLine()){ // Only light the polygon if it's not wireframe or a line
+    else if (thePolygon.getShadingModel() == gouraud && !isWireframe && !thePolygon.isLine()){ // Only light the polygon if it's not wireframe or a line
         gouraudShadePolygon( &thePolygon );
     }
 
@@ -460,7 +456,7 @@ void Renderer::drawPolygon(Polygon thePolygon){
     thePolygon.transform( &cameraToPerspective );
 
     // Backface cull: Don't attempt to render polygons not facing the camera
-    if (!thePolygon.isFacingCamera() && thePolygon.isFilled() && !thePolygon.isLine()){ // Don't backface cull wireframe polygons or lines, as we still want to see them
+    if (!thePolygon.isFacingCamera() && !isWireframe && !thePolygon.isLine()){ // Don't backface cull wireframe polygons or lines, as we still want to see them
       return;
     }
 
@@ -492,12 +488,14 @@ void Renderer::drawPolygon(Polygon thePolygon){
     for (unsigned int i = 0; i < theFaces->size(); i++){
 
         // Draw regular polygons:
-        if ( theFaces->at(i).isFilled() ){
+        if (!isWireframe) {
             rasterizePolygon( &theFaces->at(i) );
         }
         else{ // Draw wireframe polygons
             drawPolygonWireframe( &theFaces->at(i) );
         }
+
+
     }
 
     // Cleanup:
@@ -813,7 +811,7 @@ void Renderer::drawPolygonWireframe(Polygon* thePolygon){
 // Draw a mesh object
 void Renderer::drawMesh(Mesh* theMesh){
     for (unsigned int i = 0; i < theMesh->faces.size(); i++)
-        drawPolygon(theMesh->faces[i]);
+        drawPolygon(theMesh->faces[i], theMesh->isWireframe);
 }
 
 // Render a scene

@@ -101,12 +101,6 @@ public:
     // Get a count of the number of vertices contained by this polygon
     int getVertexCount();
 
-    // Check whether or not this polygon is filled
-    bool isFilled();
-
-    // Set whether or not this polygon is filled or not
-    void setFilled(bool filled);
-
     // Check if this polygon is affected by depth fog
     bool isAffectedByDepthFog();
 
@@ -163,7 +157,6 @@ private:
     unsigned int vertexArraySize; // Size of the vertex array in this polygon
     unsigned int currentVertices; // The number of vertices actually added to this polygon
 
-    bool isDrawnFilled; // Determine whether this polygon is set to be rendered filled, or in wireframe mode
     bool isDepthFogged; // Atmospheric fog
     bool isAmbientLit; // Ambient lighting
 

@@ -75,7 +75,7 @@ private:
     // Draw a polygon. Calls the rasterize Polygon helper function
     // If thePolygon vertices are all not the same color, the color will be LERP'd
     // Assumption: All polygons are in world space
-    void drawPolygon(Polygon thePolygon);
+    void drawPolygon(Polygon thePolygon, bool isWireframe);
 
     // Draw a polygon in wireframe only
     void drawPolygonWireframe(Polygon* thePolygon);

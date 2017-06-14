@@ -19,8 +19,7 @@ Polygon::Polygon(){ //
     vertices = new Vertex[vertexArraySize];
     currentVertices = 0;
 
-    isDrawnFilled = true;
-    isDepthFogged = false; // Don't use depth cueing or atmospheric fog by default:
+    isDepthFogged = false; // Don't use depth cueing or atmospheric fog by default
     isAmbientLit = false;
 
     // Set the shading model to ambient only, by default:
@@ -41,7 +40,6 @@ Polygon::Polygon(Vertex p0, Vertex p1, Vertex p2){
 
     currentVertices = 3;
 
-    isDrawnFilled = true;
     isDepthFogged = false;
     isAmbientLit = false;
 
@@ -54,7 +52,6 @@ Polygon::Polygon(const Polygon& currentPoly){
     this->vertexArraySize = currentPoly.vertexArraySize;
     this->currentVertices = currentPoly.currentVertices;
 
-    this->isDrawnFilled = currentPoly.isDrawnFilled;
     this->isDepthFogged = currentPoly.isDepthFogged;
     this->isAmbientLit = currentPoly.isAmbientLit;
 
@@ -76,7 +73,6 @@ Polygon& Polygon::operator=(const Polygon& rhs){
     this->vertexArraySize = rhs.vertexArraySize;
     this->currentVertices = rhs.currentVertices;
 
-    this->isDrawnFilled = rhs.isDrawnFilled;
     this->isDepthFogged = rhs.isDepthFogged;
     this->isAmbientLit = rhs.isAmbientLit;
 
@@ -308,7 +304,6 @@ Polygon Polygon::clipHelper(Polygon source, Vertex planePoint, normalVector plan
 
     // Create a result Polygon, and copy the source's key attributes
     Polygon result;
-    result.isDrawnFilled = source.isDrawnFilled;
     result.isDepthFogged = source.isDepthFogged;
     result.isAmbientLit = source.isAmbientLit;
 
@@ -396,16 +391,6 @@ bool Polygon::isFacingCamera(){
     return true;
 }
 
-// Check whether or not this polygon is filled
-bool Polygon::isFilled(){
-    return isDrawnFilled;
-}
-
-// Set whether or not this polygon is filled or not
-void Polygon::setFilled(bool filled){
-    isDrawnFilled = filled;
-}
-
 // Transform this polygon by a transformation matrix
 void Polygon::transform(TransformationMatrix* theMatrix){
     transform(theMatrix, false);
@@ -443,7 +428,6 @@ vector<Polygon>* Polygon::getTriangulatedFaces(){
     int lastIndex = currentVertices - 1;
     while (index < lastIndex){
         Polygon newFace; // Create a new empty polygon, and copy the essential drawing attributes into it
-        newFace.isDrawnFilled = this->isDrawnFilled;
         newFace.isDepthFogged = this->isDepthFogged;
         newFace.isAmbientLit = this->isAmbientLit;
 

@@ -22,10 +22,6 @@ public:
     // Overloaded assignment operator
     Mesh& operator=(const Mesh& rhs);
 
-    // Add a polygon face to the mesh
-    // Assumption: The face is not already contained in the mesh
-    void addFace(Polygon newFace);
-
     // Transform this Mesh by a transformation matrix
     void transform(TransformationMatrix* theMatrix);
 
@@ -37,11 +33,14 @@ public:
     void debug();
 
 
+    // Mesh attributes:
     vector<Polygon> faces; // This mesh's collection of faces
+
+    bool isWireframe = false; // Whether or not this mesh's polygons are to be rendered in wireframe, or filled
 
 private:
 
-    bool isFilled; // Whether or not this mesh's polygons are to be rendered as a wireframes, or filled
+
 };
 
 #endif // MESH_H

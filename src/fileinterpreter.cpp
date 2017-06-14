@@ -35,10 +35,7 @@ Scene FileInterpreter::buildSceneFromFile(string filename){
     Scene theScene;
     currentScene = &theScene; // Save the address of the scene being constructed
 
-    Mesh newMesh;
-    newMesh.faces = getMeshHelper(filename, true, false, false, false, 0xffffffff, phong , 0.3, 8); // Set the default values to start
-
-    theScene.theMeshes.emplace_back( newMesh );
+    theScene.theMeshes = getMeshHelper(filename, false, false, false, false, 0xffffffff, phong , 0.3, 8); // Set the default values to start
 
     currentScene = nullptr; // Remove the reference to the local object for safety
 
@@ -46,8 +43,8 @@ Scene FileInterpreter::buildSceneFromFile(string filename){
 }
 
 // Recursive helper function: Extracts polygons
-vector<Polygon> FileInterpreter::getMeshHelper(string filename, bool currentDrawFilled, bool currentDepthFog, bool currentAmbientLighting, bool currentUseSurfaceColor, unsigned int currentSurfaceColor, ShadingModel currentShadingModel, double currentSpecCoef, double currentSpecExponent){
-    bool drawFilled = currentDrawFilled;                // Wireframe/filled flag
+vector<Mesh> FileInterpreter::getMeshHelper(string filename, bool currentIsWireframe, bool currentDepthFog, bool currentAmbientLighting, bool currentUseSurfaceColor, unsigned int currentSurfaceColor, ShadingModel currentShadingModel, double currentSpecCoef, double currentSpecExponent){
+    bool isWireframe = currentIsWireframe;                // Wireframe/filled flag
     bool usesDepthFog = currentDepthFog;                // Depth fog flag
     bool usesAmbientLighting = currentAmbientLighting;  // Ambient lighting flag
 
@@ -60,8 +57,9 @@ vector<Polygon> FileInterpreter::getMeshHelper(string filename, bool currentDraw
 
     TransformationMatrix CTM;                   // Identity matrix
     stack<TransformationMatrix> theCTMStack;    // Stack of CTM's
-    vector<Polygon> processedFaces;             // Vector of processed polygons, that will be inserted returned for insertion into a mesh
-    vector<Polygon> currentFaces;               // A working vector of polygon faces, that will eventually be added to the processed faces vector
+
+    vector<Polygon> currentFaces;               // A working vector of polygon faces
+    vector<Mesh> extractedMeshes;               // A collection of assembled meshes
 
     // Open the file, and process it:
     ifstream* input = new ifstream(); // File reading object
@@ -83,11 +81,11 @@ vector<Polygon> FileInterpreter::getMeshHelper(string filename, bool currentDraw
 
                     // Handle wireframe/filled directive:
                     if (theIterator->compare("filled") == 0){
-                        drawFilled = true;
+                        isWireframe = false;
                         theIterator++;
                     }
                     else if (theIterator->compare("wire") == 0){
-                        drawFilled = false;
+                        isWireframe = true;
                         theIterator++;
                     }
 
@@ -266,9 +264,6 @@ vector<Polygon> FileInterpreter::getMeshHelper(string filename, bool currentDraw
                         for (unsigned int i = 0; i < objContents.size(); i++){
                             objContents[i].transform(&CTM);
 
-                            // Set the various polygon drawing flags:
-                            objContents[i].setFilled(drawFilled);
-
                             // Set the surface color instructions:
                             if (usesSurfaceColor)
                                 objContents[i].setSurfaceColor(theSurfaceColor);
@@ -290,13 +285,18 @@ vector<Polygon> FileInterpreter::getMeshHelper(string filename, bool currentDraw
 
                         theIterator++; // Move the iterator to the filename element
 
-                        vector<Polygon> loadedFaces = getMeshHelper("./" + *theIterator + ".simp", drawFilled, usesDepthFog, usesAmbientLighting, usesSurfaceColor, theSurfaceColor, theShadingModel, theSpecCoefficient, theSpecExponent);
+                        vector<Mesh> newMeshes = getMeshHelper("./" + *theIterator + ".simp", isWireframe, usesDepthFog, usesAmbientLighting, usesSurfaceColor, theSurfaceColor, theShadingModel, theSpecCoefficient, theSpecExponent);
+
                         theIterator++;
 
-                        for (unsigned int i = 0; i < loadedFaces.size(); i++){
-                            loadedFaces[i].transform(&CTM);
+                        // Loop through each mesh, and then through each face of each mesh, applying the current CTM
+                        for (int i = 0; i < newMeshes.size(); i++){
+                            for (unsigned int j = 0; j < newMeshes[i].faces.size(); j++){
+                                newMeshes[i].faces[j].transform(&CTM);
+                            }
                         }
-                        currentFaces.insert(currentFaces.end(), loadedFaces.begin(), loadedFaces.end() );
+                        // Add the new meshes to our final collection of meshes:
+                        extractedMeshes.insert(extractedMeshes.end(), newMeshes.begin(), newMeshes.end() );
                     }
 
                     // Handle line commands:
@@ -403,7 +403,6 @@ vector<Polygon> FileInterpreter::getMeshHelper(string filename, bool currentDraw
                         newFace.transform(&CTM); // Apply the CTM
 
                         // Set the various polygon drawing flags:
-                        newFace.setFilled(drawFilled);
                         newFace.setAffectedByDepthFog(usesDepthFog);
                         newFace.setAffectedByAmbientLight(usesAmbientLighting);
 
@@ -416,7 +415,6 @@ vector<Polygon> FileInterpreter::getMeshHelper(string filename, bool currentDraw
                         for (int i = 0; i < newFace.getVertexCount(); i++){
                             newFace.vertices[i].normal = faceNormal;
                         }
-
 
                         // Place the new face in the vector:
                         currentFaces.emplace_back(newFace);
@@ -432,8 +430,13 @@ vector<Polygon> FileInterpreter::getMeshHelper(string filename, bool currentDraw
                         for (unsigned int i = 0; i < currentFaces.size(); i++){
                             currentFaces[i].transform(&CTM);
                         }
-                        // Insert the processed faces into the final vector:
-                        processedFaces.insert(processedFaces.end(), currentFaces.begin(), currentFaces.end() );
+
+                        // Insert the processed faces into the final mesh object:
+                        Mesh newMesh;
+                        newMesh.faces = currentFaces;
+                        newMesh.isWireframe = isWireframe;
+                        extractedMeshes.emplace_back( newMesh );
+
                         currentFaces.clear();
 
                         if (!currentUseSurfaceColor) // Handle recursive cases where we've inherited a color and it needs to apply to the loaded file
@@ -455,10 +458,12 @@ vector<Polygon> FileInterpreter::getMeshHelper(string filename, bool currentDraw
     // Close the input stream
     input->close();
 
-    // Insert the last faces into the vector of processed faces:
-    processedFaces.insert(processedFaces.end(), currentFaces.begin(), currentFaces.end() );
+    // Insert the final set of faces into a mesh, and add it to the scene
+    Mesh newMesh;
+    newMesh.faces = currentFaces;
+    extractedMeshes.emplace_back( newMesh );
 
-    return processedFaces;
+    return extractedMeshes;
 }
 
 // Interpret a string that has been read
