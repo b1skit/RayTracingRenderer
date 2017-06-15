@@ -104,7 +104,7 @@ private:
     // Return: An unsigned int, representing a blended translucent pixel value
     unsigned int blendPixelValues(int x, int y, unsigned int color, float opacity);
 
-    // Override: Lerp between the color values of 2 points (Perspective correct: Takes Z-Depth into account)
+    // Override: Lerp be#Filter:3tween the color values of 2 points (Perspective correct: Takes Z-Depth into account)
     // Return: An unsigned int color value, calculated based on a LERP of the current position between the 2 provided points
     unsigned int getPerspCorrectLerpColor(Vertex* p1, Vertex* p2, double ratio) const;
 
@@ -132,7 +132,7 @@ private:
     void gouraudShadePolygon(Polygon* thePolygon);
 
     // Light a given point in camera space
-    void lightPointInCameraSpace(Vertex* currentPosition, bool doAmbient, double specularExponent, double specularCoefficient);
+    void lightPointInCameraSpace(Vertex* currentPosition, normalVector viewVector, bool doAmbient, double specularExponent, double specularCoefficient);
 
     // Check if a pixel coordinate is in front of the current z-buffer depth
     bool isVisible(int x, int y, double z);

@@ -106,8 +106,12 @@ void Renderer::drawLine(Line theLine, ShadingModel theShadingModel, bool doAmbie
 
                     currentPosition.color = getPerspCorrectLerpColor(&theLine.p1, &theLine.p2, ratio); // Get the (perspective correct) base color
 
+                    // Create a view vector: Points from the face towards the camera
+                    normalVector viewVector(-currentPosition.x, -currentPosition.y, -currentPosition.z);
+                    viewVector.normalize();
+
                     // Calculate the lit pixel value, apply distance fog then attempt to set it:
-                    lightPointInCameraSpace(&currentPosition, doAmbient, specularExponent, specularCoefficient);
+                    lightPointInCameraSpace(&currentPosition, viewVector, doAmbient, specularExponent, specularCoefficient);
 
                     if (currentMesh->isDepthFogged)
                         setPixel((int)theLine.p1.x, y, correctZ, getDistanceFoggedColor( currentPosition.color, correctZ ) );
@@ -197,7 +201,11 @@ void Renderer::drawLine(Line theLine, ShadingModel theShadingModel, bool doAmbie
 
                         currentPosition.color = getPerspCorrectLerpColor(&theLine.p1, &theLine.p2, ratio); // Get the (perspective correct) base color
 
-                        lightPointInCameraSpace(&currentPosition, doAmbient, specularExponent, specularCoefficient);
+                        // Create a view vector: Points from the face towards the camera
+                        normalVector viewVector(-currentPosition.x, -currentPosition.y, -currentPosition.z);
+                        viewVector.normalize();
+
+                        lightPointInCameraSpace(&currentPosition, viewVector, doAmbient, specularExponent, specularCoefficient);
 
                         if (currentMesh->isDepthFogged) // Calculate the lit pixel value, apply distance fog then attempt to set it:
                             setPixel(round_x, y, correctZ, getDistanceFoggedColor( currentPosition.color, correctZ ) );
@@ -252,8 +260,12 @@ void Renderer::drawLine(Line theLine, ShadingModel theShadingModel, bool doAmbie
 
                         currentPosition.color = getPerspCorrectLerpColor(&theLine.p1, &theLine.p2, ratio); // Get the (perspective correct) base color
 
+                        // Create a view vector: Points from the face towards the camera
+                        normalVector viewVector(-currentPosition.x, -currentPosition.y, -currentPosition.z);
+                        viewVector.normalize();
+
                         // Calculate the lit pixel value, apply distance fog then attempt to set it:
-                        lightPointInCameraSpace(&currentPosition, doAmbient, specularExponent, specularCoefficient);
+                        lightPointInCameraSpace(&currentPosition, viewVector, doAmbient, specularExponent, specularCoefficient);
 
                         if (currentMesh->isDepthFogged)
                             setPixel(x, round_y, correctZ, getDistanceFoggedColor( currentPosition.color, correctZ ) );
@@ -266,7 +278,6 @@ void Renderer::drawLine(Line theLine, ShadingModel theShadingModel, bool doAmbie
                         else
                             setPixel(x, round_y, correctZ, getPerspCorrectLerpColor(&theLine.p1, &theLine.p2, ratio) );
                     }
-
                 }
 
                 y += slope;
@@ -519,8 +530,6 @@ void Renderer::drawPolygon(Polygon thePolygon, bool isWireframe){
         else{ // Draw wireframe polygons
             drawPolygonWireframe( &theFaces->at(i) );
         }
-
-
     }
 
     // Cleanup:
@@ -813,7 +822,12 @@ void Renderer::gouraudShadePolygon(Polygon* thePolygon){
 
     // Loop through each vertex and calculate lighting for it
     for (int i = 0; i < thePolygon->getVertexCount(); i++){
-        lightPointInCameraSpace(&thePolygon->vertices[i], thePolygon->isAffectedByAmbientLight(), thePolygon->getSpecularExponent(), thePolygon->getSpecularCoefficient() );
+
+        // Create a view vector: Points from the face towards the camera
+        normalVector viewVector(-thePolygon->vertices[i].x, -thePolygon->vertices[i].y, -thePolygon->vertices[i].z);
+        viewVector.normalize();
+
+        lightPointInCameraSpace(&thePolygon->vertices[i], viewVector, thePolygon->isAffectedByAmbientLight(), thePolygon->getSpecularExponent(), thePolygon->getSpecularCoefficient() );
     }
 }
 
@@ -951,13 +965,18 @@ void Renderer::drawPerPxLitScanlineIfVisible(Vertex* start, Vertex* end, bool do
 
             currentPosition.color = getPerspCorrectLerpColor(start, end, ratio); // Get the (perspective correct) base color
 
-            // Calculate the lit pixel value, apply distance fog then set it:
-            lightPointInCameraSpace(&currentPosition, doAmbient, specularExponent, specularCoefficient);
+            // Create a view vector: Points from the face towards the camera
+            normalVector viewVector(-currentPosition.x, -currentPosition.y, -currentPosition.z);
+            viewVector.normalize();
 
-            if (currentMesh->isDepthFogged)
+            // Calculate the lit pixel value, apply distance fog then set it:
+            lightPointInCameraSpace(&currentPosition, viewVector, doAmbient, specularExponent, specularCoefficient);
+
+            if (currentMesh->isDepthFogged) {
                 setPixel(x, y_rounded, correctZ, getDistanceFoggedColor( currentPosition.color, correctZ ) );
-            else
+            } else {
                 setPixel(x, y_rounded, correctZ, currentPosition.color);
+            }
         }
 
         ratio += ratioDiff;
@@ -967,7 +986,8 @@ void Renderer::drawPerPxLitScanlineIfVisible(Vertex* start, Vertex* end, bool do
 }
 
 // Light a given point in camera space
-void Renderer::lightPointInCameraSpace(Vertex* currentPosition, bool doAmbient, double specularExponent, double specularCoefficient) {
+// Precondition: viewVector is normalized
+void Renderer::lightPointInCameraSpace(Vertex* currentPosition, normalVector viewVector, bool doAmbient, double specularExponent, double specularCoefficient) {
 
     unsigned int ambientValue = 0;
 
@@ -975,7 +995,7 @@ void Renderer::lightPointInCameraSpace(Vertex* currentPosition, bool doAmbient, 
     redTotalDiffuseIntensity = greenTotalDiffuseIntensity = blueTotalDiffuseIntensity = redTotalSpecIntensity = greenTotalSpecIntensity = blueTotalSpecIntensity = 0;
 
     // Calculate the ambient component:
-    if (doAmbient ){
+    if ( doAmbient ){
         ambientValue = multiplyColorChannels(currentPosition->color, 1.0, currentScene->ambientRedIntensity, currentScene->ambientGreenIntensity, currentScene->ambientBlueIntensity );
     }
 
@@ -1013,10 +1033,6 @@ void Renderer::lightPointInCameraSpace(Vertex* currentPosition, bool doAmbient, 
             double redSpecIntensity = specularCoefficient;
             double greenSpecIntensity = specularCoefficient;
             double blueSpecIntensity = specularCoefficient;
-
-            // Create a view vector: Points from the face towards the camera
-            normalVector viewVector(-currentPosition->x, -currentPosition->y, -currentPosition->z);
-            viewVector.normalize();
 
             // Calculate the reflection vector:
             normalVector reflectionVector = currentPosition->normal;

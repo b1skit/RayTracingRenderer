@@ -48,6 +48,9 @@ public:
     double fogBlueIntensity = 0;
     unsigned int fogColor = 0xff000000; // Combined color, assembled from the recieved fog intensities. Default to black.
 
+    // Ray tracing settings:
+    int numRayBounces = 0;  // Default number of bounces when ray tracing. Default = 0 (ie. No ray tracing)
+
 private:
 
 };
