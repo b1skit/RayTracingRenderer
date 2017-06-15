@@ -56,8 +56,9 @@ private:
     int maxZVal = std::numeric_limits<int>::max();    // Max possible z-depth value
 
 
-    // The current scene being drawn (used to access various render variables)
+    // The current scene and mesh objects being drawn (used to access various render variables)
     Scene* currentScene;
+    Mesh* currentMesh;
 
     // A transformation matrix from world to camera space
     TransformationMatrix worldToCamera;

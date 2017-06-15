@@ -108,11 +108,19 @@ void Renderer::drawLine(Line theLine, ShadingModel theShadingModel, bool doAmbie
 
                     // Calculate the lit pixel value, apply distance fog then attempt to set it:
                     lightPointInCameraSpace(&currentPosition, doAmbient, specularExponent, specularCoefficient);
-                    setPixel((int)theLine.p1.x, y, correctZ, getDistanceFoggedColor( currentPosition.color, correctZ ) );
 
+                    if (currentMesh->isDepthFogged)
+                        setPixel((int)theLine.p1.x, y, correctZ, getDistanceFoggedColor( currentPosition.color, correctZ ) );
+                    else
+                        setPixel((int)theLine.p1.x, y, correctZ, currentPosition.color );
                 }
-                else
-                    setPixel((int)theLine.p1.x, (int)y, correctZ, getFogPixelValue(&theLine.p1, &theLine.p2, ratio, correctZ) );
+                else{
+                    if (currentMesh->isDepthFogged)
+                        setPixel((int)theLine.p1.x, (int)y, correctZ, getFogPixelValue(&theLine.p1, &theLine.p2, ratio, correctZ) );
+                    else
+                        setPixel((int)theLine.p1.x, (int)y, correctZ, getPerspCorrectLerpColor(&theLine.p1, &theLine.p2, ratio) );
+                }
+
             } // End z-check
 
             y++;
@@ -189,12 +197,20 @@ void Renderer::drawLine(Line theLine, ShadingModel theShadingModel, bool doAmbie
 
                         currentPosition.color = getPerspCorrectLerpColor(&theLine.p1, &theLine.p2, ratio); // Get the (perspective correct) base color
 
-                        // Calculate the lit pixel value, apply distance fog then attempt to set it:
                         lightPointInCameraSpace(&currentPosition, doAmbient, specularExponent, specularCoefficient);
-                        setPixel(round_x, y, correctZ, getDistanceFoggedColor( currentPosition.color, correctZ ) );
+
+                        if (currentMesh->isDepthFogged) // Calculate the lit pixel value, apply distance fog then attempt to set it:
+                            setPixel(round_x, y, correctZ, getDistanceFoggedColor( currentPosition.color, correctZ ) );
+                        else
+                            setPixel(round_x, y, correctZ, currentPosition.color );
                     }
-                    else
-                        setPixel(round_x, y, correctZ, getFogPixelValue(&theLine.p1, &theLine.p2, ratio, correctZ) );
+                    else{
+                        if (currentMesh->isDepthFogged)
+                            setPixel(round_x, y, correctZ, getFogPixelValue(&theLine.p1, &theLine.p2, ratio, correctZ) );
+                        else
+                            setPixel(round_x, y, correctZ, getPerspCorrectLerpColor(&theLine.p1, &theLine.p2, ratio) );
+                    }
+
                 }
 
                 y++;
@@ -238,10 +254,19 @@ void Renderer::drawLine(Line theLine, ShadingModel theShadingModel, bool doAmbie
 
                         // Calculate the lit pixel value, apply distance fog then attempt to set it:
                         lightPointInCameraSpace(&currentPosition, doAmbient, specularExponent, specularCoefficient);
-                        setPixel(x, round_y, correctZ, getDistanceFoggedColor( currentPosition.color, correctZ ) );
+
+                        if (currentMesh->isDepthFogged)
+                            setPixel(x, round_y, correctZ, getDistanceFoggedColor( currentPosition.color, correctZ ) );
+                        else
+                            setPixel(x, round_y, correctZ, currentPosition.color );
                     }
-                    else
-                        setPixel(x, round_y, correctZ, getFogPixelValue(&theLine.p1, &theLine.p2, ratio, correctZ) );
+                    else{
+                        if (currentMesh->isDepthFogged)
+                            setPixel(x, round_y, correctZ, getFogPixelValue(&theLine.p1, &theLine.p2, ratio, correctZ) );
+                        else
+                            setPixel(x, round_y, correctZ, getPerspCorrectLerpColor(&theLine.p1, &theLine.p2, ratio) );
+                    }
+
                 }
 
                 y += slope;
@@ -828,11 +853,14 @@ void Renderer::renderScene(Scene theScene){
     }
 
     // Process and draw each mesh in the scene:
-    for (auto &currentMesh : theScene.theMeshes)
-        drawMesh(&currentMesh);
+    for (auto &renderMesh : theScene.theMeshes){
+        currentMesh = &renderMesh;
+        drawMesh(&renderMesh);
+    }
 
     // Remove the pointer to the current scene
     currentScene = nullptr;
+    currentMesh = nullptr;
 }
 
 // Draw a scanline, with consideration to the Z-Buffer
@@ -864,7 +892,10 @@ void Renderer::drawScanlineIfVisible(Vertex* start, Vertex* end){
         double correctZ = getPerspCorrectLerpValue(start->z, start->z, end->z, end->z, ratio);
 
         if (isVisible(x, y_rounded, correctZ) ){
-            setPixel(x, y_rounded, correctZ, getFogPixelValue(start, end, ratio, correctZ) );
+            if (currentMesh->isDepthFogged)
+                setPixel(x, y_rounded, correctZ, getFogPixelValue(start, end, ratio, correctZ) );
+            else
+                setPixel(x, y_rounded, correctZ, getPerspCorrectLerpColor(start, end, ratio) );
         }
 
         z += z_slope;
@@ -922,7 +953,11 @@ void Renderer::drawPerPxLitScanlineIfVisible(Vertex* start, Vertex* end, bool do
 
             // Calculate the lit pixel value, apply distance fog then set it:
             lightPointInCameraSpace(&currentPosition, doAmbient, specularExponent, specularCoefficient);
-            setPixel(x, y_rounded, correctZ, getDistanceFoggedColor( currentPosition.color, correctZ ) );
+
+            if (currentMesh->isDepthFogged)
+                setPixel(x, y_rounded, correctZ, getDistanceFoggedColor( currentPosition.color, correctZ ) );
+            else
+                setPixel(x, y_rounded, correctZ, currentPosition.color);
         }
 
         ratio += ratioDiff;

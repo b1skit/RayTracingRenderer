@@ -15,12 +15,14 @@ Mesh::Mesh(){
 Mesh::Mesh(const Mesh &existingMesh){
     faces = existingMesh.faces;
     isWireframe = existingMesh.isWireframe;
+    isDepthFogged = existingMesh.isDepthFogged;
 }
 
 // Overloaded assignment operator
 Mesh& Mesh::operator=(const Mesh& rhs){
     this->faces = rhs.faces;
     this->isWireframe = rhs.isWireframe;
+    this->isDepthFogged = rhs.isDepthFogged;
 
     return *this;
 }

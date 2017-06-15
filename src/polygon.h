@@ -101,12 +101,6 @@ public:
     // Get a count of the number of vertices contained by this polygon
     int getVertexCount();
 
-    // Check if this polygon is affected by depth fog
-    bool isAffectedByDepthFog();
-
-    // Set whether or not this polygon is affected by depth fog
-    void setAffectedByDepthFog(bool newAffectedByDepthFog);
-
     // Check whether this polygon is affected by ambient lighting
     bool isAffectedByAmbientLight();
 
@@ -157,7 +151,6 @@ private:
     unsigned int vertexArraySize; // Size of the vertex array in this polygon
     unsigned int currentVertices; // The number of vertices actually added to this polygon
 
-    bool isDepthFogged; // Atmospheric fog
     bool isAmbientLit; // Ambient lighting
 
     ShadingModel theShadingModel; // The shading model to be used for this polygon

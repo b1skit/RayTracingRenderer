@@ -43,11 +43,14 @@ Scene FileInterpreter::buildSceneFromFile(string filename){
 }
 
 // Recursive helper function: Extracts polygons
-vector<Mesh> FileInterpreter::getMeshHelper(string filename, bool currentIsWireframe, bool currentDepthFog, bool currentAmbientLighting, bool currentUseSurfaceColor, unsigned int currentSurfaceColor, ShadingModel currentShadingModel, double currentSpecCoef, double currentSpecExponent){
-    bool isWireframe = currentIsWireframe;                // Wireframe/filled flag
-    bool usesDepthFog = currentDepthFog;                // Depth fog flag
-    bool usesAmbientLighting = currentAmbientLighting;  // Ambient lighting flag
+vector<Mesh> FileInterpreter::getMeshHelper(string filename, bool currentIsWireframe, bool currentisDepthFogged, bool currentAmbientLighting, bool currentUseSurfaceColor, unsigned int currentSurfaceColor, ShadingModel currentShadingModel, double currentSpecCoef, double currentSpecExponent){
 
+    // Mesh flags:
+    bool isWireframe = currentIsWireframe;                // Wireframe/filled flag
+    bool isDepthFogged = currentisDepthFogged;            // Depth fog flag
+
+    // Polygon flags:
+    bool usesAmbientLighting = currentAmbientLighting;  // Ambient lighting flag
     bool usesSurfaceColor = currentUseSurfaceColor;
     unsigned int theSurfaceColor = currentSurfaceColor;
 
@@ -66,8 +69,7 @@ vector<Mesh> FileInterpreter::getMeshHelper(string filename, bool currentIsWiref
     input->open(filename);
     if (input->is_open() ){
 
-        // Catch errors caused by malformed files
-        try {
+        try { // Catch errors caused by malformed files
             while(!input->eof()){ // Loop until the end of the file has been reached
 
                 // Extract and cleanse the current line:
@@ -158,7 +160,6 @@ vector<Mesh> FileInterpreter::getMeshHelper(string filename, bool currentIsWiref
 
                         currentScene->xLow = stod(*theIterator++);
                         currentScene->yLow = stod(*theIterator++);
-
                         currentScene->xHigh = stod(*theIterator++);
                         currentScene->yHigh = stod(*theIterator++);
 
@@ -175,19 +176,18 @@ vector<Mesh> FileInterpreter::getMeshHelper(string filename, bool currentIsWiref
                         currentScene->ambientGreenIntensity = stod(*theIterator++);
                         currentScene->ambientBlueIntensity = stod(*theIterator++);
 
-                        // Update the ambient flag
-                        usesAmbientLighting = true;
-
+                        usesAmbientLighting = true; // Update the ambient flag
                     }
 
                     // Handle depth commands:
                     else if (theIterator->compare("depth") == 0){
                         theIterator++;
-                        usesDepthFog = true;
+                        isDepthFogged = true;
 
                         // Update the renderer with the new parameters
                         currentScene->fogHither = stod(*theIterator++);
                         currentScene->fogYon = stod(*theIterator++);
+
                         currentScene->fogRedIntensity = stod(*theIterator++);
                         currentScene->fogGreenIntensity = stod(*theIterator++);
                         currentScene->fogBlueIntensity = stod(*theIterator++);
@@ -274,7 +274,6 @@ vector<Mesh> FileInterpreter::getMeshHelper(string filename, bool currentIsWiref
 
                             // Set the fog and ambient lighting:
                             objContents[i].setShadingModel(theShadingModel);
-                            objContents[i].setAffectedByDepthFog(usesDepthFog);
                             objContents[i].setAffectedByAmbientLight(usesAmbientLighting);
                         }
                         currentFaces.insert(currentFaces.end(), objContents.begin(), objContents.end() );
@@ -285,7 +284,7 @@ vector<Mesh> FileInterpreter::getMeshHelper(string filename, bool currentIsWiref
 
                         theIterator++; // Move the iterator to the filename element
 
-                        vector<Mesh> newMeshes = getMeshHelper("./" + *theIterator + ".simp", isWireframe, usesDepthFog, usesAmbientLighting, usesSurfaceColor, theSurfaceColor, theShadingModel, theSpecCoefficient, theSpecExponent);
+                        vector<Mesh> newMeshes = getMeshHelper("./" + *theIterator + ".simp", isWireframe, isDepthFogged, usesAmbientLighting, usesSurfaceColor, theSurfaceColor, theShadingModel, theSpecCoefficient, theSpecExponent);
 
                         theIterator++;
 
@@ -335,7 +334,6 @@ vector<Mesh> FileInterpreter::getMeshHelper(string filename, bool currentIsWiref
                         newFace.addVertex(v1);
                         newFace.addVertex(v2);
 
-                        newFace.setAffectedByDepthFog(usesDepthFog);
                         newFace.setAffectedByAmbientLight(usesAmbientLighting);
 
                         newFace.transform(&CTM); // Apply the CTM to the line
@@ -403,7 +401,6 @@ vector<Mesh> FileInterpreter::getMeshHelper(string filename, bool currentIsWiref
                         newFace.transform(&CTM); // Apply the CTM
 
                         // Set the various polygon drawing flags:
-                        newFace.setAffectedByDepthFog(usesDepthFog);
                         newFace.setAffectedByAmbientLight(usesAmbientLighting);
 
                         newFace.setSpecularCoefficient(theSpecCoefficient);
@@ -432,12 +429,18 @@ vector<Mesh> FileInterpreter::getMeshHelper(string filename, bool currentIsWiref
                         }
 
                         // Insert the processed faces into the final mesh object:
-                        Mesh newMesh;
-                        newMesh.faces = currentFaces;
-                        newMesh.isWireframe = isWireframe;
-                        extractedMeshes.emplace_back( newMesh );
+                        if (currentFaces.size() > 0 ){
+                            Mesh newMesh;
+                            newMesh.faces = currentFaces;
+                            currentFaces.clear();
 
-                        currentFaces.clear();
+                            // Set the mesh flags:
+                            newMesh.isWireframe = isWireframe;
+                            newMesh.isDepthFogged = isDepthFogged;
+
+                            // Add the mesh
+                            extractedMeshes.emplace_back( newMesh );
+                        }
 
                         if (!currentUseSurfaceColor) // Handle recursive cases where we've inherited a color and it needs to apply to the loaded file
                             usesSurfaceColor = false;
@@ -458,10 +461,18 @@ vector<Mesh> FileInterpreter::getMeshHelper(string filename, bool currentIsWiref
     // Close the input stream
     input->close();
 
-    // Insert the final set of faces into a mesh, and add it to the scene
-    Mesh newMesh;
-    newMesh.faces = currentFaces;
-    extractedMeshes.emplace_back( newMesh );
+    // Insert any final set of faces into a mesh, and add it to the scene
+    if (currentFaces.size() > 0){
+
+        Mesh newMesh;
+        newMesh.faces = currentFaces;
+
+        // Set the mesh flags:
+        newMesh.isWireframe = isWireframe;
+        newMesh.isDepthFogged = isDepthFogged;
+
+        extractedMeshes.emplace_back( newMesh );
+    }
 
     return extractedMeshes;
 }
@@ -520,7 +531,6 @@ list<string> FileInterpreter::split(string line){
 
             start = indexIterator + 1; // Move our starting position
             indexIterator+= 2;
-
         }
 
         // Handle '/' characters:

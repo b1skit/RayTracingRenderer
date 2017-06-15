@@ -19,7 +19,6 @@ Polygon::Polygon(){ //
     vertices = new Vertex[vertexArraySize];
     currentVertices = 0;
 
-    isDepthFogged = false; // Don't use depth cueing or atmospheric fog by default
     isAmbientLit = false;
 
     // Set the shading model to ambient only, by default:
@@ -40,7 +39,6 @@ Polygon::Polygon(Vertex p0, Vertex p1, Vertex p2){
 
     currentVertices = 3;
 
-    isDepthFogged = false;
     isAmbientLit = false;
 
     // Set the shading model to ambient only, by default:
@@ -52,7 +50,6 @@ Polygon::Polygon(const Polygon& currentPoly){
     this->vertexArraySize = currentPoly.vertexArraySize;
     this->currentVertices = currentPoly.currentVertices;
 
-    this->isDepthFogged = currentPoly.isDepthFogged;
     this->isAmbientLit = currentPoly.isAmbientLit;
 
     this->theShadingModel = currentPoly.theShadingModel;
@@ -73,7 +70,6 @@ Polygon& Polygon::operator=(const Polygon& rhs){
     this->vertexArraySize = rhs.vertexArraySize;
     this->currentVertices = rhs.currentVertices;
 
-    this->isDepthFogged = rhs.isDepthFogged;
     this->isAmbientLit = rhs.isAmbientLit;
 
     this->theShadingModel = rhs.theShadingModel;
@@ -304,7 +300,6 @@ Polygon Polygon::clipHelper(Polygon source, Vertex planePoint, normalVector plan
 
     // Create a result Polygon, and copy the source's key attributes
     Polygon result;
-    result.isDepthFogged = source.isDepthFogged;
     result.isAmbientLit = source.isAmbientLit;
 
     result.theShadingModel = source.theShadingModel;
@@ -428,7 +423,6 @@ vector<Polygon>* Polygon::getTriangulatedFaces(){
     int lastIndex = currentVertices - 1;
     while (index < lastIndex){
         Polygon newFace; // Create a new empty polygon, and copy the essential drawing attributes into it
-        newFace.isDepthFogged = this->isDepthFogged;
         newFace.isAmbientLit = this->isAmbientLit;
 
         newFace.theShadingModel = this->theShadingModel;
@@ -445,16 +439,6 @@ vector<Polygon>* Polygon::getTriangulatedFaces(){
     }
 
     return result;
-}
-
-// Check if this polygon is affected by depth fog
-bool Polygon::isAffectedByDepthFog(){
-    return isDepthFogged;
-}
-
-// Set whether or not this polygon is affected by depth fog
-void Polygon::setAffectedByDepthFog(bool newAffectedByDepthFog){
-    isDepthFogged = newAffectedByDepthFog;
 }
 
 // Check whether this polygon is affected by ambient lighting
