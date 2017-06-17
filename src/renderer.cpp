@@ -454,11 +454,8 @@ void Renderer::drawLine(Line theLine, ShadingModel theShadingModel, bool doAmbie
 
 // Draw a polygon. Calls the rasterize Polygon helper function
 // If thePolygon vertices are all not the same color, the color will be LERP'd
-// Assumption: All polygons are in world space
+// Pre-condition: All polygons are in camera space
 void Renderer::drawPolygon(Polygon thePolygon, bool isWireframe){
-
-    // Transform to camera space
-    thePolygon.transform(&worldToCamera);
 
     // Cull polygons outside of hither/yon
     if (!thePolygon.isInDepth(currentScene->camHither, currentScene->camYon)){
@@ -475,15 +472,14 @@ void Renderer::drawPolygon(Polygon thePolygon, bool isWireframe){
     // Apply ambient lighting to Lines, if neccessary:
     if (thePolygon.isLine() && thePolygon.isAffectedByAmbientLight() ){
         thePolygon.lightAmbiently( currentScene->ambientRedIntensity, currentScene->ambientGreenIntensity, currentScene->ambientBlueIntensity);
-
     }
 
     // Calculate flat/gouraud lighting (while we're still in camera space)
-    // Handle flat:
+    // Handle flat shading:
     else if (thePolygon.getShadingModel() == flat && !isWireframe && !thePolygon.isLine() ){ // Only light the polygon if it's not wireframe or a line
         flatShadePolygon( &thePolygon );
     }
-    // Handle gouraud:
+    // Handle gouraud shading:
     else if (thePolygon.getShadingModel() == gouraud && !isWireframe && !thePolygon.isLine()){ // Only light the polygon if it's not wireframe or a line
         gouraudShadePolygon( &thePolygon );
     }
@@ -849,8 +845,9 @@ void Renderer::drawPolygonWireframe(Polygon* thePolygon){
 
 // Draw a mesh object
 void Renderer::drawMesh(Mesh* theMesh){
-    for (unsigned int i = 0; i < theMesh->faces.size(); i++)
+    for (unsigned int i = 0; i < theMesh->faces.size(); i++){
         drawPolygon(theMesh->faces[i], theMesh->isWireframe);
+    }
 }
 
 // Render a scene
@@ -866,9 +863,14 @@ void Renderer::renderScene(Scene theScene){
         currentLight.position.transform(&worldToCamera); // THIS MODIFIES THE ORIGINAL SCENE LIGHTS!!!!! NEED TO FIX THIS!!!!!!!!!!!!!!!!!!!!!!!!
     }
 
+    // Transform each mesh into camera space:
+    for(auto &processMesh : theScene.theMeshes){
+        processMesh.transform(&worldToCamera);
+    }
+
     // Process and draw each mesh in the scene:
     for (auto &renderMesh : theScene.theMeshes){
-        currentMesh = &renderMesh;
+        currentMesh = &renderMesh; // Update the currentMesh pointer to the current mesh being drawn
         drawMesh(&renderMesh);
     }
 
@@ -1010,6 +1012,9 @@ void Renderer::lightPointInCameraSpace(Vertex* currentPosition, normalVector vie
         double currentNormalDotLightDirection = currentPosition->normal.dotProduct(lightDirection);
 
         if (currentNormalDotLightDirection > 0){
+
+            // Check if the polygon is shaded by any other polygons in the scene:
+
 
             // Get the attenuation factor of the current light:
             double attenuationFactor = currentScene->theLights[i].getAttenuationFactor(*currentPosition);
@@ -1194,44 +1199,6 @@ void Renderer::transformCamera(TransformationMatrix cameraMovement){
     screenToPerspective = TransformationMatrix();        // Reset the matrix back to the identity
     screenToPerspective *= perspectiveToScreen;
     screenToPerspective = screenToPerspective.getInverse();
-
-
-//    // Reset the depth buffer
-//    resetDepthBuffer();
-
-//    worldToCamera = cameraMovement.getInverse(); // Store the inverse of the camera movements as the world->camera xform
-
-//    // Rebuild the toScreen matrix:
-//    perspectiveToScreen = TransformationMatrix(); // Reset to the identity matrix
-
-//    // Calculate highest resolution
-//    int highestResolution;
-//    if (xRes > yRes)
-//        highestResolution = xRes;
-//    else
-//        highestResolution = yRes;
-
-//    double highestXYDelta;
-//    if ((newXHigh - newXLow) > (newYHigh - newYLow))
-//        highestXYDelta = newXHigh - newXLow;
-//    else
-//        highestXYDelta = newYHigh - newYLow;
-
-//    // We build our matrix in reverse here, so each new xForm is on the right  [currentxForms] * [newXform]
-//    // Ie. Last xForm added is the first applied when we use this to transform a vector
-//    perspectiveToScreen.addTranslation(xRes/2, yRes/2, 0); // Shift local space origin to be centered at center of raster
-
-//    // Scale:
-//    perspectiveToScreen.addNonUniformScale( (highestResolution - (2 * border)) / (highestXYDelta), ( (highestResolution - (2 * border)) / (highestXYDelta) ), 1 ); // Scale
-
-//    // Center the camera within the xlow/ylow/xhigh/yhigh view window:
-//    perspectiveToScreen.addTranslation(-(newXHigh + newXLow)/2.0, -(newYHigh + newYLow)/2.0, 0);
-
-//    // Rebuild the matrix that transforms points from screen space back to perspective space:
-//    screenToPerspective = TransformationMatrix();        // Reset the matrix back to the identity
-//    screenToPerspective *= perspectiveToScreen;
-//    screenToPerspective = screenToPerspective.getInverse();
-
 }
 
 // Visually debug lights:

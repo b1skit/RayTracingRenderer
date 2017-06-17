@@ -91,6 +91,11 @@ vector<Mesh> FileInterpreter::getMeshHelper(string filename, bool currentIsWiref
                         theIterator++;
                     }
 
+                    else if (theIterator->compare("raytrace") == 0 ){
+                        theIterator++;
+                        currentScene->numRayBounces = stoi(*theIterator++);
+                    }
+
                     // Handle open brace "{"
                     else if(theIterator->compare("{") == 0){
                         theIterator++;
@@ -275,6 +280,9 @@ vector<Mesh> FileInterpreter::getMeshHelper(string filename, bool currentIsWiref
                             // Set the fog and ambient lighting:
                             objContents[i].setShadingModel(theShadingModel);
                             objContents[i].setAffectedByAmbientLight(usesAmbientLighting);
+
+                            // Calculate the face normal of the polygon:
+                            objContents[i].faceNormal = objContents[i].getFaceNormal();
                         }
                         currentFaces.insert(currentFaces.end(), objContents.begin(), objContents.end() );
                     }
@@ -412,6 +420,9 @@ vector<Mesh> FileInterpreter::getMeshHelper(string filename, bool currentIsWiref
                         for (int i = 0; i < newFace.getVertexCount(); i++){
                             newFace.vertices[i].normal = faceNormal;
                         }
+
+                        // Store the face normal of the polygon:
+                        newFace.faceNormal = faceNormal;
 
                         // Place the new face in the vector:
                         currentFaces.emplace_back(newFace);

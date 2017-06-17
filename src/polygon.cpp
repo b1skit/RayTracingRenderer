@@ -43,6 +43,8 @@ Polygon::Polygon(Vertex p0, Vertex p1, Vertex p2){
 
     // Set the shading model to ambient only, by default:
     theShadingModel = ambientOnly;
+
+    faceNormal = this->getFaceNormal();
 }
 
 // Copy constructor
@@ -59,7 +61,9 @@ Polygon::Polygon(const Polygon& currentPoly){
     this->vertices = new Vertex[vertexArraySize];
     for (unsigned int i = 0; i < vertexArraySize; i++){
         this->vertices[i] = currentPoly.vertices[i];
-    }   
+    }
+
+    this->faceNormal = currentPoly.faceNormal;
 }
 
 // Overloaded assignment operator
@@ -80,6 +84,8 @@ Polygon& Polygon::operator=(const Polygon& rhs){
     this->vertices = new Vertex[vertexArraySize];
     for (unsigned int i = 0; i < currentVertices; i++)
         this->vertices[i] = rhs.vertices[i];
+
+    this->faceNormal = rhs.faceNormal;
 
     return *this;
 }
@@ -343,7 +349,7 @@ bool Polygon::inside(Vertex theVertex, Vertex thePlane, normalVector planeNormal
 // Calculate a vector intersection with a plane. Used to clip polygons.
 Vertex Polygon::intersection(Vertex prevVertex, Vertex currentVertex, Vertex planePoint, normalVector planeNormal, bool doPerspectiveCorrect){
 
-    // Vector from D to C
+    // Vector from current to previous vertex
     Vertex distance = currentVertex - prevVertex;
 
     // Calculate the ratio of the cosine angles between the line and the plane
@@ -397,6 +403,9 @@ void Polygon::transform(TransformationMatrix* theMatrix, bool doRound){
     for (unsigned int i = 0; i < currentVertices; i++){
         vertices[i].transform(theMatrix, doRound);
     }
+
+    // Transform the face normal
+    faceNormal.transform(theMatrix);
 }
 
 // Get a count of the number of vertices contained by this polygon

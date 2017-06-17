@@ -1,9 +1,9 @@
 # This scene renders 4 spheres to demonstrate each shading model (wireframe, flat, gouraud, phong)
 
 phong
-
 ambient 0.3 0.3 0.3
 depth 1 6 0 0 0
+raytrace 0
 
 # Default Camera
 {

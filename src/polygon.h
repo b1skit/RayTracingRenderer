@@ -147,6 +147,8 @@ public:
 
     Vertex* vertices; // An array of points that describe this polygon
 
+    normalVector faceNormal;    // The pre-computed face normal of this polygon
+
 private:
     unsigned int vertexArraySize; // Size of the vertex array in this polygon
     unsigned int currentVertices; // The number of vertices actually added to this polygon

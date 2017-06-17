@@ -1,7 +1,7 @@
 phong
 ambient .3 .3 .32
 depth 1 12 0 0 0
-
+raytrace 0
 
 # Default Camera
 {

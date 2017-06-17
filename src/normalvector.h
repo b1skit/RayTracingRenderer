@@ -52,7 +52,9 @@ public:
     // Normal vector attributes:
     //**************************
 
-    double xn, yn, zn;
+    double xn = 0; // Initialize to zero, to prevent nan issues
+    double yn = 0;
+    double zn = 0;
 
 
     // Debug this object

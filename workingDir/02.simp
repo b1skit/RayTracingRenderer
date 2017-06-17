@@ -1,9 +1,9 @@
 # This scene renders a grid of spheres to demonstrate various specular settings for the phong shading model
 
+phong
 ambient 0 0 0
 depth 1 35 0 0 0
-
-phong
+raytrace 0
 
 # Camera
 {
