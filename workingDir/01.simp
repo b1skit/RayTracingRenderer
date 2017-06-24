@@ -1,10 +1,12 @@
 # This scene renders 4 spheres to demonstrate each shading model (wireframe, flat, gouraud, phong)
 
-phong
 ambient 0.3 0.3 0.3
 depth 1 6 0 0 0
 raytrace 0
 #noshadows
+
+phong
+reflectivity 0.5
 
 # Default Camera
 {
@@ -38,6 +40,7 @@ wire
 		
 		surface 0.6 0.6 0.6
 		specular 0.5 2.5
+		reflectivity 0.5
 		
         obj "unitSphere_20"
 }
@@ -48,6 +51,7 @@ wire
 		
 		surface 0.6 0.6 0.6
 		specular 0.5 2.5
+		reflectivity 0.5
         obj "unitPlane"
 }
 
@@ -61,6 +65,7 @@ flat
 		
 		surface 0.6 0.6 0.6
 		specular 0.5 2.5
+		reflectivity 0.5
         obj "unitSphere_20"
 }
 # Flat Shaded Plane
@@ -70,6 +75,7 @@ flat
 		
 		surface 0.6 0.6 0.6
 		specular 0.5 2.5
+		reflectivity 0.5
         obj "unitPlane"
 }
 
@@ -81,6 +87,7 @@ gouraud
 		
 		surface 0.6 0.6 0.6
 		specular 0.5 2.5
+		reflectivity 0.5
         obj "unitSphere_20"
 }
 # Gouraud Shaded Plane
@@ -90,6 +97,7 @@ gouraud
 
 		surface 0.6 0.6 0.6
 		specular 0.5 2.5
+		reflectivity 0.5
         obj "unitPlane"
 }
 
@@ -101,6 +109,7 @@ phong
 
 		surface 0.6 0.6 0.6
 		specular 0.5 2.5
+		reflectivity 0.5
         obj "unitSphere_20"
 }
 # Phong Shaded Plane
@@ -110,5 +119,6 @@ phong
 
 		surface 0.6 0.6 0.6
 		specular 0.5 2.5
+		reflectivity 0.5
         obj "unitPlane"
 }

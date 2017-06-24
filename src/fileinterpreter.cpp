@@ -35,7 +35,7 @@ Scene FileInterpreter::buildSceneFromFile(string filename){
     Scene theScene;
     currentScene = &theScene; // Save the address of the scene being constructed
 
-    theScene.theMeshes = getMeshHelper(filename, false, false, false, false, 0xffffffff, phong , 0.3, 8); // Set the default values to start
+    theScene.theMeshes = getMeshHelper(filename, false, false, false, false, 0xffffffff, phong , 0.3, 8, 0.5); // Set the default values to start
 
     // Generate bounding boxes:
     for (auto &currentMesh : theScene.theMeshes){
@@ -48,7 +48,7 @@ Scene FileInterpreter::buildSceneFromFile(string filename){
 }
 
 // Recursive helper function: Extracts polygons
-vector<Mesh> FileInterpreter::getMeshHelper(string filename, bool currentIsWireframe, bool currentisDepthFogged, bool currentAmbientLighting, bool currentUseSurfaceColor, unsigned int currentSurfaceColor, ShadingModel currentShadingModel, double currentSpecCoef, double currentSpecExponent){
+vector<Mesh> FileInterpreter::getMeshHelper(string filename, bool currentIsWireframe, bool currentisDepthFogged, bool currentAmbientLighting, bool currentUseSurfaceColor, unsigned int currentSurfaceColor, ShadingModel currentShadingModel, double currentSpecCoef, double currentSpecExponent, double currentReflectivity){
 
     // Mesh flags:
     bool isWireframe = currentIsWireframe;                // Wireframe/filled flag
@@ -62,6 +62,7 @@ vector<Mesh> FileInterpreter::getMeshHelper(string filename, bool currentIsWiref
     ShadingModel theShadingModel = currentShadingModel;
     double theSpecCoefficient = currentSpecCoef;
     double theSpecExponent = currentSpecExponent;
+    double theReflectivity = currentReflectivity;
 
     TransformationMatrix CTM;                   // Identity matrix
     stack<TransformationMatrix> theCTMStack;    // Stack of CTM's
@@ -248,6 +249,14 @@ vector<Mesh> FileInterpreter::getMeshHelper(string filename, bool currentIsWiref
                         theSpecExponent = stod(*theIterator++);
                     }
 
+                    // Handle reflectivity commands:
+                    else if (theIterator->compare("reflectivity") == 0){
+                        theIterator++;
+
+                        // Store the reflectivity settings
+                        theReflectivity = stod(*theIterator++);
+                    }
+
                     // Handle flat shading:
                     else if (theIterator->compare("flat") == 0){
                         theIterator++;
@@ -273,7 +282,7 @@ vector<Mesh> FileInterpreter::getMeshHelper(string filename, bool currentIsWiref
                         // Extract the polygons:
                         vector<Polygon> objContents = getPolysFromObj("./" + *theIterator + ".obj");
 
-                        // Process the polygons:
+                        // Process the recieved polygons:
                         for (unsigned int i = 0; i < objContents.size(); i++){
                             objContents[i].transform(&CTM);
 
@@ -284,9 +293,9 @@ vector<Mesh> FileInterpreter::getMeshHelper(string filename, bool currentIsWiref
                             objContents[i].setSpecularCoefficient(theSpecCoefficient);
                             objContents[i].setSpecularExponent(theSpecExponent);
                             objContents[i].setShadingModel(theShadingModel);
+                            objContents[i].setReflectivity(theReflectivity);
 
                             // Set the fog and ambient lighting:
-                            objContents[i].setShadingModel(theShadingModel);
                             objContents[i].setAffectedByAmbientLight(usesAmbientLighting);
 
                             // Calculate the face normal of the polygon:
@@ -300,7 +309,7 @@ vector<Mesh> FileInterpreter::getMeshHelper(string filename, bool currentIsWiref
 
                         theIterator++; // Move the iterator to the filename element
 
-                        vector<Mesh> newMeshes = getMeshHelper("./" + *theIterator + ".simp", isWireframe, isDepthFogged, usesAmbientLighting, usesSurfaceColor, theSurfaceColor, theShadingModel, theSpecCoefficient, theSpecExponent);
+                        vector<Mesh> newMeshes = getMeshHelper("./" + *theIterator + ".simp", isWireframe, isDepthFogged, usesAmbientLighting, usesSurfaceColor, theSurfaceColor, theShadingModel, theSpecCoefficient, theSpecExponent, theReflectivity);
 
                         theIterator++;
 
@@ -422,6 +431,7 @@ vector<Mesh> FileInterpreter::getMeshHelper(string filename, bool currentIsWiref
                         newFace.setSpecularCoefficient(theSpecCoefficient);
                         newFace.setSpecularExponent(theSpecExponent);
                         newFace.setShadingModel(theShadingModel);
+                        newFace.setReflectivity(theReflectivity);
 
                         // Set all .simp object polygon normals to be equivalent to face normals
                         normalVector faceNormal = newFace.getFaceNormal();

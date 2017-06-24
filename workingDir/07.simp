@@ -22,7 +22,9 @@ raytrace 0
 		rotate X 17
 		rotate Y 26
 		
-		specular 1 10		
+		specular 1 10
+		reflectivity 0.5
+		
 		obj "unitCubeColored"
 	}
 
@@ -33,7 +35,9 @@ raytrace 0
 		rotate X 35
 		rotate Y 19
 		
-		specular 1 10		
+		specular 1 10
+		reflectivity 0.5		
+		
 		obj "unitCubeColored"
 	}
 
@@ -44,7 +48,9 @@ raytrace 0
 		rotate X 42
 		rotate Y 63
 		
-		specular 1 10		
+		specular 1 10
+		reflectivity 0.5
+		
 		obj "unitCubeColored"
 	}
 
@@ -55,7 +61,9 @@ raytrace 0
 		rotate X 84
 		rotate Y 99
 		
-		specular 1 10		
+		specular 1 10
+		reflectivity 0.5
+		
 		obj "unitCubeColored"
 	}
 
@@ -66,7 +74,9 @@ raytrace 0
 		rotate X 160
 		rotate Y 122
 		
-		specular 1 10		
+		specular 1 10
+		reflectivity 0.5
+		
 		obj "unitCubeColored"
 	}
 
@@ -77,7 +87,9 @@ raytrace 0
 		rotate X 150
 		rotate Y 45
 		
-		specular 1 10		
+		specular 1 10
+		reflectivity 0.5
+		
 		obj "unitCubeColored"
 	}
 	
@@ -86,7 +98,9 @@ raytrace 0
 		rotate X 225
 		rotate Y 315
 		
-		specular 1 10		
+		specular 1 10
+		reflectivity 0.5
+		
 		obj "unitCubeColored"
 	}
 	
@@ -97,7 +111,9 @@ raytrace 0
 		scale 11 11 1
 		rotate X 90
 		
-		specular 1 10		
+		specular 1 10
+		reflectivity 0.5
+		
 		obj "unitPlaneColored"
 	}
 }

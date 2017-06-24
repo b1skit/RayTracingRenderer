@@ -111,7 +111,7 @@ void Renderer::drawLine(Line theLine, ShadingModel theShadingModel, bool doAmbie
                     viewVector.normalize();
 
                     // Calculate the lit pixel value, apply distance fog then attempt to set it:
-                    lightPointInCameraSpace(&currentPosition, viewVector, doAmbient, specularExponent, specularCoefficient);
+                    lightPointInCameraSpace(&currentPosition, viewVector, doAmbient, specularExponent, specularCoefficient, currentScene->numRayBounces);
 
                     if (currentMesh->isDepthFogged)
                         setPixel((int)theLine.p1.x, y, correctZ, getDistanceFoggedColor( currentPosition.color, correctZ ) );
@@ -205,7 +205,7 @@ void Renderer::drawLine(Line theLine, ShadingModel theShadingModel, bool doAmbie
                         normalVector viewVector(-currentPosition.x, -currentPosition.y, -currentPosition.z);
                         viewVector.normalize();
 
-                        lightPointInCameraSpace(&currentPosition, viewVector, doAmbient, specularExponent, specularCoefficient);
+                        lightPointInCameraSpace(&currentPosition, viewVector, doAmbient, specularExponent, specularCoefficient, currentScene->numRayBounces);
 
                         if (currentMesh->isDepthFogged) // Calculate the lit pixel value, apply distance fog then attempt to set it:
                             setPixel(round_x, y, correctZ, getDistanceFoggedColor( currentPosition.color, correctZ ) );
@@ -265,7 +265,7 @@ void Renderer::drawLine(Line theLine, ShadingModel theShadingModel, bool doAmbie
                         viewVector.normalize();
 
                         // Calculate the lit pixel value, apply distance fog then attempt to set it:
-                        lightPointInCameraSpace(&currentPosition, viewVector, doAmbient, specularExponent, specularCoefficient);
+                        lightPointInCameraSpace(&currentPosition, viewVector, doAmbient, specularExponent, specularCoefficient, currentScene->numRayBounces);
 
                         if (currentMesh->isDepthFogged)
                             setPixel(x, round_y, correctZ, getDistanceFoggedColor( currentPosition.color, correctZ ) );
@@ -823,7 +823,7 @@ void Renderer::gouraudShadePolygon(Polygon* thePolygon){
         normalVector viewVector(-thePolygon->vertices[i].x, -thePolygon->vertices[i].y, -thePolygon->vertices[i].z);
         viewVector.normalize();
 
-        lightPointInCameraSpace(&thePolygon->vertices[i], viewVector, thePolygon->isAffectedByAmbientLight(), thePolygon->getSpecularExponent(), thePolygon->getSpecularCoefficient() );
+        lightPointInCameraSpace(&thePolygon->vertices[i], viewVector, thePolygon->isAffectedByAmbientLight(), thePolygon->getSpecularExponent(), thePolygon->getSpecularCoefficient(), currentScene->numRayBounces );
     }
 }
 
@@ -984,7 +984,7 @@ void Renderer::drawPerPxLitScanlineIfVisible(Vertex* start, Vertex* end, bool do
             viewVector.normalize();
 
             // Calculate the lit pixel value, apply distance fog then set it:
-            lightPointInCameraSpace(&currentPosition, viewVector, doAmbient, specularExponent, specularCoefficient);
+            lightPointInCameraSpace(&currentPosition, viewVector, doAmbient, specularExponent, specularCoefficient, currentScene->numRayBounces);
 
             if (currentMesh->isDepthFogged) {
                 setPixel(x, y_rounded, correctZ, getDistanceFoggedColor( currentPosition.color, correctZ ) );
@@ -1001,7 +1001,7 @@ void Renderer::drawPerPxLitScanlineIfVisible(Vertex* start, Vertex* end, bool do
 
 // Light a given point in camera space
 // Precondition: viewVector is normalized
-void Renderer::lightPointInCameraSpace(Vertex* currentPosition, normalVector viewVector, bool doAmbient, double specularExponent, double specularCoefficient) {
+void Renderer::lightPointInCameraSpace(Vertex* currentPosition, normalVector viewVector, bool doAmbient, double specularExponent, double specularCoefficient, int bounceRays) {
 
     // Running light totals:
     unsigned int ambientValue = 0;
@@ -1087,6 +1087,23 @@ void Renderer::lightPointInCameraSpace(Vertex* currentPosition, normalVector vie
                                                 multiplyColorChannels( currentPosition->color, 1.0, redTotalDiffuseIntensity, greenTotalDiffuseIntensity, blueTotalDiffuseIntensity ),
                                                 combineColorChannels( redTotalSpecIntensity, greenTotalSpecIntensity, blueTotalSpecIntensity ) )
                                               );
+
+    // Calculate recursive bounce light contribution:
+
+    if (bounceRays > 0){
+        // Calculate the bounce vector:
+
+        // Find an intersection point, if it exists:
+
+        //    -> If no intersection exists, STOP HERE!!!
+
+
+        // Make the recursive call:
+
+        // Attenuate the bounced light by SOME MATERIAL PROPERTY!
+
+        // Add the color of the bounce intersection to the currentPosition
+    }
 }
 
 // Determine whether a current position is shadowed by some polygon in the scene that lies between it and a light

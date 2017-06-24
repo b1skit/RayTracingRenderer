@@ -37,7 +37,7 @@ private:
     Scene* currentScene; // A Scene object: Used to insert values during construction
 
     // Recursive helper function: Extracts polygons
-    vector<Mesh> getMeshHelper(string filename, bool currentDrawFilled, bool currentDepthFog, bool currentAmbientLighting, bool currentUseSurfaceColor, unsigned int currentSurfaceColor, ShadingModel currentShadingModel, double currentSpecCoef, double currentSpecExponent);
+    vector<Mesh> getMeshHelper(string filename, bool currentDrawFilled, bool currentDepthFog, bool currentAmbientLighting, bool currentUseSurfaceColor, unsigned int currentSurfaceColor, ShadingModel currentShadingModel, double currentSpecCoef, double currentSpecExponent, double currentReflectivity);
 
     // Read an obj file
     // Return: A vector<Polygon> containing all of the faces described by the obj

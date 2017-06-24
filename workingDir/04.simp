@@ -43,7 +43,7 @@ raytrace 0
 	{
 			surface 0.7 0.7 0.7 
 			specular 0.6 12
-			
+			reflectivity 0.5
 			
 			obj "lightScene_A"
 	}
@@ -52,7 +52,8 @@ raytrace 0
 	{
 			surface 0 0.7 0.7 
 			specular 0.75 200
-
+			reflectivity 0.5
+			
 			obj "lightScene_B"
 	}
 	
@@ -60,7 +61,8 @@ raytrace 0
 	{
 			surface 0.7 0 0.7 
 			specular 0.99 300
-
+			reflectivity 0.5
+			
 			obj "lightScene_C"
 	}
 	
@@ -68,6 +70,7 @@ raytrace 0
 	{
 			surface 0.7 0.7 0 
 			specular 0.6 12
+			reflectivity 0.5
 
 			obj "lightScene_D"
 	}
@@ -76,6 +79,7 @@ raytrace 0
 	{
 			surface 0.2 0.3 0.7 
 			specular 0.45 1.9
+			reflectivity 0.5
 
 			obj "lightScene_E"
 	}
@@ -84,6 +88,8 @@ raytrace 0
 	{
 			surface 0.75 0.25 0.45 
 			specular 0.4 10
+			reflectivity 0.5
+			
 			obj "lightScene_F"
 	}
 	
@@ -91,6 +97,7 @@ raytrace 0
 	{
 			surface 0.5 0.3 0.9 
 			specular 0.39 20
+			reflectivity 0.5
 
 			obj "lightScene_G"
 	}
@@ -99,6 +106,7 @@ raytrace 0
 	{
 			surface 0.7 0.4 0.2 
 			specular 0.25 93
+			reflectivity 0.5
 
 			obj "lightScene_H"
 	}
@@ -107,6 +115,7 @@ raytrace 0
 	{
 			surface 0.1 0.7 0.15 
 			specular 1 160
+			reflectivity 0.5
 
 			obj "lightScene_I"
 	}
@@ -115,6 +124,7 @@ raytrace 0
 	{
 			surface 0.95 0.7 0.2 
 			specular 1 115
+			reflectivity 0.5
 
 			obj "lightScene_J"
 	}
@@ -123,6 +133,7 @@ raytrace 0
 	{
 			surface 0.7 0 0 
 			specular 8 75
+			reflectivity 0.5
 
 			obj "lightScene_K"
 	}
@@ -132,6 +143,7 @@ raytrace 0
 	
 			surface 1 1 1 
 			specular 1 200
+			reflectivity 0.5
 
 			obj "lightScene_L"
 	}
@@ -140,6 +152,7 @@ raytrace 0
 	{
 			surface 0 0 0 
 			specular 1 200
+			reflectivity 0.5
 
 			obj "lightScene_M"
 	}
@@ -148,6 +161,7 @@ raytrace 0
 	{
 			surface 0.8 0.8 0.9 
 			specular 0.6 22
+			reflectivity 0.5
 
 			obj "lightScene_N"
 	}

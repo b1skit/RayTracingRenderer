@@ -43,6 +43,8 @@ raytrace 0
 
 	surface 0.51 0.505 0.6
 	specular 0.05 4
+	reflectivity 0.1
+	
 	obj "elephant"
 }
 
@@ -50,6 +52,7 @@ raytrace 0
 {
 	surface 0.55 0.55 0.55
 	specular 0.1 2
+	reflectivity 0.5
 
 	scale 10 5.5 5.5
 	

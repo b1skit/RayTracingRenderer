@@ -501,6 +501,16 @@ void Polygon::setSpecularExponent(double newSpecExponent){
     specularExponent = newSpecExponent;
 }
 
+// Get this polygon's reflectivity
+double Polygon::getReflectivity(){
+    return reflectivity;
+}
+
+// Set this polygon's reflectivity
+void Polygon::setReflectivity(double newReflectivity){
+    reflectivity = newReflectivity;
+}
+
 // Get the center of this polygon, as a vertex
 Vertex Polygon::getFaceCenter(){
     double xTotal = 0;

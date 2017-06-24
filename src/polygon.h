@@ -128,6 +128,12 @@ public:
     // Set this polygon's specular exponent
     void setSpecularExponent(double newSpecExponent);
 
+    // Get this polygon's reflectivity
+    double getReflectivity();
+
+    // Set this polygon's reflectivity
+    void setReflectivity(double newReflectivity);
+
     // Get the center of this polygon, as a vertex
     Vertex getFaceCenter();
 
@@ -158,6 +164,7 @@ private:
     ShadingModel theShadingModel; // The shading model to be used for this polygon
     double specularCoefficient = 0.3;
     double specularExponent = 8;
+    double reflectivity = 0.5;
 
     // Check if a vertex is in the positive half space of a plane. Used to clip polygons.
     bool inside(Vertex V, Vertex P, normalVector n);

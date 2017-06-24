@@ -4,7 +4,9 @@ depth 0 150 0 0 0
 ambient 0.25 0.25 0.25
 raytrace 0
 
-wire
+reflectivity 0
+
+#wire
 
 # Camera
 {

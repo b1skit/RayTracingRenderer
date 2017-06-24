@@ -38,7 +38,9 @@ raytrace 0
 	rotate Y 223
 	
 	surface .75 .75 .75 
-	specular 1 150		
+	specular 1 150
+	reflectivity 0.75
+	
 	obj "car"
 }
 
@@ -49,6 +51,8 @@ raytrace 0
 	
 	surface 0.3 0.3 0.3 
 	specular 0.1 2
+	reflectivity 0.5
+	
 	obj lightscene_A
 }
 
