@@ -41,11 +41,16 @@ Light& Light::operator=(const Light& rhs){
     return *this;
 }
 
-// Calculate the attenuation of this light to a point, as a ratio
+// Calculate the attenuation of this light to a point, as a ratio (Overloaded)
 double Light::getAttenuationFactor(Vertex thePoint){
     normalVector distance(position.x - thePoint.x, position.y - thePoint.y, position.z - thePoint.z);
 
     return (1.0 /((double) (attenuationA + (attenuationB * distance.length() ) ) ));
+}
+
+// Calculate the attenuation of this light to a point, as a ratio (Overloaded)
+double Light::getAttenuationFactor(double distance){
+    return (1.0 /((double) (attenuationA + (attenuationB * distance) ) ));
 }
 
 // Debug this light:

@@ -18,11 +18,11 @@ public:
     // Copy Constructor
     normalVector(const normalVector& rhs);
 
-    // Overloaded assignment operator
-    normalVector& operator=(const normalVector& rhs);
-
     // Interpolation constructor: Builds an interpolated normal vector based on current between start and end
     normalVector(const normalVector& lhs, double lhsZ, const normalVector& rhs, double rhsZ, double current, double start, double end);
+
+    // Overloaded assignment operator
+    normalVector& operator=(const normalVector& rhs);
 
     // Normalize the vector
     void normalize();
@@ -31,7 +31,7 @@ public:
     double length();
 
     // Get the cross product of this and another vector
-    normalVector& crossProduct(const normalVector& rhs);
+    normalVector crossProduct(const normalVector& rhs);
 
     // Get the dot product of this and another vector
     double dotProduct(const normalVector& rhs);
@@ -39,8 +39,11 @@ public:
     // Overloaded scalar multiplication operator
     normalVector& operator*=(const double rhs);
 
+    // Overloaded scalar multiplication operator
+    normalVector operator*(double scalar);
+
     // Overloaded (friend) subtraction operator
-    friend normalVector& operator-(const normalVector& lhs, const normalVector& rhs);
+    friend normalVector operator-(const normalVector& lhs, const normalVector& rhs);
 
     // Determine if this normal is (0, 0, 0)
     bool isZero();

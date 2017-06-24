@@ -40,13 +40,16 @@ public:
     bool operator!=(Vertex &otherVertex);
 
     // Overloaded subtraction operator: Perform componenent-wise subtraction of 2 vertices
-    Vertex& operator-(const Vertex& rhs) const;
+    Vertex operator-(const Vertex& rhs) const;
 
     // Overloaded addition operator: Perform componenent-wise addition of 2 vertices
-    Vertex& operator+(const Vertex& rhs) const;
+    Vertex operator+(const Vertex& rhs) const;
+
+    // Overloaded addition operator: Perform componenent-wise addition of 2 vertices
+    Vertex operator+(const normalVector& rhs) const;
 
     // Multiply the components of this vertex by a scalar
-    Vertex& operator*(double scale);
+    Vertex operator*(double scale);
 
     // Perform a dot product: Vertex vector dot product normal vector.
     double dot(normalVector theNormal);
@@ -83,6 +86,12 @@ public:
 //    double xt;
 //    double yt;
 //    double zt;
+
+
+//    // Check if another vertex is within a certain threshold
+//    bool isClose(Vertex otherPoint);
+
+
 
 private:
     static const unsigned int DEFAULT_COLOR = 0xffffffff; // Default color for all vertices, if none is assigned

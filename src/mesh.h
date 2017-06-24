@@ -9,6 +9,7 @@
 #include <vector>
 
 using std::vector;
+class Mesh;
 
 class Mesh
 {
@@ -28,6 +29,9 @@ public:
     // Transform this Mesh by a transformation matrix
     void transform(TransformationMatrix* theMatrix, bool doRound);
 
+    // Generate/update a bounding box around the faces of this mesh
+    // Precondition: The mesh has at least 1 polygon
+    void generateBoundingBox();
 
     // Debug this mesh
     void debug();
@@ -35,6 +39,7 @@ public:
 
     // Mesh attributes:
     vector<Polygon> faces; // This mesh's collection of faces
+    vector<Polygon> boundingBoxFaces;    // A collection of 6 faces that make up a bounding box surrounding this polygon
 
     bool isWireframe = false; // Whether or not this mesh's polygons are to be rendered in wireframe, or filled
     bool isDepthFogged = false;  // Whether or not this mesh is occluded by atmospheric fog. Default = false

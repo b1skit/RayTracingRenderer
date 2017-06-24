@@ -4,6 +4,7 @@ phong
 ambient 0 0 0
 depth 1 35 0 0 0
 raytrace 0
+noshadows
 
 # Camera
 {

@@ -80,7 +80,9 @@ Polygon& Polygon::operator=(const Polygon& rhs){
     this->specularCoefficient = rhs.specularCoefficient;
     this->specularExponent = rhs.specularExponent;
 
-    delete[] vertices;
+    if (vertices != nullptr)
+        delete[] vertices;
+
     this->vertices = new Vertex[vertexArraySize];
     for (unsigned int i = 0; i < currentVertices; i++)
         this->vertices[i] = rhs.vertices[i];
@@ -100,7 +102,7 @@ Polygon::~Polygon(){
 }
 
 // Add a vertex to the polygon.
-// Assumption: Vertices are always added in a Counter Clockwise order (vertices[i+1] = CCW, vertices[i-1] = CW
+// PreCondition: Vertices are always added in a Counter Clockwise order (vertices[i+1] = CCW, vertices[i-1] = CW
 void Polygon::addVertex(Vertex newPoint){
     // If the vertex array still has space left:
     if (currentVertices < vertexArraySize){
@@ -118,7 +120,7 @@ void Polygon::addVertex(Vertex newPoint){
         for (unsigned int i = 0; i < vertexArraySize; i++){
             newVertices[i] = vertices[i];
         }
-        // Deallocate the array now that we've stored the values elsewhere
+        // Deallocate the old array now that we've stored the values elsewhere
         delete [] vertices;
 
         newPoint.vertexNumber = vertexArraySize;
@@ -265,7 +267,7 @@ bool Polygon::isInFrustum(double xLow, double xHigh, double yLow, double yHigh){
 }
 
 // Clip a polygon to the near/far planes
-// Note: Algorithm sourced from "Computer Graphics: Principals and Practice" Volume 3
+// Note: Algorithm modified from "Computer Graphics: Principals and Practice" Volume 3
 void Polygon::clipHitherYon(double hither, double yon){
     Vertex hitherPlane(0, 0, hither);
     normalVector hitherNormal(0, 0, 1);
@@ -312,6 +314,8 @@ Polygon Polygon::clipHelper(Polygon source, Vertex planePoint, normalVector plan
     result.specularCoefficient = source.specularCoefficient;
     result.specularExponent = source.specularExponent;
 
+    result.faceNormal = source.faceNormal;
+
     bool dontAddLast = false; // Flag: Prevent adding extra vertices at the end
     int last = source.getVertexCount() - 1; // Last index: Calculated once here
 
@@ -343,7 +347,7 @@ Polygon Polygon::clipHelper(Polygon source, Vertex planePoint, normalVector plan
 
 // Check if a vertex is in the positive half space of a plane. Used to clip polygons.
 bool Polygon::inside(Vertex theVertex, Vertex thePlane, normalVector planeNormal){
-    return (theVertex - thePlane).dot(planeNormal) >= 0;
+    return (theVertex - thePlane).dot(planeNormal) >= 0; // Compare vector pointing from plane towards point against the face normal
 }
 
 // Calculate a vector intersection with a plane. Used to clip polygons.
@@ -516,8 +520,8 @@ Vertex Polygon::getFaceCenter(){
 normalVector Polygon::getFaceNormal(){
 
     // Calculate vectors originating at vertex 0, and pointing towards vertices 1 & 2
-    normalVector lhs(vertices[1].x - vertices[0].x, vertices[1].y - vertices[0].y, vertices[1].z - vertices[0].z);
-    normalVector rhs(vertices[2].x - vertices[0].x, vertices[2].y - vertices[0].y, vertices[2].z - vertices[0].z);
+    normalVector lhs(vertices[1].x - vertices[0].x, vertices[1].y - vertices[0].y, vertices[1].z - vertices[0].z);  // 0 to 1
+    normalVector rhs(vertices[2].x - vertices[0].x, vertices[2].y - vertices[0].y, vertices[2].z - vertices[0].z);  // 0 to 2
 
     // Perform a cross product, and normalize the result:
     lhs = lhs.crossProduct(rhs);
@@ -549,12 +553,15 @@ normalVector Polygon::getNormalAverage(){
 
 // Debug this polygon
 void Polygon::debug(){
+
     cout << "Polygon:\n";
     for (unsigned int i = 0; i < currentVertices; i++){
         vertices[i].debug();
-        if (i != currentVertices - 1)
-            cout << "\n";
+//        if (i != currentVertices - 1)
+//            cout << "\n";
     }
-    cout << "End Polygon.\n";
+    cout << "Face normal: ";
+    faceNormal.debug();
+    cout << "End Polygon.\n\n";
 }
 

@@ -13,6 +13,12 @@
 #include <iostream>
 
 
+// FOR DEBUG ONLY:
+#include "vertex.h"
+#include "polygon.h"
+// ^FOR DEBUG ONLY^
+
+
 
 #include <chrono>
 using std::chrono::high_resolution_clock;
@@ -100,86 +106,127 @@ void Client::nextPage() {
 
 
 
-
-
-//    Scene scene2 = clientFileInterpreter.buildSceneFromFile("./debug.simp");
-//    clientRenderer->renderScene(scene2);
-
+    Scene scene2 = clientFileInterpreter.buildSceneFromFile("./debug.simp");
+    clientRenderer->renderScene(scene2);
 
 
 
 
 
 
-    // Handle command line mode:
-    if (commandLineMode){
-        Scene cmdLineScene = clientFileInterpreter.buildSceneFromFile("./" + filename + ".simp");
-        clientRenderer->renderScene(cmdLineScene);
-    }
-    else{ // Handle standard mode:
+//    // TEST inside
 
-        Scene theScene;
-        high_resolution_clock::time_point t1, t2;
+//    Polygon* testPoly = new Polygon();
 
-        t1 = high_resolution_clock::now();
+//    Vertex A(0, 0, 0);
+//    Vertex B(1, 0, 0);
+//    Vertex C(1, 1, 0);
+//    Vertex D(0, 1, 0);
 
-        // Load the appropriate mesh:
-        switch(pageNumber % 7) {
-        case 0:{ // Page 1:
-            theScene = clientFileInterpreter.buildSceneFromFile("./01.simp");
-        }
-            break;
-
-        case 1:{ // Page 2:
-            theScene = clientFileInterpreter.buildSceneFromFile("./02.simp");
-        }
-            break;
-
-        case 2:{ // Page 3:
-            theScene = clientFileInterpreter.buildSceneFromFile("./03.simp");
-            }
-            break;
-
-        case 3:{ // Page 4:
-            theScene = clientFileInterpreter.buildSceneFromFile("./04.simp");
-        }
-            break;
-
-        case 4:{ // Page 5:
-            theScene = clientFileInterpreter.buildSceneFromFile("./05.simp");
-        }
-            break;
-
-        case 5: { // Page 6:
-            theScene = clientFileInterpreter.buildSceneFromFile("./06.simp");
-            }
-            break;
-
-        case 6: { // Page 7:
-            theScene = clientFileInterpreter.buildSceneFromFile("./07.simp");
-            }
-            break;
-
-        default: // We should never reach this state!
-            // Draw bright pink boxes to highlight error state
-            clientRenderer->drawRectangle(50, 50, 700, 700, 0xffff00ea);
-            break;
-
-        } // End switch
-
-        t2 = high_resolution_clock::now();
-        auto duration = duration_cast<microseconds>( t2 - t1 ).count();
-        cout << "File read in:\t" << duration << "ms\n";
+//    testPoly->addVertex(A);
+//    testPoly->addVertex(B);
+//    testPoly->addVertex(C);
+////    testPoly->addVertex(D);
 
 
-        // Draw the mesh:
-        t1 = high_resolution_clock::now();
-        clientRenderer->renderScene(theScene);
-        t2 = high_resolution_clock::now();
-        duration = duration_cast<microseconds>( t2 - t1 ).count();
-        cout << "Mesh drawn in:\t" << duration << "ms\n\n";
+//    testPoly->faceNormal = testPoly->getFaceNormal();
 
-    } // End "commandLineMode" else
+//    Vertex* testIntersectionPoint = new Vertex(-0.1,0.1,0);
+
+//    // Test inside func
+//    if ( clientRenderer->pointIsInsidePoly( testPoly, testIntersectionPoint ) )
+//        cout << "Point is inside!\n";
+//    else
+//        cout << "Point is outside!\n";
+
+//    Vertex* planeIntersect = new Vertex(0.1,0.1,-1);
+
+//    Vertex* result = new Vertex();
+//    clientRenderer->getPolyPlaneIntersectionPoint(planeIntersect, new normalVector(0,0,1), &A, &testPoly->faceNormal, result);
+//    result->debug();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//    // Handle command line mode:
+//    if (commandLineMode){
+//        Scene cmdLineScene = clientFileInterpreter.buildSceneFromFile("./" + filename + ".simp");
+//        clientRenderer->renderScene(cmdLineScene);
+//    }
+//    else{ // Handle standard mode:
+
+//        Scene theScene;
+//        high_resolution_clock::time_point t1, t2;
+
+//        t1 = high_resolution_clock::now();
+
+//        // Load the appropriate mesh:
+//        switch(pageNumber % 7) {
+//        case 0:{ // Page 1:
+//            theScene = clientFileInterpreter.buildSceneFromFile("./01.simp");
+//        }
+//            break;
+
+//        case 1:{ // Page 2:
+//            theScene = clientFileInterpreter.buildSceneFromFile("./02.simp");
+//        }
+//            break;
+
+//        case 2:{ // Page 3:
+//            theScene = clientFileInterpreter.buildSceneFromFile("./03.simp");
+//            }
+//            break;
+
+//        case 3:{ // Page 4:
+//            theScene = clientFileInterpreter.buildSceneFromFile("./04.simp");
+//        }
+//            break;
+
+//        case 4:{ // Page 5:
+//            theScene = clientFileInterpreter.buildSceneFromFile("./05.simp");
+//        }
+//            break;
+
+//        case 5: { // Page 6:
+//            theScene = clientFileInterpreter.buildSceneFromFile("./06.simp");
+//            }
+//            break;
+
+//        case 6: { // Page 7:
+//            theScene = clientFileInterpreter.buildSceneFromFile("./07.simp");
+//            }
+//            break;
+
+//        default: // We should never reach this state!
+//            // Draw bright pink boxes to highlight error state
+//            clientRenderer->drawRectangle(50, 50, 700, 700, 0xffff00ea);
+//            break;
+
+//        } // End switch
+
+//        t2 = high_resolution_clock::now();
+//        auto duration = duration_cast<microseconds>( t2 - t1 ).count();
+//        cout << "File read in:\t" << duration << "ms\n";
+
+
+//        // Draw the mesh:
+//        t1 = high_resolution_clock::now();
+//        clientRenderer->renderScene(theScene);
+//        t2 = high_resolution_clock::now();
+//        duration = duration_cast<microseconds>( t2 - t1 ).count();
+//        cout << "Mesh drawn in:\t" << duration << "ms\n\n";
+
+//    } // End "commandLineMode" else
 
     pageNumber++; // Increment the page number
 }

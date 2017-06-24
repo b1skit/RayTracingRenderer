@@ -44,6 +44,7 @@ public:
     // Visually debug the renderer's collection of lights
     void debugLights();
 
+
 private:
     Drawable* drawable; // A drawable object, used to interface with QT framework
 
@@ -55,10 +56,10 @@ private:
     int** ZBuffer;               // Z Depth buffer
     int maxZVal = std::numeric_limits<int>::max();    // Max possible z-depth value
 
-
-    // The current scene and mesh objects being drawn (used to access various render variables)
+    // The current scene, mesh & polgyon objects being drawn (used to access various render variables)
     Scene* currentScene;
     Mesh* currentMesh;
+    Polygon* currentPolygon;
 
     // A transformation matrix from world to camera space
     TransformationMatrix worldToCamera;
@@ -139,6 +140,17 @@ private:
 
     // Get a scaled z-buffer value for a given Z
     int getScaledZVal(double correctZ);
+
+    // Determine whether a current position is shadowed by some polygon in the scene that lies between it and a light
+    bool isShadowed(Vertex* currentPosition, normalVector* lightDirection, double lightDistance);
+
+    // Find the intersection point of a ray and the plane of a polygon
+    // Return: True if the ray intersects, false otherwise. Modifies result Vertex to be the point of intersection, leaves it unchanged otherwise
+    bool getPolyPlaneIntersectionPoint(Vertex* currentPosition, normalVector* currentDirection, Vertex* planePoint, normalVector* planeNormal, Vertex* result);
+
+    // Determine whether a point on a polygon's plane lies within the polygon
+    bool pointIsInsidePoly(Polygon* thePolygon, Vertex* intersectionPoint);
+
 };
 
 #endif // MYRENDERER_H

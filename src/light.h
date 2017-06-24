@@ -19,11 +19,15 @@ public:
     // Overloaded assignment operator
     Light& operator=(const Light& rhs);
 
-    // Light attributes:
-    Vertex position; // This lights position, as a point in space
-
     // Calculate the attenuation of this light to a point, as a ratio
     double getAttenuationFactor(Vertex thePoint);
+
+    // Calculate the attenuation of this light to a point, as a ratio
+    double getAttenuationFactor(double distance);
+
+
+    // Light attributes:
+    Vertex position; // This lights position, as a point in space
 
     // The light's color:
     double redIntensity, greenIntensity, blueIntensity;     // [0, 1]

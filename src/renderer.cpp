@@ -514,7 +514,7 @@ void Renderer::drawPolygon(Polygon thePolygon, bool isWireframe){
     }
 
     // Trianglulate:
-    vector<Polygon>* theFaces = thePolygon.getTriangulatedFaces();
+    vector<Polygon>* theFaces = thePolygon.getTriangulatedFaces();  
 
     // Render each resulting triangle:
     for (unsigned int i = 0; i < theFaces->size(); i++){
@@ -618,8 +618,8 @@ void Renderer::rasterizePolygon(Polygon* thePolygon){
             drawPerPxLitScanlineIfVisible( &lhs, &rhs, thePolygon->isAffectedByAmbientLight(), thePolygon->getSpecularCoefficient(), thePolygon->getSpecularExponent());
         }
         else
-            drawScanlineIfVisible( new Vertex(xLeft_rounded, (double)y, leftCorrectZ, getPerspCorrectLerpColor(topLeftVertex, botLeftVertex, leftRatio)),
-                                   new Vertex(xRight_rounded, (double)y, rightCorrectZ, getPerspCorrectLerpColor(topRightVertex, botRightVertex, rightRatio))
+            drawScanlineIfVisible( &Vertex(xLeft_rounded, (double)y, leftCorrectZ, getPerspCorrectLerpColor(topLeftVertex, botLeftVertex, leftRatio)),
+                                   &Vertex(xRight_rounded, (double)y, rightCorrectZ, getPerspCorrectLerpColor(topRightVertex, botRightVertex, rightRatio))
                                    );
 
         y--; // Move to the next line, and handle transitions between vertices if neccessary:
@@ -846,8 +846,12 @@ void Renderer::drawPolygonWireframe(Polygon* thePolygon){
 // Draw a mesh object
 void Renderer::drawMesh(Mesh* theMesh){
     for (unsigned int i = 0; i < theMesh->faces.size(); i++){
+        currentPolygon = &theMesh->faces[i];    // Track the current polygon, so we can identify it after we've made a copy to pass down the rendering pipeline
         drawPolygon(theMesh->faces[i], theMesh->isWireframe);
     }
+
+    // Remove the reference to the currentPolygon, for safety
+    currentPolygon = nullptr;
 }
 
 // Render a scene
@@ -860,18 +864,26 @@ void Renderer::renderScene(Scene theScene){
 
     // Transform lights from world space to camera space:
     for (auto &currentLight : theScene.theLights){
-        currentLight.position.transform(&worldToCamera); // THIS MODIFIES THE ORIGINAL SCENE LIGHTS!!!!! NEED TO FIX THIS!!!!!!!!!!!!!!!!!!!!!!!!
+        currentLight.position.transform(&worldToCamera);
+
     }
 
-    // Transform each mesh into camera space:
-    for(auto &processMesh : theScene.theMeshes){
-        processMesh.transform(&worldToCamera);
+
+    // Transform meshes into camera space:
+    for(auto &processingMesh : theScene.theMeshes){
+        processingMesh.transform(&worldToCamera);
     }
 
     // Process and draw each mesh in the scene:
     for (auto &renderMesh : theScene.theMeshes){
         currentMesh = &renderMesh; // Update the currentMesh pointer to the current mesh being drawn
         drawMesh(&renderMesh);
+
+
+//        // VISIBLY DEBUG BOUNDING BOXES:
+//        for (int i = 0; i < renderMesh.boundingBoxFaces.size(); i++){
+//            drawPolygon(renderMesh.boundingBoxFaces[i], true);
+//        }
     }
 
     // Remove the pointer to the current scene
@@ -991,8 +1003,8 @@ void Renderer::drawPerPxLitScanlineIfVisible(Vertex* start, Vertex* end, bool do
 // Precondition: viewVector is normalized
 void Renderer::lightPointInCameraSpace(Vertex* currentPosition, normalVector viewVector, bool doAmbient, double specularExponent, double specularCoefficient) {
 
+    // Running light totals:
     unsigned int ambientValue = 0;
-
     double redTotalDiffuseIntensity, greenTotalDiffuseIntensity, blueTotalDiffuseIntensity, redTotalSpecIntensity, greenTotalSpecIntensity, blueTotalSpecIntensity;
     redTotalDiffuseIntensity = greenTotalDiffuseIntensity = blueTotalDiffuseIntensity = redTotalSpecIntensity = greenTotalSpecIntensity = blueTotalSpecIntensity = 0;
 
@@ -1011,59 +1023,62 @@ void Renderer::lightPointInCameraSpace(Vertex* currentPosition, normalVector vie
         // Get the cosine of the angle between the face normal and the light direction
         double currentNormalDotLightDirection = currentPosition->normal.dotProduct(lightDirection);
 
-        if (currentNormalDotLightDirection > 0){
+        // Ensure the light is within 90 degrees about the surface normal, and is not shaded by any other polygons in the scene:
+        if (currentNormalDotLightDirection > 0) {
 
-            // Check if the polygon is shaded by any other polygons in the scene:
+            double lightDistance = normalVector(currentScene->theLights[i].position.x - currentPosition->x, currentScene->theLights[i].position.y - currentPosition->y, currentScene->theLights[i].position.z - currentPosition->z).length();
+
+            // Calculate light value if scene or current point is unshadowed
+            if (currentScene->noRayShadows || !isShadowed(currentPosition, &lightDirection, lightDistance) ){
+
+                double attenuationFactor = currentScene->theLights[i].getAttenuationFactor(lightDistance);
+
+                // Mutliply the light intensities by the attenuation:
+                double redDiffuseIntensity = currentScene->theLights[i].redIntensity * attenuationFactor;
+                double greenDiffuseIntensity = currentScene->theLights[i].greenIntensity * attenuationFactor;
+                double blueDiffuseIntensity = currentScene->theLights[i].blueIntensity * attenuationFactor;
+
+                // Factor the cosine value into the light intensity values:
+                redDiffuseIntensity *= currentNormalDotLightDirection;
+                greenDiffuseIntensity *= currentNormalDotLightDirection;
+                blueDiffuseIntensity *= currentNormalDotLightDirection;
+
+                // Add the diffuse intensity for the current light to the running totals
+                redTotalDiffuseIntensity += redDiffuseIntensity;
+                greenTotalDiffuseIntensity += greenDiffuseIntensity;
+                blueTotalDiffuseIntensity += blueDiffuseIntensity;
+
+                // Calculate the spec component:
+                double redSpecIntensity = specularCoefficient;
+                double greenSpecIntensity = specularCoefficient;
+                double blueSpecIntensity = specularCoefficient;
+
+                // Calculate the reflection vector:
+                normalVector reflectionVector = currentPosition->normal;
+                reflectionVector *= 2 * currentNormalDotLightDirection;
+                reflectionVector = reflectionVector - lightDirection;
+                reflectionVector.normalize();
+
+                // Calculate the cosine of the angle between the view vector and the reflection vector:
+                double viewDotReflection = viewVector.dotProduct(reflectionVector);
+                if (viewDotReflection < 0) // Clamp the value to be >=0
+                    viewDotReflection = 0;
+
+                viewDotReflection = pow(viewDotReflection, specularExponent );
+
+                redSpecIntensity *= (currentScene->theLights[i].redIntensity * attenuationFactor * viewDotReflection);
+                greenSpecIntensity *= (currentScene->theLights[i].greenIntensity * attenuationFactor * viewDotReflection);
+                blueSpecIntensity *= (currentScene->theLights[i].blueIntensity * attenuationFactor * viewDotReflection);
 
 
-            // Get the attenuation factor of the current light:
-            double attenuationFactor = currentScene->theLights[i].getAttenuationFactor(*currentPosition);
+                // Add the final diffuse/spec values to the running totals:
 
-            // Mutliply the light intensities by the attenuation:
-            double redDiffuseIntensity = currentScene->theLights[i].redIntensity * attenuationFactor;
-            double greenDiffuseIntensity = currentScene->theLights[i].greenIntensity * attenuationFactor;
-            double blueDiffuseIntensity = currentScene->theLights[i].blueIntensity * attenuationFactor;
+                redTotalSpecIntensity += redSpecIntensity;
+                greenTotalSpecIntensity += greenSpecIntensity;
+                blueTotalSpecIntensity += blueSpecIntensity;
 
-            // Factor the cosine value into the light intensity values:
-            redDiffuseIntensity *= currentNormalDotLightDirection;
-            greenDiffuseIntensity *= currentNormalDotLightDirection;
-            blueDiffuseIntensity *= currentNormalDotLightDirection;
-
-            // Add the diffuse intensity for the current light to the running totals
-            redTotalDiffuseIntensity += redDiffuseIntensity;
-            greenTotalDiffuseIntensity += greenDiffuseIntensity;
-            blueTotalDiffuseIntensity += blueDiffuseIntensity;
-
-            // Calculate the spec component:
-            double redSpecIntensity = specularCoefficient;
-            double greenSpecIntensity = specularCoefficient;
-            double blueSpecIntensity = specularCoefficient;
-
-            // Calculate the reflection vector:
-            normalVector reflectionVector = currentPosition->normal;
-            reflectionVector *= 2 * currentNormalDotLightDirection;
-            reflectionVector = reflectionVector - lightDirection;
-            reflectionVector.normalize();
-
-            // Calculate the cosine of the angle between the view vector and the reflection vector:
-            double viewDotReflection = viewVector.dotProduct(reflectionVector);
-            if (viewDotReflection < 0) // Clamp the value to be >=0
-                viewDotReflection = 0;
-
-            viewDotReflection = pow(viewDotReflection, specularExponent );
-
-            redSpecIntensity *= (currentScene->theLights[i].redIntensity * attenuationFactor * viewDotReflection);
-            greenSpecIntensity *= (currentScene->theLights[i].greenIntensity * attenuationFactor * viewDotReflection);
-            blueSpecIntensity *= (currentScene->theLights[i].blueIntensity * attenuationFactor * viewDotReflection);
-
-
-            // Add the final diffuse/spec values to the running totals:
-
-            redTotalSpecIntensity += redSpecIntensity;
-            greenTotalSpecIntensity += greenSpecIntensity;
-            blueTotalSpecIntensity += blueSpecIntensity;
-
-        } // end if
+            } // End ifShadowed check
+        } // end if surface normal check
     } // End lights loop
 
     // Combine the color values, and assign their sum as the color of the currentPosition:
@@ -1072,6 +1087,119 @@ void Renderer::lightPointInCameraSpace(Vertex* currentPosition, normalVector vie
                                                 multiplyColorChannels( currentPosition->color, 1.0, redTotalDiffuseIntensity, greenTotalDiffuseIntensity, blueTotalDiffuseIntensity ),
                                                 combineColorChannels( redTotalSpecIntensity, greenTotalSpecIntensity, blueTotalSpecIntensity ) )
                                               );
+}
+
+// Determine whether a current position is shadowed by some polygon in the scene that lies between it and a light
+// Precondition: All Polygons in the scene must have at least 3 vertices, and all meshes must have pre-calcualted bounding boxes
+bool Renderer::isShadowed(Vertex* currentPosition, normalVector* lightDirection, double lightDistance){
+
+    // Allocate a vertex to hold any intersection results we find:
+    Vertex* intersectionResult = new Vertex(); // Modified if getPolyPlaneIntersectionPoint() finds a point of intersection
+
+    // Loop through all Meshes in the current scene
+    for (auto &currentVisibleMesh : currentScene->theMeshes){
+
+        // Loop through each face of the current mesh's bounding box
+        for (int i = 0; i < currentVisibleMesh.boundingBoxFaces.size(); i++){
+
+            // Find an intersection point with the bounding box, if it exists:
+            if ( getPolyPlaneIntersectionPoint(currentPosition, lightDirection, &currentVisibleMesh.boundingBoxFaces[i].vertices[0], &currentVisibleMesh.boundingBoxFaces[i].faceNormal, intersectionResult ) ){
+
+                // Ensure the intersection is between the currentPosition and the light:
+                if ( (*intersectionResult - *currentPosition).length() < lightDistance ){
+
+                    // Ensure the intersection point hit the bounding box
+                    if ( pointIsInsidePoly( &currentVisibleMesh.boundingBoxFaces[i], intersectionResult ) ){
+
+                        // We have a bounding box intersection hit! Loop through each visible face in the current mesh and find an actual intersection point:
+                        for (int j = 0; j < currentVisibleMesh.faces.size(); j++){
+
+                            // Skip the current polygon (as it always has an intersection)
+                            if ( &currentVisibleMesh.faces[j] == currentPolygon )
+                                continue;
+
+                            // Find an actual intersection point, if it exists:
+                            if ( getPolyPlaneIntersectionPoint(currentPosition, lightDirection, &currentVisibleMesh.faces[j].vertices[0], &currentVisibleMesh.faces[j].faceNormal, intersectionResult ) ){
+
+                                // Ensure the intersection is between the currentPosition and the light:
+                                if ( (*intersectionResult - *currentPosition).length() < lightDistance ){
+
+                                    // Check if the intersection point is inside of the polygon
+                                    if( pointIsInsidePoly( &currentVisibleMesh.faces[j], intersectionResult ) ){ // We've found an intersection!
+
+                                        // Cleanup:
+                                        delete intersectionResult;
+
+                                        return true;
+                                    }
+                                }
+
+                            } // End current face checking
+
+                        } // End visible face checking loop
+
+                        break; // Don't bother checking any more of the bounding box faces, already checked all of the visible faces once.
+
+                    } // End bounding box inside check
+
+                } // End bounding box intersection between light and position check
+
+            } // End bounding box intersection check
+
+        } // End bounding box face loop
+
+    } // End mesh loop
+
+    // Cleanup:
+    delete intersectionResult;
+
+    return false;
+}
+
+// Find the intersection point of a ray and the plane of a polygon
+// Return: True if the ray intersects, false otherwise. Modifies result Vertex to be the point of intersection, leaves it unchanged otherwise
+bool Renderer::getPolyPlaneIntersectionPoint(Vertex* currentPosition, normalVector* currentDirection, Vertex* planePoint, normalVector* planeNormal, Vertex* intersectionResult){
+
+    double currentDirectionDotPlaneNormal = currentDirection->dotProduct(*planeNormal);
+
+    // Check if direction and poly plane are parallel (ie. == 0), or if we're hitting the backface of the polygon (ie. < 0)
+    if (currentDirectionDotPlaneNormal <= 0)
+        return false;
+
+    double distance = (*planePoint - *currentPosition).dot(*planeNormal)/(double)currentDirectionDotPlaneNormal;
+    // Ensure the intersection is in front of the ray ( >0.1 to avoid intersections with neighbouring polys in the same mesh)
+    if (distance > 0.1){
+        *intersectionResult = (*currentPosition + (*currentDirection * distance));
+        return true;
+    }
+
+    return false; // The intersection was behind the ray
+}
+
+// Determine whether a point on a polygon's plane lies within the polygon
+bool Renderer::pointIsInsidePoly(Polygon* thePolygon, Vertex* intersectionPoint){
+
+    bool isInside = true;
+    for (int i = 0; i < thePolygon->getVertexCount() - 1; i++){
+
+        normalVector innerNormal(thePolygon->vertices[i].x - thePolygon->vertices[i+1].x, thePolygon->vertices[i].y - thePolygon->vertices[i+1].y, thePolygon->vertices[i].z - thePolygon->vertices[i+1].z);
+
+        innerNormal = innerNormal.crossProduct(thePolygon->faceNormal);
+
+        if ((*intersectionPoint - thePolygon->vertices[i]).dot(innerNormal) < 0){
+            isInside = false;
+        }
+    }
+
+    normalVector innerNormal(thePolygon->vertices[thePolygon->getVertexCount() - 1].x - thePolygon->vertices[0].x, thePolygon->vertices[thePolygon->getVertexCount() - 1].y - thePolygon->vertices[0].y, thePolygon->vertices[thePolygon->getVertexCount() - 1].z - thePolygon->vertices[0].z);
+
+    innerNormal = innerNormal.crossProduct(thePolygon->faceNormal);
+
+    if ((*intersectionPoint - thePolygon->vertices[thePolygon->getVertexCount() - 1]).dot(innerNormal) < 0){
+        isInside = false;
+    }
+
+    return isInside;
 }
 
 // Calculate value of blending an existing pixel with a color, based on an opacity ratio

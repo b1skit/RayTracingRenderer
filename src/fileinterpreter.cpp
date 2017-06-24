@@ -37,6 +37,11 @@ Scene FileInterpreter::buildSceneFromFile(string filename){
 
     theScene.theMeshes = getMeshHelper(filename, false, false, false, false, 0xffffffff, phong , 0.3, 8); // Set the default values to start
 
+    // Generate bounding boxes:
+    for (auto &currentMesh : theScene.theMeshes){
+        currentMesh.generateBoundingBox();
+    }
+
     currentScene = nullptr; // Remove the reference to the local object for safety
 
     return theScene;
@@ -95,7 +100,10 @@ vector<Mesh> FileInterpreter::getMeshHelper(string filename, bool currentIsWiref
                         theIterator++;
                         currentScene->numRayBounces = stoi(*theIterator++);
                     }
-
+                    else if (theIterator->compare("noshadows") == 0 ){
+                        theIterator++;
+                        currentScene->noRayShadows = true;
+                    }
                     // Handle open brace "{"
                     else if(theIterator->compare("{") == 0){
                         theIterator++;

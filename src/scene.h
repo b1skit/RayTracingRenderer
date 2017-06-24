@@ -20,7 +20,6 @@ public:
     // Overloaded assignment operator
     Scene& operator=(const Scene& rhs);
 
-
     vector<Mesh> theMeshes;     // Contains our meshes
     vector<Light> theLights;    // Contains our lights
 
@@ -50,6 +49,7 @@ public:
 
     // Ray tracing settings:
     int numRayBounces = 0;  // Default number of bounces when ray tracing. Default = 0 (ie. No ray tracing)
+    bool noRayShadows = false;     // Whether or not to use shadow rays. Default = false (ie. Calculate shadows). Shadows can be disabled with "noshadows" command in the .simp file
 
 private:
 

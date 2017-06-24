@@ -37,7 +37,7 @@ public:
     ~Polygon();
 
     // Add a vertex to the polygon.
-    // Vertices are always added behind the head (as the head's CW_neighbour), hence polygons MUST be initialized by providing vertices in a Counter Clockwise sequence
+    // PreCondition: Vertices are always added in a Counter Clockwise order (vertices[i+1] = CCW, vertices[i-1] = CW
     void addVertex(Vertex newPoint);
 
     // Get the vertex with the highest y value. Used by the renderer to draw this polygon.
@@ -145,7 +145,7 @@ public:
     // Public polygon attributes:
     //***************************
 
-    Vertex* vertices; // An array of points that describe this polygon
+    Vertex* vertices = nullptr; // An array of points that describe this polygon
 
     normalVector faceNormal;    // The pre-computed face normal of this polygon
 

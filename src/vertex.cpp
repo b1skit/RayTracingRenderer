@@ -111,35 +111,45 @@ bool Vertex::operator!=(Vertex &otherVertex){
 }
 
 // Overloaded subtraction operator: Perform componenent-wise subtraction: LHS(x, y, z) - RHS(x, y, z). All other attributes maintained from LHS. LHS and RHS remain unchanged
-Vertex& Vertex::operator-(const Vertex& rhs) const {
+Vertex Vertex::operator-(const Vertex& rhs) const {
 
-    Vertex* result = new Vertex(*this); // Copy the LHS
-    result->x -= rhs.x; // Perform the component-wise subtraction
-    result->y -= rhs.y;
-    result->z -= rhs.z;
+    Vertex result(*this); // Copy the LHS
+    result.x -= rhs.x; // Perform the component-wise subtraction
+    result.y -= rhs.y;
+    result.z -= rhs.z;
 
-    return *result;
+    return result;
 }
 
 // Overloaded addition operator: Perform componenent-wise addition of 2 vertices
-Vertex& Vertex::operator+(const Vertex& rhs) const{
-    Vertex* result = new Vertex(*this); // Copy the LHS
-    result->x += rhs.x; // Perform the component-wise addition
-    result->y += rhs.y;
-    result->z += rhs.z;
+Vertex Vertex::operator+(const Vertex& rhs) const{
+    Vertex result(*this); // Copy the LHS
+    result.x += rhs.x; // Perform the component-wise addition
+    result.y += rhs.y;
+    result.z += rhs.z;
 
-    return *result;
+    return result;
+}
+
+// Overloaded addition operator: Perform componenent-wise addition of 2 vertices
+Vertex Vertex::operator+(const normalVector& rhs) const{
+    Vertex result = (*this);
+    result.x += rhs.xn;
+    result.y += rhs.yn;
+    result.z += rhs.zn;
+
+    return result;
 }
 
 // Multiply the components of this vertex by a scalar
-Vertex& Vertex::operator*(double scale){
-    Vertex* result = new Vertex(*this);
+Vertex Vertex::operator*(double scale){
+    Vertex result(*this);
 
-    result->x *= scale;
-    result->y *= scale;
-    result->z *= scale;
+    result.x *= scale;
+    result.y *= scale;
+    result.z *= scale;
 
-    return *result;
+    return result;
 }
 
 // Perform a dot product: Vertex vector dot normal vector.
@@ -224,8 +234,15 @@ void Vertex::setW(double newW){
         divideByW();
 }
 
+//// Check if another vertex is within a certain threshold
+//bool Vertex::isClose(Vertex otherPoint){
+//    double epsilon = 1;
+
+//    return (abs(this->x - otherPoint.x) < epsilon && abs(this->y - otherPoint.y) < epsilon && abs(this->z - otherPoint.z) < epsilon);
+//}
+
 // Debug this vertex:
 void Vertex::debug(){
-    cout << "Vertex x: " << x << " y: " << y << " z: " << z << " w: " << w << " color: " << std::hex << color << std::dec << " R: " << extractColorChannel(color, 1) << " G: " << extractColorChannel(color, 2) << " B: " << extractColorChannel(color, 3) << "\n";
+    cout << "Vertex: (" << x << ", " << y << ", " << z << ", " << w << ") color: " << std::hex << color << std::dec << " R: " << extractColorChannel(color, 1) << " G: " << extractColorChannel(color, 2) << " B: " << extractColorChannel(color, 3) << "\n";
     normal.debug();
 }
