@@ -151,6 +151,8 @@ private:
     // Determine whether a point on a polygon's plane lies within the polygon
     bool pointIsInsidePoly(Polygon* thePolygon, Vertex* intersectionPoint);
 
+    // Calculate attenuation factor for bounced light contributions
+    double getBounceLightAttenuationFactor(double pointDistance);
 };
 
 #endif // MYRENDERER_H

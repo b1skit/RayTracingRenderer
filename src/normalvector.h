@@ -42,8 +42,11 @@ public:
     // Overloaded scalar multiplication operator
     normalVector operator*(double scalar);
 
-    // Overloaded (friend) subtraction operator
-    friend normalVector operator-(const normalVector& lhs, const normalVector& rhs);
+    // Overloaded subtraction operator
+    normalVector operator-(const normalVector& rhs);
+
+    // Overloaded -= operator
+    normalVector& operator-=(const normalVector& rhs);
 
     // Determine if this normal is (0, 0, 0)
     bool isZero();

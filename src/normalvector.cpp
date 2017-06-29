@@ -115,14 +115,23 @@ normalVector normalVector::operator*(double scalar){
     return result;
 }
 
-// Overloaded (friend) subtraction operator
-normalVector operator-(const normalVector& lhs, const normalVector& rhs){
-    normalVector newNormal(lhs);
+// Overloaded subtraction operator
+normalVector normalVector::operator-(const normalVector& rhs){
+    normalVector newNormal(*this);
     newNormal.xn -= rhs.xn;
     newNormal.yn -= rhs.yn;
     newNormal.zn -= rhs.zn;
 
     return newNormal;
+}
+
+// Overloaded -= operator
+normalVector& normalVector::operator-=(const normalVector& rhs){
+    this->xn -= rhs.xn;
+    this->yn -= rhs.yn;
+    this->zn -= rhs.zn;
+
+    return *this;
 }
 
 // Determine if this normal is (0, 0, 0)

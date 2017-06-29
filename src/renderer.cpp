@@ -1052,12 +1052,14 @@ void Renderer::lightPointInCameraSpace(Vertex* currentPosition, normalVector vie
                 double redSpecIntensity = specularCoefficient;
                 double greenSpecIntensity = specularCoefficient;
                 double blueSpecIntensity = specularCoefficient;
+                // ^^^^^^^^ TO DO:  WRAP THESE CALCULATIONS INTO A SIMPLER " if (viewDotReflection > 0) " STATEMENT BELOW !!!!!! ^^^^^^^^^^^^^
 
                 // Calculate the reflection vector:
                 normalVector reflectionVector = currentPosition->normal;
                 reflectionVector *= 2 * currentNormalDotLightDirection;
                 reflectionVector = reflectionVector - lightDirection;
                 reflectionVector.normalize();
+                // ^^^^^^^^ TO DO: SIMPLIFY THIS CALCULATION!!!!!!!! ^^^^^^^^^^^^^^^
 
                 // Calculate the cosine of the angle between the view vector and the reflection vector:
                 double viewDotReflection = viewVector.dotProduct(reflectionVector);
@@ -1081,28 +1083,124 @@ void Renderer::lightPointInCameraSpace(Vertex* currentPosition, normalVector vie
         } // end if surface normal check
     } // End lights loop
 
-    // Combine the color values, and assign their sum as the color of the currentPosition:
-    currentPosition->color = addColors(      ambientValue,
-                                            addColors(
-                                                multiplyColorChannels( currentPosition->color, 1.0, redTotalDiffuseIntensity, greenTotalDiffuseIntensity, blueTotalDiffuseIntensity ),
-                                                combineColorChannels( redTotalSpecIntensity, greenTotalSpecIntensity, blueTotalSpecIntensity ) )
-                                              );
+
 
     // Calculate recursive bounce light contribution:
 
+    // Find an intersection point, if it exists:
+    Vertex* intersectionResult;
+    Polygon* hitPoly;
+    double hitDistance;
+
     if (bounceRays > 0){
+
         // Calculate the bounce vector:
+        normalVector bounceDirection = currentPosition->normal;
+        bounceDirection *= 2;
+        bounceDirection *= (currentPosition->normal.dotProduct(viewVector));
+        bounceDirection -= viewVector;
+        bounceDirection.normalize();
+        // ^^ COMBINE THESE CALCULATIONS!!!!!!!!!!!! ^^^^^^^^^^^^^^^^
 
         // Find an intersection point, if it exists:
+        intersectionResult = new Vertex(*currentPosition); // Copy the current position (and its attributes) as the starting point for our calculations
 
-        //    -> If no intersection exists, STOP HERE!!!
+        hitPoly = nullptr; // Track which polygon, if any, we've hit
+        hitDistance = std::numeric_limits<double>::max();         // Track how for the current nearest hit we've found is from the starting position
+        Vertex closestIntersection;
+
+        // Loop through all Meshes in the current scene
+        for (auto &currentVisibleMesh : currentScene->theMeshes){
+
+            // Loop through each face of the current mesh's bounding box
+            for (int i = 0; i < currentVisibleMesh.boundingBoxFaces.size(); i++){
+
+                // Find an intersection point with the bounding box, if it exists:
+                if ( getPolyPlaneIntersectionPoint(currentPosition, &bounceDirection, &currentVisibleMesh.boundingBoxFaces[i].vertices[0], &currentVisibleMesh.boundingBoxFaces[i].faceNormal, intersectionResult ) ){
+
+                    // Ensure the intersection point hit the bounding box
+                    if ( pointIsInsidePoly( &currentVisibleMesh.boundingBoxFaces[i], intersectionResult ) ){
+
+                        // We have a bounding box intersection hit! Loop through each visible face in the current mesh and find an actual intersection point:
+                        for (int j = 0; j < currentVisibleMesh.faces.size(); j++){
+
+                            // Skip the current polygon (as it always has an intersection)
+                            if ( &currentVisibleMesh.faces[j] == currentPolygon )
+                                continue;
+
+                            // Find an actual intersection point, if it exists:
+                            if ( getPolyPlaneIntersectionPoint(currentPosition, &bounceDirection, &currentVisibleMesh.faces[j].vertices[0], &currentVisibleMesh.faces[j].faceNormal, intersectionResult ) ){
+
+                                // Ensure we're intersecting with the front face of the polygon only:
+                                if ( (*intersectionResult - *currentPosition).dot(currentVisibleMesh.faces[j].faceNormal) > 0){ // <----- Does this work? Is it efficient?
+                                // ^^^^^^^^ I DON'T THINK THIS IS NECCESSARY!!!!!!!!!!!!!!!^^^^^^^^^^^
+
+                                    // Check if the intersection point is inside of the polygon
+                                    if( pointIsInsidePoly( &currentVisibleMesh.faces[j], intersectionResult ) ){ // We've found an intersection!
+
+                                        // Make sure the intersection is nearest, and keep it if it is
+                                        double currentHitDistance = (*intersectionResult - *currentPosition).length();
+                                        if (currentHitDistance < hitDistance){ // Store the new closest hit
+                                            hitDistance = currentHitDistance;
+                                            hitPoly = &currentVisibleMesh.faces[j];
+                                            closestIntersection = *intersectionResult;
+
+                                            closestIntersection.color = hitPoly->vertices[0].color; // !!!!!!!! EEEEEEEEEEEEEK! :(
+                                        }
+                                    }
+                                }
+                            }
+                        } // End of visible face intersection check
+
+                        // If we've gotten this far, we've already checked all visible faces. Move to the next mesh.
+                        break;
+
+                    } // End inside bounding box check
+                }
+            }
+        }
 
 
-        // Make the recursive call:
 
-        // Attenuate the bounced light by SOME MATERIAL PROPERTY!
+        // If we've found bounced light intersection points, calculate their contribution and add it to the final color:
+        if (hitPoly != nullptr){
+            // Light the intersection point:
+            lightPointInCameraSpace(&closestIntersection, bounceDirection, hitPoly->isAffectedByAmbientLight(), hitPoly->getSpecularExponent(), hitPoly->getSpecularCoefficient(), bounceRays - 1);
 
-        // Add the color of the bounce intersection to the currentPosition
+            // Scale the point's lit color by its material's reflectivity:
+            closestIntersection.color = multiplyColorChannels(closestIntersection.color, 1.0, currentPolygon->getReflectivity(), currentPolygon->getReflectivity(), hitPoly->getReflectivity() );
+
+            // Calculate the resulting lighting contribution of the bounced light and the current position:
+            closestIntersection.color = multiplyColorChannels(closestIntersection.color, currentPosition->color );
+
+            // Combine the color values for the current, non-bounce lit point, and assign the sum as the color of the currentPosition:
+            currentPosition->color = addColors(     ambientValue,
+                                                    addColors(
+                                                        multiplyColorChannels( currentPosition->color, 1.0, redTotalDiffuseIntensity, greenTotalDiffuseIntensity, blueTotalDiffuseIntensity ),
+                                                        combineColorChannels( redTotalSpecIntensity, greenTotalSpecIntensity, blueTotalSpecIntensity ) )
+                                                    );
+
+            currentPosition->color = addColors(currentPosition->color, closestIntersection.color);
+
+
+        }
+        else {
+
+            // TO DO: Add the scene background color if a ray hits nothing!!!!!!!!!!!!!!!!!!!!
+
+            // Combine the color values for the current, non-bounce lit point, and assign the sum as the color of the currentPosition:
+            currentPosition->color = addColors(      ambientValue,
+                                                    addColors(
+                                                        multiplyColorChannels( currentPosition->color, 1.0, redTotalDiffuseIntensity, greenTotalDiffuseIntensity, blueTotalDiffuseIntensity ),
+                                                        combineColorChannels( redTotalSpecIntensity, greenTotalSpecIntensity, blueTotalSpecIntensity ) )
+                                                      );
+
+        }
+
+
+
+        // Cleanup:
+        delete intersectionResult;
     }
 }
 
@@ -1187,6 +1285,8 @@ bool Renderer::getPolyPlaneIntersectionPoint(Vertex* currentPosition, normalVect
     // Ensure the intersection is in front of the ray ( >0.1 to avoid intersections with neighbouring polys in the same mesh)
     if (distance > 0.1){
         *intersectionResult = (*currentPosition + (*currentDirection * distance));
+        intersectionResult->normal = *planeNormal; // Copy the plane normal as the normal for the intersection point
+
         return true;
     }
 
@@ -1196,6 +1296,7 @@ bool Renderer::getPolyPlaneIntersectionPoint(Vertex* currentPosition, normalVect
 // Determine whether a point on a polygon's plane lies within the polygon
 bool Renderer::pointIsInsidePoly(Polygon* thePolygon, Vertex* intersectionPoint){
 
+    // Loop through each pair of vertices (ie. Edges), checking the point is inside the positive halfspace of the poly's plane
     bool isInside = true;
     for (int i = 0; i < thePolygon->getVertexCount() - 1; i++){
 
@@ -1205,15 +1306,18 @@ bool Renderer::pointIsInsidePoly(Polygon* thePolygon, Vertex* intersectionPoint)
 
         if ((*intersectionPoint - thePolygon->vertices[i]).dot(innerNormal) < 0){
             isInside = false;
+            break;  // Don't bother continuing
         }
     }
 
-    normalVector innerNormal(thePolygon->vertices[thePolygon->getVertexCount() - 1].x - thePolygon->vertices[0].x, thePolygon->vertices[thePolygon->getVertexCount() - 1].y - thePolygon->vertices[0].y, thePolygon->vertices[thePolygon->getVertexCount() - 1].z - thePolygon->vertices[0].z);
+    if (isInside){ // Only bother checking the last edge if there's a chance the point is inside the polygon:
+        normalVector innerNormal(thePolygon->vertices[thePolygon->getVertexCount() - 1].x - thePolygon->vertices[0].x, thePolygon->vertices[thePolygon->getVertexCount() - 1].y - thePolygon->vertices[0].y, thePolygon->vertices[thePolygon->getVertexCount() - 1].z - thePolygon->vertices[0].z);
 
-    innerNormal = innerNormal.crossProduct(thePolygon->faceNormal);
+        innerNormal = innerNormal.crossProduct(thePolygon->faceNormal);
 
-    if ((*intersectionPoint - thePolygon->vertices[thePolygon->getVertexCount() - 1]).dot(innerNormal) < 0){
-        isInside = false;
+        if ((*intersectionPoint - thePolygon->vertices[thePolygon->getVertexCount() - 1]).dot(innerNormal) < 0){
+            isInside = false;
+        }
     }
 
     return isInside;
@@ -1344,6 +1448,11 @@ void Renderer::transformCamera(TransformationMatrix cameraMovement){
     screenToPerspective = TransformationMatrix();        // Reset the matrix back to the identity
     screenToPerspective *= perspectiveToScreen;
     screenToPerspective = screenToPerspective.getInverse();
+}
+
+// Calculate attenuation factor for bounced light contributions
+double Renderer::getBounceLightAttenuationFactor(double pointDistance){
+    return (1.0 /((double) (currentScene->attenuationA + (currentScene->attenuationB * pointDistance) ) ));
 }
 
 // Visually debug lights:

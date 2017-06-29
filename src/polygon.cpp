@@ -57,6 +57,7 @@ Polygon::Polygon(const Polygon& currentPoly){
     this->theShadingModel = currentPoly.theShadingModel;
     this->specularCoefficient = currentPoly.specularCoefficient;
     this->specularExponent = currentPoly.specularExponent;
+    this->reflectivity = currentPoly.reflectivity;
 
     this->vertices = new Vertex[vertexArraySize];
     for (unsigned int i = 0; i < vertexArraySize; i++){
@@ -79,6 +80,7 @@ Polygon& Polygon::operator=(const Polygon& rhs){
     this->theShadingModel = rhs.theShadingModel;
     this->specularCoefficient = rhs.specularCoefficient;
     this->specularExponent = rhs.specularExponent;
+    this->reflectivity = rhs.reflectivity;
 
     if (vertices != nullptr)
         delete[] vertices;
@@ -313,6 +315,7 @@ Polygon Polygon::clipHelper(Polygon source, Vertex planePoint, normalVector plan
     result.theShadingModel = source.theShadingModel;
     result.specularCoefficient = source.specularCoefficient;
     result.specularExponent = source.specularExponent;
+    result.reflectivity = source.reflectivity;
 
     result.faceNormal = source.faceNormal;
 
@@ -441,6 +444,7 @@ vector<Polygon>* Polygon::getTriangulatedFaces(){
         newFace.theShadingModel = this->theShadingModel;
         newFace.specularCoefficient = this->specularCoefficient;
         newFace.specularExponent = this->specularExponent;
+        newFace.reflectivity = this->reflectivity;
 
         newFace.addVertex(v1); // Add the common vertex
 

@@ -25,7 +25,7 @@ unsigned int getRandomColor();
 // Combine color channels into a single unsigned int
 unsigned int combineColorChannels(double red, double green, double blue);
 
-// Extract a color channel as a double [0, 1]
+// Extract a color channel as a double in [0, 1]
 // Channel flags: 0 = alpha, 1 = red, 2 = green, 3 = blue
 double extractColorChannel(unsigned int color, int channel);
 
