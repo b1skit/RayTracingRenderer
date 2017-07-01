@@ -106,8 +106,8 @@ void Client::nextPage() {
 
 
 
-    Scene scene2 = clientFileInterpreter.buildSceneFromFile("./debug.simp");
-    clientRenderer->renderScene(scene2);
+//    Scene scene2 = clientFileInterpreter.buildSceneFromFile("./debug.simp");
+//    clientRenderer->renderScene(scene2);
 
 
 
@@ -158,75 +158,75 @@ void Client::nextPage() {
 
 
 
-//    // Handle command line mode:
-//    if (commandLineMode){
-//        Scene cmdLineScene = clientFileInterpreter.buildSceneFromFile("./" + filename + ".simp");
-//        clientRenderer->renderScene(cmdLineScene);
-//    }
-//    else{ // Handle standard mode:
+    // Handle command line mode:
+    if (commandLineMode){
+        Scene cmdLineScene = clientFileInterpreter.buildSceneFromFile("./" + filename + ".simp");
+        clientRenderer->renderScene(cmdLineScene);
+    }
+    else{ // Handle standard mode:
 
-//        Scene theScene;
-//        high_resolution_clock::time_point t1, t2;
+        Scene theScene;
+        high_resolution_clock::time_point t1, t2;
 
-//        t1 = high_resolution_clock::now();
+        t1 = high_resolution_clock::now();
 
-//        // Load the appropriate mesh:
-//        switch(pageNumber % 7) {
-//        case 0:{ // Page 1:
-//            theScene = clientFileInterpreter.buildSceneFromFile("./01.simp");
-//        }
-//            break;
+        // Load the appropriate mesh:
+        switch(pageNumber % 7) {
+        case 0:{ // Page 1:
+            theScene = clientFileInterpreter.buildSceneFromFile("./01.simp");
+        }
+            break;
 
-//        case 1:{ // Page 2:
-//            theScene = clientFileInterpreter.buildSceneFromFile("./02.simp");
-//        }
-//            break;
+        case 1:{ // Page 2:
+            theScene = clientFileInterpreter.buildSceneFromFile("./02.simp");
+        }
+            break;
 
-//        case 2:{ // Page 3:
-//            theScene = clientFileInterpreter.buildSceneFromFile("./03.simp");
-//            }
-//            break;
+        case 2:{ // Page 3:
+            theScene = clientFileInterpreter.buildSceneFromFile("./03.simp");
+            }
+            break;
 
-//        case 3:{ // Page 4:
-//            theScene = clientFileInterpreter.buildSceneFromFile("./04.simp");
-//        }
-//            break;
+        case 3:{ // Page 4:
+            theScene = clientFileInterpreter.buildSceneFromFile("./04.simp");
+        }
+            break;
 
-//        case 4:{ // Page 5:
-//            theScene = clientFileInterpreter.buildSceneFromFile("./05.simp");
-//        }
-//            break;
+        case 4:{ // Page 5:
+            theScene = clientFileInterpreter.buildSceneFromFile("./05.simp");
+        }
+            break;
 
-//        case 5: { // Page 6:
-//            theScene = clientFileInterpreter.buildSceneFromFile("./06.simp");
-//            }
-//            break;
+        case 5: { // Page 6:
+            theScene = clientFileInterpreter.buildSceneFromFile("./06.simp");
+            }
+            break;
 
-//        case 6: { // Page 7:
-//            theScene = clientFileInterpreter.buildSceneFromFile("./07.simp");
-//            }
-//            break;
+        case 6: { // Page 7:
+            theScene = clientFileInterpreter.buildSceneFromFile("./07.simp");
+            }
+            break;
 
-//        default: // We should never reach this state!
-//            // Draw bright pink boxes to highlight error state
-//            clientRenderer->drawRectangle(50, 50, 700, 700, 0xffff00ea);
-//            break;
+        default: // We should never reach this state!
+            // Draw bright pink boxes to highlight error state
+            clientRenderer->drawRectangle(50, 50, 700, 700, 0xffff00ea);
+            break;
 
-//        } // End switch
+        } // End switch
 
-//        t2 = high_resolution_clock::now();
-//        auto duration = duration_cast<microseconds>( t2 - t1 ).count();
-//        cout << "File read in:\t" << duration << "ms\n";
+        t2 = high_resolution_clock::now();
+        auto duration = duration_cast<microseconds>( t2 - t1 ).count();
+        cout << "File read in:\t" << duration << "ms\n";
 
 
-//        // Draw the mesh:
-//        t1 = high_resolution_clock::now();
-//        clientRenderer->renderScene(theScene);
-//        t2 = high_resolution_clock::now();
-//        duration = duration_cast<microseconds>( t2 - t1 ).count();
-//        cout << "Mesh drawn in:\t" << duration << "ms\n\n";
+        // Draw the mesh:
+        t1 = high_resolution_clock::now();
+        clientRenderer->renderScene(theScene);
+        t2 = high_resolution_clock::now();
+        duration = duration_cast<microseconds>( t2 - t1 ).count();
+        cout << "Mesh drawn in:\t" << duration << "ms\n\n";
 
-//    } // End "commandLineMode" else
+    } // End "commandLineMode" else
 
     pageNumber++; // Increment the page number
 }

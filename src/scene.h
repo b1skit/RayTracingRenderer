@@ -53,7 +53,7 @@ public:
     double attenuationA = 1;        // Scene bounce light attenuation constants
     double attenuationB = 0.5;
 
-    unsigned int backgroundColor = 0xff000000;  // Default background color
+    unsigned int backgroundColor = 0xffff0000;  // Default background color
 
 private:
 

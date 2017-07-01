@@ -1085,14 +1085,25 @@ void Renderer::lightPointInCameraSpace(Vertex* currentPosition, normalVector vie
 
 
 
+
+    // Combine the color values for the current, non-bounce lit point, and assign the sum as the color of the currentPosition:
+    currentPosition->color = addColors(     ambientValue,
+                                            addColors(
+                                                multiplyColorChannels( currentPosition->color, 1.0, redTotalDiffuseIntensity, greenTotalDiffuseIntensity, blueTotalDiffuseIntensity ),
+                                                combineColorChannels( redTotalSpecIntensity, greenTotalSpecIntensity, blueTotalSpecIntensity ) )
+                                            );
+
+
     // Calculate recursive bounce light contribution:
 
-    // Find an intersection point, if it exists:
-    Vertex* intersectionResult;
-    Polygon* hitPoly;
-    double hitDistance;
+
 
     if (bounceRays > 0){
+
+        // Find an intersection point, if it exists:
+        Vertex* intersectionResult;
+        Polygon* hitPoly;
+        double hitDistance;
 
         // Calculate the bounce vector:
         normalVector bounceDirection = currentPosition->normal;
@@ -1116,7 +1127,7 @@ void Renderer::lightPointInCameraSpace(Vertex* currentPosition, normalVector vie
             for (int i = 0; i < currentVisibleMesh.boundingBoxFaces.size(); i++){
 
                 // Find an intersection point with the bounding box, if it exists:
-                if ( getPolyPlaneIntersectionPoint(currentPosition, &bounceDirection, &currentVisibleMesh.boundingBoxFaces[i].vertices[0], &currentVisibleMesh.boundingBoxFaces[i].faceNormal, intersectionResult ) ){
+                if ( getPolyPlaneBackFaceIntersectionPoint(currentPosition, &bounceDirection, &currentVisibleMesh.boundingBoxFaces[i].vertices[0], &currentVisibleMesh.boundingBoxFaces[i].faceNormal, intersectionResult ) ){
 
                     // Ensure the intersection point hit the bounding box
                     if ( pointIsInsidePoly( &currentVisibleMesh.boundingBoxFaces[i], intersectionResult ) ){
@@ -1129,11 +1140,7 @@ void Renderer::lightPointInCameraSpace(Vertex* currentPosition, normalVector vie
                                 continue;
 
                             // Find an actual intersection point, if it exists:
-                            if ( getPolyPlaneIntersectionPoint(currentPosition, &bounceDirection, &currentVisibleMesh.faces[j].vertices[0], &currentVisibleMesh.faces[j].faceNormal, intersectionResult ) ){
-
-                                // Ensure we're intersecting with the front face of the polygon only:
-                                if ( (*intersectionResult - *currentPosition).dot(currentVisibleMesh.faces[j].faceNormal) > 0){ // <----- Does this work? Is it efficient?
-                                // ^^^^^^^^ I DON'T THINK THIS IS NECCESSARY!!!!!!!!!!!!!!!^^^^^^^^^^^
+                            if ( getPolyPlaneFrontFaceIntersectionPoint(currentPosition, &bounceDirection, &currentVisibleMesh.faces[j].vertices[0], &currentVisibleMesh.faces[j].faceNormal, intersectionResult ) ){
 
                                     // Check if the intersection point is inside of the polygon
                                     if( pointIsInsidePoly( &currentVisibleMesh.faces[j], intersectionResult ) ){ // We've found an intersection!
@@ -1148,7 +1155,7 @@ void Renderer::lightPointInCameraSpace(Vertex* currentPosition, normalVector vie
                                             closestIntersection.color = hitPoly->vertices[0].color; // !!!!!!!! EEEEEEEEEEEEEK! :(
                                         }
                                     }
-                                }
+
                             }
                         } // End of visible face intersection check
 
@@ -1158,50 +1165,27 @@ void Renderer::lightPointInCameraSpace(Vertex* currentPosition, normalVector vie
                     } // End inside bounding box check
                 }
             }
-        }
-
+        } // End looping through all meshes
 
 
         // If we've found bounced light intersection points, calculate their contribution and add it to the final color:
         if (hitPoly != nullptr){
+
             // Light the intersection point:
             lightPointInCameraSpace(&closestIntersection, bounceDirection, hitPoly->isAffectedByAmbientLight(), hitPoly->getSpecularExponent(), hitPoly->getSpecularCoefficient(), bounceRays - 1);
 
-            // Scale the point's lit color by its material's reflectivity:
-            closestIntersection.color = multiplyColorChannels(closestIntersection.color, 1.0, currentPolygon->getReflectivity(), currentPolygon->getReflectivity(), hitPoly->getReflectivity() );
-
-            // Calculate the resulting lighting contribution of the bounced light and the current position:
-            closestIntersection.color = multiplyColorChannels(closestIntersection.color, currentPosition->color );
-
-            // Combine the color values for the current, non-bounce lit point, and assign the sum as the color of the currentPosition:
-            currentPosition->color = addColors(     ambientValue,
-                                                    addColors(
-                                                        multiplyColorChannels( currentPosition->color, 1.0, redTotalDiffuseIntensity, greenTotalDiffuseIntensity, blueTotalDiffuseIntensity ),
-                                                        combineColorChannels( redTotalSpecIntensity, greenTotalSpecIntensity, blueTotalSpecIntensity ) )
-                                                    );
+            // Scale the intersection point's lit color by its polygon's material's reflectivity:
+            closestIntersection.color = multiplyColorChannels(closestIntersection.color, 1.0, hitPoly->getReflectivity(), hitPoly->getReflectivity(), hitPoly->getReflectivity() );
 
             currentPosition->color = addColors(currentPosition->color, closestIntersection.color);
 
-
         }
-        else {
-
-            // TO DO: Add the scene background color if a ray hits nothing!!!!!!!!!!!!!!!!!!!!
-
-            // Combine the color values for the current, non-bounce lit point, and assign the sum as the color of the currentPosition:
-            currentPosition->color = addColors(      ambientValue,
-                                                    addColors(
-                                                        multiplyColorChannels( currentPosition->color, 1.0, redTotalDiffuseIntensity, greenTotalDiffuseIntensity, blueTotalDiffuseIntensity ),
-                                                        combineColorChannels( redTotalSpecIntensity, greenTotalSpecIntensity, blueTotalSpecIntensity ) )
-                                                      );
-
-        }
-
-
 
         // Cleanup:
         delete intersectionResult;
     }
+    // THE VERY LAST BOUNCE IS NOT GETTING SCALED BY getReflectivity() !!!!!!!!!!
+
 }
 
 // Determine whether a current position is shadowed by some polygon in the scene that lies between it and a light
@@ -1218,7 +1202,7 @@ bool Renderer::isShadowed(Vertex* currentPosition, normalVector* lightDirection,
         for (int i = 0; i < currentVisibleMesh.boundingBoxFaces.size(); i++){
 
             // Find an intersection point with the bounding box, if it exists:
-            if ( getPolyPlaneIntersectionPoint(currentPosition, lightDirection, &currentVisibleMesh.boundingBoxFaces[i].vertices[0], &currentVisibleMesh.boundingBoxFaces[i].faceNormal, intersectionResult ) ){
+            if ( getPolyPlaneBackFaceIntersectionPoint(currentPosition, lightDirection, &currentVisibleMesh.boundingBoxFaces[i].vertices[0], &currentVisibleMesh.boundingBoxFaces[i].faceNormal, intersectionResult ) ){
 
                 // Ensure the intersection is between the currentPosition and the light:
                 if ( (*intersectionResult - *currentPosition).length() < lightDistance ){
@@ -1234,7 +1218,7 @@ bool Renderer::isShadowed(Vertex* currentPosition, normalVector* lightDirection,
                                 continue;
 
                             // Find an actual intersection point, if it exists:
-                            if ( getPolyPlaneIntersectionPoint(currentPosition, lightDirection, &currentVisibleMesh.faces[j].vertices[0], &currentVisibleMesh.faces[j].faceNormal, intersectionResult ) ){
+                            if ( getPolyPlaneBackFaceIntersectionPoint(currentPosition, lightDirection, &currentVisibleMesh.faces[j].vertices[0], &currentVisibleMesh.faces[j].faceNormal, intersectionResult ) ){
 
                                 // Ensure the intersection is between the currentPosition and the light:
                                 if ( (*intersectionResult - *currentPosition).length() < lightDistance ){
@@ -1273,11 +1257,11 @@ bool Renderer::isShadowed(Vertex* currentPosition, normalVector* lightDirection,
 
 // Find the intersection point of a ray and the plane of a polygon
 // Return: True if the ray intersects, false otherwise. Modifies result Vertex to be the point of intersection, leaves it unchanged otherwise
-bool Renderer::getPolyPlaneIntersectionPoint(Vertex* currentPosition, normalVector* currentDirection, Vertex* planePoint, normalVector* planeNormal, Vertex* intersectionResult){
+bool Renderer::getPolyPlaneBackFaceIntersectionPoint(Vertex* currentPosition, normalVector* currentDirection, Vertex* planePoint, normalVector* planeNormal, Vertex* intersectionResult){
 
     double currentDirectionDotPlaneNormal = currentDirection->dotProduct(*planeNormal);
 
-    // Check if direction and poly plane are parallel (ie. == 0), or if we're hitting the backface of the polygon (ie. < 0)
+    // Check if direction and poly plane are parallel (ie. == 0), or if we're hitting the front face of the polygon (ie. < 0) (Light can pass through the back face, but not the front face
     if (currentDirectionDotPlaneNormal <= 0)
         return false;
 
@@ -1292,6 +1276,31 @@ bool Renderer::getPolyPlaneIntersectionPoint(Vertex* currentPosition, normalVect
 
     return false; // The intersection was behind the ray
 }
+
+
+// Find the intersection point of a ray and the plane of a polygon
+// Return: True if the ray intersects, false otherwise. Modifies result Vertex to be the point of intersection, leaves it unchanged otherwise
+bool Renderer::getPolyPlaneFrontFaceIntersectionPoint(Vertex* currentPosition, normalVector* currentDirection, Vertex* planePoint, normalVector* planeNormal, Vertex* intersectionResult){
+
+    double currentDirectionDotPlaneNormal = currentDirection->dotProduct(*planeNormal);
+
+    // Check if direction and poly plane are parallel (ie. == 0), or if we're hitting the back face of the polygon (ie. < 0) (Light can pass through the back face, but not the front face
+    if (currentDirectionDotPlaneNormal >= 0)
+        return false;
+
+    double distance = (*planePoint - *currentPosition).dot(*planeNormal)/(double)currentDirectionDotPlaneNormal;
+    // Ensure the intersection is in front of the ray ( >0.1 to avoid intersections with neighbouring polys in the same mesh)
+    if (distance > 0.1){
+        *intersectionResult = (*currentPosition + (*currentDirection * distance));
+        intersectionResult->normal = *planeNormal; // Copy the plane normal as the normal for the intersection point
+        // ^^^^^ TO DO: Interpolate this normal ????????????
+
+        return true;
+    }
+
+    return false; // The intersection was behind the ray
+}
+
 
 // Determine whether a point on a polygon's plane lies within the polygon
 bool Renderer::pointIsInsidePoly(Polygon* thePolygon, Vertex* intersectionPoint){
