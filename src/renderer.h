@@ -152,6 +152,10 @@ private:
     // Return: True if the ray intersects, false otherwise. Modifies result Vertex to be the point of intersection, leaves it unchanged otherwise
     bool getPolyPlaneFrontFaceIntersectionPoint(Vertex* currentPosition, normalVector* currentDirection, Vertex* planePoint, normalVector* planeNormal, Vertex* result);
 
+    // Find the intersection point of a ray and the plane of a polygon
+    // Return: True if the ray intersects, false otherwise. Modifies result Vertex to be the point of intersection, leaves it unchanged otherwise
+    bool getPolyPlaneIntersectionPoint(Vertex* currentPosition, normalVector* currentDirection, Vertex* planePoint, normalVector* planeNormal, Vertex* result);
+
     // Determine whether a point on a polygon's plane lies within the polygon
     bool pointIsInsidePoly(Polygon* thePolygon, Vertex* intersectionPoint);
 

@@ -96,14 +96,20 @@ void Mesh::generateBoundingBox(){
     double swell = 0.001;
 
     // Ensure that the bounding box is not planar:
-    if (xMin == xMax)
-        xMin += swell;
+    if (xMin == xMax){
+        xMin -= swell;
+        xMax += swell;
+    }
 
-    if (yMin == yMax)
-        yMin += swell;
+    if (yMin == yMax){
+        yMin -= swell;
+        yMax += swell;
+    }
 
-    if (zMin == zMax)
-        zMin += swell;
+    if (zMin == zMax){
+        zMin -= swell;
+        zMax += swell;
+    }
 
     // Assemble the 6 sides of a bounding cube using our min/max coords
     Polygon left, right, front, back, top, bottom;

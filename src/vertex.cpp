@@ -215,7 +215,6 @@ void Vertex::transform(TransformationMatrix* theMatrix, bool doRound){
         // Transform the normal:
         normal.transform(theMatrix);
     }
-
 }
 
 // // Divide this vector by the W coordinate. Resets the common denomintor as 1. Used when adding perspective transformations
@@ -233,13 +232,6 @@ void Vertex::setW(double newW){
     if (w != 1)
         divideByW();
 }
-
-//// Check if another vertex is within a certain threshold
-//bool Vertex::isClose(Vertex otherPoint){
-//    double epsilon = 1;
-
-//    return (abs(this->x - otherPoint.x) < epsilon && abs(this->y - otherPoint.y) < epsilon && abs(this->z - otherPoint.z) < epsilon);
-//}
 
 // Debug this vertex:
 void Vertex::debug(){

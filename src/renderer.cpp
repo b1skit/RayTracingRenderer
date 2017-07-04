@@ -868,7 +868,6 @@ void Renderer::renderScene(Scene theScene){
 
     }
 
-
     // Transform meshes into camera space:
     for(auto &processingMesh : theScene.theMeshes){
         processingMesh.transform(&worldToCamera);
@@ -886,7 +885,7 @@ void Renderer::renderScene(Scene theScene){
 //        }
     }
 
-    // Remove the pointer to the current scene
+    // Remove the pointers to the current scene objects
     currentScene = nullptr;
     currentMesh = nullptr;
 }
@@ -935,7 +934,7 @@ void Renderer::drawScanlineIfVisible(Vertex* start, Vertex* end){
 void Renderer::drawPerPxLitScanlineIfVisible(Vertex* start, Vertex* end, bool doAmbient, double specularCoefficient, double specularExponent){
 
     // Calculate the starting parameters:
-    double zCameraSpace = start->z; // Z is in camera space
+    double zCameraSpace = start->z; // Recieved Z is the correct, camera space Z
     double z_slope; // Make sure we're setting a valid z-slope value
     if (end->x - start->x == 0)
         z_slope = 0;
@@ -1001,7 +1000,7 @@ void Renderer::drawPerPxLitScanlineIfVisible(Vertex* start, Vertex* end, bool do
 
 // Light a given point in camera space
 // Precondition: viewVector is normalized
-void Renderer::lightPointInCameraSpace(Vertex* currentPosition, normalVector viewVector, bool doAmbient, double specularExponent, double specularCoefficient, int bounceRays) {
+void Renderer:: lightPointInCameraSpace(Vertex* currentPosition, normalVector viewVector, bool doAmbient, double specularExponent, double specularCoefficient, int bounceRays) {
 
     // Running light totals:
     unsigned int ambientValue = 0;
@@ -1084,8 +1083,6 @@ void Renderer::lightPointInCameraSpace(Vertex* currentPosition, normalVector vie
     } // End lights loop
 
 
-
-
     // Combine the color values for the current, non-bounce lit point, and assign the sum as the color of the currentPosition:
     currentPosition->color = addColors(     ambientValue,
                                             addColors(
@@ -1095,9 +1092,6 @@ void Renderer::lightPointInCameraSpace(Vertex* currentPosition, normalVector vie
 
 
     // Calculate recursive bounce light contribution:
-
-
-
     if (bounceRays > 0){
 
         // Find an intersection point, if it exists:
@@ -1127,7 +1121,8 @@ void Renderer::lightPointInCameraSpace(Vertex* currentPosition, normalVector vie
             for (int i = 0; i < currentVisibleMesh.boundingBoxFaces.size(); i++){
 
                 // Find an intersection point with the bounding box, if it exists:
-                if ( getPolyPlaneBackFaceIntersectionPoint(currentPosition, &bounceDirection, &currentVisibleMesh.boundingBoxFaces[i].vertices[0], &currentVisibleMesh.boundingBoxFaces[i].faceNormal, intersectionResult ) ){
+                if ( getPolyPlaneIntersectionPoint(currentPosition, &bounceDirection, &currentVisibleMesh.boundingBoxFaces[i].vertices[0], &currentVisibleMesh.boundingBoxFaces[i].faceNormal, intersectionResult ) ){
+                // ^^ UNNECCESSARY to not check for front/back: jUST PART OF DEBUG!!!!!!!!! ^^^^^^ Use back/front face culling....
 
                     // Ensure the intersection point hit the bounding box
                     if ( pointIsInsidePoly( &currentVisibleMesh.boundingBoxFaces[i], intersectionResult ) ){
@@ -1141,6 +1136,7 @@ void Renderer::lightPointInCameraSpace(Vertex* currentPosition, normalVector vie
 
                             // Find an actual intersection point, if it exists:
                             if ( getPolyPlaneFrontFaceIntersectionPoint(currentPosition, &bounceDirection, &currentVisibleMesh.faces[j].vertices[0], &currentVisibleMesh.faces[j].faceNormal, intersectionResult ) ){
+                            // ^^^ FRONT FACE INTERSECTION GIVES RIGHT REFELCTIONS, BLACK BASE LINE...
 
                                     // Check if the intersection point is inside of the polygon
                                     if( pointIsInsidePoly( &currentVisibleMesh.faces[j], intersectionResult ) ){ // We've found an intersection!
@@ -1192,6 +1188,8 @@ void Renderer::lightPointInCameraSpace(Vertex* currentPosition, normalVector vie
 // Precondition: All Polygons in the scene must have at least 3 vertices, and all meshes must have pre-calcualted bounding boxes
 bool Renderer::isShadowed(Vertex* currentPosition, normalVector* lightDirection, double lightDistance){
 
+    // TO DO: CHECK IF LIGHT IS INSIDE OF BOUNDING BOX!!!!!!!!!!!!
+
     // Allocate a vertex to hold any intersection results we find:
     Vertex* intersectionResult = new Vertex(); // Modified if getPolyPlaneIntersectionPoint() finds a point of intersection
 
@@ -1202,7 +1200,7 @@ bool Renderer::isShadowed(Vertex* currentPosition, normalVector* lightDirection,
         for (int i = 0; i < currentVisibleMesh.boundingBoxFaces.size(); i++){
 
             // Find an intersection point with the bounding box, if it exists:
-            if ( getPolyPlaneBackFaceIntersectionPoint(currentPosition, lightDirection, &currentVisibleMesh.boundingBoxFaces[i].vertices[0], &currentVisibleMesh.boundingBoxFaces[i].faceNormal, intersectionResult ) ){
+            if ( getPolyPlaneIntersectionPoint(currentPosition, lightDirection, &currentVisibleMesh.boundingBoxFaces[i].vertices[0], &currentVisibleMesh.boundingBoxFaces[i].faceNormal, intersectionResult ) ){
 
                 // Ensure the intersection is between the currentPosition and the light:
                 if ( (*intersectionResult - *currentPosition).length() < lightDistance ){
@@ -1261,7 +1259,7 @@ bool Renderer::getPolyPlaneBackFaceIntersectionPoint(Vertex* currentPosition, no
 
     double currentDirectionDotPlaneNormal = currentDirection->dotProduct(*planeNormal);
 
-    // Check if direction and poly plane are parallel (ie. == 0), or if we're hitting the front face of the polygon (ie. < 0) (Light can pass through the back face, but not the front face
+    // Check if direction and poly plane are parallel (ie. == 0), or if we're hitting the FRONT face of the polygon (ie. < 0) (Light can pass through the back face, but not the front face
     if (currentDirectionDotPlaneNormal <= 0)
         return false;
 
@@ -1270,6 +1268,7 @@ bool Renderer::getPolyPlaneBackFaceIntersectionPoint(Vertex* currentPosition, no
     if (distance > 0.1){
         *intersectionResult = (*currentPosition + (*currentDirection * distance));
         intersectionResult->normal = *planeNormal; // Copy the plane normal as the normal for the intersection point
+        // ^^^^^ THIS SHOULD BE INTERPOLATED!!!!!!!! ^^^^^^^^^
 
         return true;
     }
@@ -1284,13 +1283,40 @@ bool Renderer::getPolyPlaneFrontFaceIntersectionPoint(Vertex* currentPosition, n
 
     double currentDirectionDotPlaneNormal = currentDirection->dotProduct(*planeNormal);
 
-    // Check if direction and poly plane are parallel (ie. == 0), or if we're hitting the back face of the polygon (ie. < 0) (Light can pass through the back face, but not the front face
+
+
+    // Check if direction and poly plane are parallel (ie. == 0), or if we're hitting the BACK face of the polygon (ie. > 0) (Light can pass through the back face, but not the front face
     if (currentDirectionDotPlaneNormal >= 0)
         return false;
 
     double distance = (*planePoint - *currentPosition).dot(*planeNormal)/(double)currentDirectionDotPlaneNormal;
+
     // Ensure the intersection is in front of the ray ( >0.1 to avoid intersections with neighbouring polys in the same mesh)
     if (distance > 0.1){
+        *intersectionResult = (*currentPosition + (*currentDirection * distance));
+        intersectionResult->normal = *planeNormal; // Copy the plane normal as the normal for the intersection point
+        // ^^^^^ TO DO: Interpolate this normal ????????????
+
+        return true;
+    }
+
+    return false; // The intersection was behind the ray
+}
+
+// Find the intersection point of a ray and the plane of a polygon
+// Return: True if the ray intersects, false otherwise. Modifies result Vertex to be the point of intersection, leaves it unchanged otherwise
+bool Renderer::getPolyPlaneIntersectionPoint(Vertex* currentPosition, normalVector* currentDirection, Vertex* planePoint, normalVector* planeNormal, Vertex* intersectionResult){
+
+    double currentDirectionDotPlaneNormal = currentDirection->dotProduct(*planeNormal);
+
+    // Check if direction and poly plane are parallel (ie. == 0)
+    if (currentDirectionDotPlaneNormal == 0)
+        return false;
+
+    double distance = (*planePoint - *currentPosition).dot(*planeNormal)/(double)currentDirectionDotPlaneNormal;
+
+    // Ensure the intersection is in front of the ray ( >0.1 to avoid intersections with neighbouring polys in the same mesh)
+    if (distance > 0.1){ // IF THIS Fn IS JUST USED FOR BOUNDING BOX CHECKS, WE PROBABLY DON'T NEED EPSILON IN THIS CHECK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         *intersectionResult = (*currentPosition + (*currentDirection * distance));
         intersectionResult->normal = *planeNormal; // Copy the plane normal as the normal for the intersection point
         // ^^^^^ TO DO: Interpolate this normal ????????????
