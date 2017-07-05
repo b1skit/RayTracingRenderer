@@ -507,6 +507,7 @@ void Renderer::drawPolygon(Polygon thePolygon, bool isWireframe){
     // Tranform perspective to screen space
     thePolygon.transform(&perspectiveToScreen, true);
 
+
     // Draw lines (Polygons with 2 points)
     if(thePolygon.isLine()){
         drawLine(Line(*(thePolygon.getLast()), *(thePolygon.getPrev(thePolygon.getLast()->vertexNumber) )), ambientOnly, true, 0, 0);
@@ -959,7 +960,7 @@ void Renderer::drawPerPxLitScanlineIfVisible(Vertex* start, Vertex* end, bool do
         double correctZ = getPerspCorrectLerpValue(start->z, start->z, end->z, end->z, ratio); // Calculate the perspective correct Z for the current pixel
 
         // Only bother drawing if we know we're in front of the current z-buffer value:
-        if ( isVisible(x, y_rounded,  correctZ) ){
+        if ( isVisible(x, y_rounded, correctZ) ){
 
             // Calculate the current pixel position, as a vertex in camera space:
             Vertex currentPosition(x, y_rounded, correctZ);        // Create a vertex representing the current point on the scanline
@@ -1436,7 +1437,10 @@ void Renderer::setPixel(int x, int y, double z, unsigned int color){
 
 // Check if a pixel coordinate is in front of the current z-buffer depth
 bool Renderer::isVisible(int x, int y, double z){
+
     return ( getScaledZVal( z ) < ZBuffer[x][yRes - y]);
+
+//    return ( x >= 0 && x < xRes && y >= 0 && y < yRes && getScaledZVal( z ) < ZBuffer[x][yRes - y]);
 }
 
 // Get a scaled z-buffer value for a given Z

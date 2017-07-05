@@ -411,8 +411,12 @@ void Polygon::transform(TransformationMatrix* theMatrix, bool doRound){
         vertices[i].transform(theMatrix, doRound);
     }
 
+//    // Transform the face normal
+//    faceNormal.transform(theMatrix);
+
     // Transform the face normal
-    faceNormal.transform(theMatrix);
+    if (!doRound)
+        faceNormal.transform(theMatrix);
 }
 
 // Get a count of the number of vertices contained by this polygon
