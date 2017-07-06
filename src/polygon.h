@@ -166,6 +166,7 @@ private:
     double specularExponent = 8;
     double reflectivity = 0.5;
 
+
     // Check if a vertex is in the positive half space of a plane. Used to clip polygons.
     bool inside(Vertex V, Vertex P, normalVector n);
 

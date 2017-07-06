@@ -507,7 +507,6 @@ void Renderer::drawPolygon(Polygon thePolygon, bool isWireframe){
     // Tranform perspective to screen space
     thePolygon.transform(&perspectiveToScreen, true);
 
-
     // Draw lines (Polygons with 2 points)
     if(thePolygon.isLine()){
         drawLine(Line(*(thePolygon.getLast()), *(thePolygon.getPrev(thePolygon.getLast()->vertexNumber) )), ambientOnly, true, 0, 0);
@@ -536,6 +535,10 @@ void Renderer::drawPolygon(Polygon thePolygon, bool isWireframe){
 // Rasterize a polygon
 // Assumption: Received polygon is a triange, is in screen space, and all 3 vertices have been rounded to integer coordinates
 void Renderer::rasterizePolygon(Polygon* thePolygon){
+
+    cout << "Rasterizing:\n";
+    thePolygon->debug();
+
     // Get the vertices from the polygon:
     Vertex* topLeftVertex = thePolygon->getHighest();
     Vertex* topRightVertex = topLeftVertex; // Start edge traversal at the same point
@@ -879,6 +882,8 @@ void Renderer::renderScene(Scene theScene){
         currentMesh = &renderMesh; // Update the currentMesh pointer to the current mesh being drawn
         drawMesh(&renderMesh);
 
+        renderMesh.debug();
+
 
 //        // VISIBLY DEBUG BOUNDING BOXES:
 //        for (int i = 0; i < renderMesh.boundingBoxFaces.size(); i++){
@@ -1164,7 +1169,6 @@ void Renderer:: lightPointInCameraSpace(Vertex* currentPosition, normalVector vi
             }
         } // End looping through all meshes
 
-
         // If we've found bounced light intersection points, calculate their contribution and add it to the final color:
         if (hitPoly != nullptr){
 
@@ -1284,8 +1288,6 @@ bool Renderer::getPolyPlaneFrontFaceIntersectionPoint(Vertex* currentPosition, n
 
     double currentDirectionDotPlaneNormal = currentDirection->dotProduct(*planeNormal);
 
-
-
     // Check if direction and poly plane are parallel (ie. == 0), or if we're hitting the BACK face of the polygon (ie. > 0) (Light can pass through the back face, but not the front face
     if (currentDirectionDotPlaneNormal >= 0)
         return false;
@@ -1297,7 +1299,6 @@ bool Renderer::getPolyPlaneFrontFaceIntersectionPoint(Vertex* currentPosition, n
         *intersectionResult = (*currentPosition + (*currentDirection * distance));
         intersectionResult->normal = *planeNormal; // Copy the plane normal as the normal for the intersection point
         // ^^^^^ TO DO: Interpolate this normal ????????????
-
         return true;
     }
 
@@ -1438,9 +1439,9 @@ void Renderer::setPixel(int x, int y, double z, unsigned int color){
 // Check if a pixel coordinate is in front of the current z-buffer depth
 bool Renderer::isVisible(int x, int y, double z){
 
-    return ( getScaledZVal( z ) < ZBuffer[x][yRes - y]);
+//    return ( getScaledZVal( z ) < ZBuffer[x][yRes - y]);
 
-//    return ( x >= 0 && x < xRes && y >= 0 && y < yRes && getScaledZVal( z ) < ZBuffer[x][yRes - y]);
+    return ( x >= 0 && x < xRes && y >= 0 && y < yRes && getScaledZVal( z ) < ZBuffer[x][yRes - y]); // DEBUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 }
 
 // Get a scaled z-buffer value for a given Z

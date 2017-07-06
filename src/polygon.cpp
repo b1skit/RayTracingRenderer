@@ -411,9 +411,6 @@ void Polygon::transform(TransformationMatrix* theMatrix, bool doRound){
         vertices[i].transform(theMatrix, doRound);
     }
 
-//    // Transform the face normal
-//    faceNormal.transform(theMatrix);
-
     // Transform the face normal
     if (!doRound)
         faceNormal.transform(theMatrix);
@@ -449,6 +446,8 @@ vector<Polygon>* Polygon::getTriangulatedFaces(){
         newFace.specularCoefficient = this->specularCoefficient;
         newFace.specularExponent = this->specularExponent;
         newFace.reflectivity = this->reflectivity;
+
+        newFace.faceNormal = this->faceNormal;
 
         newFace.addVertex(v1); // Add the common vertex
 
@@ -575,10 +574,8 @@ void Polygon::debug(){
     cout << "Polygon:\n";
     for (unsigned int i = 0; i < currentVertices; i++){
         vertices[i].debug();
-//        if (i != currentVertices - 1)
-//            cout << "\n";
     }
-    cout << "Face normal: ";
+    cout << "Face ";
     faceNormal.debug();
     cout << "End Polygon.\n\n";
 }
