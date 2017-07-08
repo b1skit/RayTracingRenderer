@@ -536,8 +536,8 @@ void Renderer::drawPolygon(Polygon thePolygon, bool isWireframe){
 // Assumption: Received polygon is a triange, is in screen space, and all 3 vertices have been rounded to integer coordinates
 void Renderer::rasterizePolygon(Polygon* thePolygon){
 
-    cout << "Rasterizing:\n";
-    thePolygon->debug();
+//    cout << "Rasterizing:\n";
+//    thePolygon->debug();
 
     // Get the vertices from the polygon:
     Vertex* topLeftVertex = thePolygon->getHighest();
@@ -882,7 +882,7 @@ void Renderer::renderScene(Scene theScene){
         currentMesh = &renderMesh; // Update the currentMesh pointer to the current mesh being drawn
         drawMesh(&renderMesh);
 
-        renderMesh.debug();
+//        renderMesh.debug();
 
 
 //        // VISIBLY DEBUG BOUNDING BOXES:
@@ -1270,7 +1270,7 @@ bool Renderer::getPolyPlaneBackFaceIntersectionPoint(Vertex* currentPosition, no
 
     double distance = (*planePoint - *currentPosition).dot(*planeNormal)/(double)currentDirectionDotPlaneNormal;
     // Ensure the intersection is in front of the ray ( >0.1 to avoid intersections with neighbouring polys in the same mesh)
-    if (distance > 0.1){
+    if (distance > 0.1){ // LESS THAN THIS (IE. > 0) CAUSES MASSIVE DISTORTION!!!!!!!!!!!!!!!!!!!!!
         *intersectionResult = (*currentPosition + (*currentDirection * distance));
         intersectionResult->normal = *planeNormal; // Copy the plane normal as the normal for the intersection point
         // ^^^^^ THIS SHOULD BE INTERPOLATED!!!!!!!! ^^^^^^^^^
@@ -1295,7 +1295,7 @@ bool Renderer::getPolyPlaneFrontFaceIntersectionPoint(Vertex* currentPosition, n
     double distance = (*planePoint - *currentPosition).dot(*planeNormal)/(double)currentDirectionDotPlaneNormal;
 
     // Ensure the intersection is in front of the ray ( >0.1 to avoid intersections with neighbouring polys in the same mesh)
-    if (distance > 0.1){
+    if (distance > 0){
         *intersectionResult = (*currentPosition + (*currentDirection * distance));
         intersectionResult->normal = *planeNormal; // Copy the plane normal as the normal for the intersection point
         // ^^^^^ TO DO: Interpolate this normal ????????????
@@ -1318,7 +1318,7 @@ bool Renderer::getPolyPlaneIntersectionPoint(Vertex* currentPosition, normalVect
     double distance = (*planePoint - *currentPosition).dot(*planeNormal)/(double)currentDirectionDotPlaneNormal;
 
     // Ensure the intersection is in front of the ray ( >0.1 to avoid intersections with neighbouring polys in the same mesh)
-    if (distance > 0.1){ // IF THIS Fn IS JUST USED FOR BOUNDING BOX CHECKS, WE PROBABLY DON'T NEED EPSILON IN THIS CHECK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    if (distance > 0){ // IF THIS Fn IS JUST USED FOR BOUNDING BOX CHECKS, WE PROBABLY DON'T NEED EPSILON IN THIS CHECK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         *intersectionResult = (*currentPosition + (*currentDirection * distance));
         intersectionResult->normal = *planeNormal; // Copy the plane normal as the normal for the intersection point
         // ^^^^^ TO DO: Interpolate this normal ????????????
@@ -1439,9 +1439,9 @@ void Renderer::setPixel(int x, int y, double z, unsigned int color){
 // Check if a pixel coordinate is in front of the current z-buffer depth
 bool Renderer::isVisible(int x, int y, double z){
 
-//    return ( getScaledZVal( z ) < ZBuffer[x][yRes - y]);
+    return ( getScaledZVal( z ) < ZBuffer[x][yRes - y]);
 
-    return ( x >= 0 && x < xRes && y >= 0 && y < yRes && getScaledZVal( z ) < ZBuffer[x][yRes - y]); // DEBUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//    return ( x >= 0 && x < xRes && y >= 0 && y < yRes && getScaledZVal( z ) < ZBuffer[x][yRes - y]); // DEBUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 }
 
 // Get a scaled z-buffer value for a given Z
