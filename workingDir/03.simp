@@ -2,7 +2,9 @@
 phong
 depth 0 150 0 0 0
 ambient 0.25 0.25 0.25
-raytrace 1
+raytrace 0
+
+#noshadows
 
 reflectivity 0
 
@@ -18,7 +20,7 @@ reflectivity 0
 
 # Light
 {
-        translate -50 100 -200
+        translate -50 120 -200
         light 10 10 10 0.01 0.02
 }
 
@@ -28,6 +30,8 @@ reflectivity 0
 	scale 2000 1 2000
 	obj "unitPlane"
 }
+
+# Cubes
 {
 	translate 0 0 20
 	file "cubeGrid"

@@ -142,7 +142,7 @@ private:
     int getScaledZVal(double correctZ);
 
     // Determine whether a current position is shadowed by some polygon in the scene that lies between it and a light
-    bool isShadowed(Vertex* currentPosition, normalVector* lightDirection, double lightDistance);
+    bool isShadowed(Vertex currentPosition, normalVector* lightDirection, double lightDistance);
 
     // Find the intersection point of a ray and the plane of a polygon
     // Return: True if the ray intersects, false otherwise. Modifies result Vertex to be the point of intersection, leaves it unchanged otherwise

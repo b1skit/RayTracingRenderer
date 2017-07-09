@@ -42,6 +42,9 @@ public:
     // Overloaded subtraction operator: Perform componenent-wise subtraction of 2 vertices
     Vertex operator-(const Vertex& rhs) const;
 
+    // Overloaded compound addition operator: Perform componenent-wise addition of a vertex and a normal
+    Vertex& operator+=(const normalVector& rhs);
+
     // Overloaded addition operator: Perform componenent-wise addition of 2 vertices
     Vertex operator+(const Vertex& rhs) const;
 

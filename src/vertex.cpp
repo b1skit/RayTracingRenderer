@@ -121,6 +121,15 @@ Vertex Vertex::operator-(const Vertex& rhs) const {
     return result;
 }
 
+// Overloaded compound addition operator: Perform componenent-wise addition of a vertex and a normal
+Vertex& Vertex::operator+=(const normalVector& rhs){
+    this->x += rhs.xn;
+    this->y += rhs.yn;
+    this->z += rhs.zn;
+
+    return *this;
+}
+
 // Overloaded addition operator: Perform componenent-wise addition of 2 vertices
 Vertex Vertex::operator+(const Vertex& rhs) const{
     Vertex result(*this); // Copy the LHS
