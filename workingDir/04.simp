@@ -43,7 +43,7 @@ raytrace 1
 	{
 			surface 0.7 0.7 0.7 
 			specular 0.6 12
-			reflectivity 0.5
+			reflectivity 0.2
 			
 			obj "lightScene_A"
 	}
@@ -161,7 +161,7 @@ raytrace 1
 	{
 			surface 0.8 0.8 0.9 
 			specular 0.6 22
-			reflectivity 0.5
+			reflectivity 0.3
 
 			obj "lightScene_N"
 	}
