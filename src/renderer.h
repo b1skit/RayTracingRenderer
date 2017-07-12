@@ -133,7 +133,13 @@ private:
     void gouraudShadePolygon(Polygon* thePolygon);
 
     // Light a given point in camera space
-    void lightPointInCameraSpace(Vertex* currentPosition, normalVector viewVector, bool doAmbient, double specularExponent, double specularCoefficient, int bounceRays);
+    unsigned int lightPointInCameraSpace(Vertex* currentPosition, normalVector viewVector, bool doAmbient, double specularExponent, double specularCoefficient);
+
+    // Recursively ray trace a point's lighting
+    unsigned int recursivelyLightPointInCS(Vertex* currentPosition, normalVector viewVector, bool doAmbient, double specularExponent, double specularCoefficient, int bounceRays);
+
+    // Recursive helper function for ray tracing
+    unsigned int recursiveLightHelper(Vertex* currentPosition, normalVector* viewVector, bool doAmbient, double specularExponent, double specularCoefficient, int bounceRays);
 
     // Check if a pixel coordinate is in front of the current z-buffer depth
     bool isVisible(int x, int y, double z);
