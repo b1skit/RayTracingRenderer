@@ -33,11 +33,11 @@ Scene::Scene(const Scene &rhs){
     this->fogBlueIntensity = rhs.fogBlueIntensity;
     this->fogColor = rhs.fogColor;
 
+    this->environmentColor = rhs.environmentColor;
+
     this->numRayBounces = rhs.numRayBounces;
     this->noRayShadows = rhs.noRayShadows;
 
-    this->attenuationA = rhs.attenuationA;
-    this->attenuationB = rhs.attenuationB;
 }
 
 // Overloaded assignment operator
@@ -70,11 +70,10 @@ Scene& Scene::operator=(const Scene& rhs){
     this->fogBlueIntensity = rhs.fogBlueIntensity;
     this->fogColor = rhs.fogColor;
 
+    this->environmentColor = rhs.environmentColor;
+
     this->numRayBounces = rhs.numRayBounces;
     this->noRayShadows = rhs.noRayShadows;
-
-    this->attenuationA = rhs.attenuationA;
-    this->attenuationB = rhs.attenuationB;
 
     return *this;
 }

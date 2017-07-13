@@ -47,13 +47,11 @@ public:
     double fogBlueIntensity = 0;
     unsigned int fogColor = 0xff000000; // Combined color, assembled from the recieved fog intensities. Default to black.
 
+    unsigned int environmentColor = 0xff000000;  // Default background color
+
     // Scene ray trace settings:
     int numRayBounces = 0;          // Default number of bounces when ray tracing. Default = 0 (ie. No ray tracing)
     bool noRayShadows = false;      // Whether or not to use shadow rays. Default = false (ie. Calculate shadows). Shadows can be disabled with "noshadows" command in the .simp file
-    double attenuationA = 1;        // Scene bounce light attenuation constants
-    double attenuationB = 0.5;
-
-    unsigned int backgroundColor = 0xff000000;  // Default background color
 
 private:
 

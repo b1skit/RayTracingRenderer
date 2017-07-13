@@ -168,6 +168,13 @@ void normalVector::transform(TransformationMatrix* theMatrix){
     normalize();
 }
 
+// Reverse the direction of this vector
+void normalVector::reverse(){
+    xn *= -1;
+    yn *= -1;
+    zn *= -1;
+}
+
 // Debug this object
 void normalVector::debug(){
     cout << "normal: (" << xn << ", " << yn << ", " << zn << ")\n";

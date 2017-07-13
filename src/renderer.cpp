@@ -111,7 +111,7 @@ void Renderer::drawLine(Line theLine, ShadingModel theShadingModel, bool doAmbie
                     viewVector.normalize();
 
                     // Calculate the lit pixel value, apply distance fog then attempt to set it:
-                    currentPosition.color = lightPointInCameraSpace(&currentPosition, viewVector, doAmbient, specularExponent, specularCoefficient);
+                    currentPosition.color = lightPointInCameraSpace(&currentPosition, &viewVector, doAmbient, specularExponent, specularCoefficient);
 
                     if (currentMesh->isDepthFogged)
                         setPixel((int)theLine.p1.x, y, correctZ, getDistanceFoggedColor( currentPosition.color, correctZ ) );
@@ -205,7 +205,7 @@ void Renderer::drawLine(Line theLine, ShadingModel theShadingModel, bool doAmbie
                         normalVector viewVector(-currentPosition.x, -currentPosition.y, -currentPosition.z);
                         viewVector.normalize();
 
-                        currentPosition.color = lightPointInCameraSpace(&currentPosition, viewVector, doAmbient, specularExponent, specularCoefficient);
+                        currentPosition.color = lightPointInCameraSpace(&currentPosition, &viewVector, doAmbient, specularExponent, specularCoefficient);
 
                         if (currentMesh->isDepthFogged) // Calculate the lit pixel value, apply distance fog then attempt to set it:
                             setPixel(round_x, y, correctZ, getDistanceFoggedColor( currentPosition.color, correctZ ) );
@@ -265,7 +265,7 @@ void Renderer::drawLine(Line theLine, ShadingModel theShadingModel, bool doAmbie
                         viewVector.normalize();
 
                         // Calculate the lit pixel value, apply distance fog then attempt to set it:
-                        currentPosition.color = lightPointInCameraSpace(&currentPosition, viewVector, doAmbient, specularExponent, specularCoefficient);
+                        currentPosition.color = lightPointInCameraSpace(&currentPosition, &viewVector, doAmbient, specularExponent, specularCoefficient);
 
                         if (currentMesh->isDepthFogged)
                             setPixel(x, round_y, correctZ, getDistanceFoggedColor( currentPosition.color, correctZ ) );
@@ -289,168 +289,6 @@ void Renderer::drawLine(Line theLine, ShadingModel theShadingModel, bool doAmbie
     // Update the screen:
     drawable->updateScreen();
 }
-
-
-
-
-//// Draw a line (Bresenham's Algorithm)
-//void Renderer::draw_lineBRES(Line theLine, unsigned int color, bool doLerp){
-
-//    Vertex *p1 = &theLine.p1;
-//    Vertex *p2 = &theLine.p2;
-
-//    // TO DO:
-//    // ******
-//    // Z-Buffer checks
-//    // Pass pointers instead of value
-//    // Incremental ratio values (for correct z)
-//    // Bresenham's incrementation of Z values...?
-
-//    double z, ZDiff;
-
-//    // Handle vertical lines:
-//    if (p1->x == p2->x){
-//        if (p1->y < p2->y){ // p1 is lower
-
-//            z = p1->z;
-
-//            for (int y = (int)p1->y; y < (int)p2->y; y++){
-
-//               // ZDiff =
-
-//                double ratio = (y - p1->y)/(double)(p2->y - p1->y); // Get our current position as a ratio
-//                double correctZ = getPerspCorrectLerpValue(p1->z, p1->z, p2->z, p2->z, ratio);
-
-//                setPixel((int)p1->x, y, correctZ, getPerspCorrectLerpColor(p1, p2, p1->x, y, p1->z) );
-
-//            }
-//        } else { // p2 is lower
-//            for (int y = (int)p2->y; y < (int)p1->y; y++){
-
-//                double ratio = (y - p2->y)/(double)(p1->y - p2->y); // Get our current position as a ratio
-//                double correctZ = getPerspCorrectLerpValue(p2->z, p2->z, p1->z, p1->z, ratio); // IS THIS CORRECT?????????????????????????
-
-
-//                drawable->setPixel(p1->x, y, correctZ, getPerspCorrectLerpColor(p1, p2, p1->x, y)); // ??????????????
-//            }
-//        }
-//        return; // We're done! No need to continue.
-//    }
-
-//    // Handle non-vertical lines:
-//    // Flip the points, so we're always drawing left to right
-//    if (p1->x > p2->x){
-//        int temp = p1->x;
-//        p1->x = p2->x;
-//        p2->x = temp;
-//        temp = p1->y;
-//        p1->y = p2->y;
-//        p2->y = temp;
-
-//        unsigned int colorTemp = p1->color;
-//        p1->color = p2->color;
-//        p2->color = colorTemp;
-//    }
-
-//    // Determine which octant we're in:
-//    int diff_x = p2->x - p1->x;
-//    int diff_y = p2->y - p1->y;
-//    int abs_x = abs(diff_x);
-//    int abs_y = abs(diff_y);
-
-//    // Octants I, V, II, VI
-//    if (diff_y >= 0){
-
-//        // Handle Octants II, VI
-//        bool isOctII_VI = false;
-//        if (abs_x <= abs_y){
-//            // Transpose from II or VI into Octant I:
-//            int temp = p1->x;
-//            p1->x = p1->y;
-//            p1->y = temp;
-//            temp = p2->x;
-//            p2->x = p2->y;
-//            p2->y = temp;
-
-//            isOctII_VI = true;
-//        }
-
-//        // Draw the line:
-//        int dx = p2->x - p1->x;
-//        int two_dx = 2 * dx;
-//        int two_dy = 2 * (p2->y - p1->y);
-//        int two_dy_minus_two_dx = two_dy - two_dx;
-//        int error = two_dy - dx;
-//        int y = p1->y;
-//        for (int x = p1->x; x <= p2->x; x++){ // DRAWING LOOP
-//            if (isOctII_VI) // Flip x, y for Octant II and VI
-//                drawable->setPixel(y, x, getLerpColor(p1, p2, x, y)); // y, x !
-
-//            else{ // Don't flip x, y for Octant I, V
-//                    drawable->setPixel(x, y, getLerpColor(p1, p2, x, y)); // y, x !
-//            }
-//            if (error >= 0){
-//                error += two_dy_minus_two_dx;
-//                y++;
-//            }
-//            else{
-//                error += two_dy;
-//            }
-//        } // End for
-//    } // End octants I, V, II, VI
-
-//    else { // Octants III, VII, IV, VIII
-
-//        // Detect Octants III, VII
-//        bool isOctIII_VII = false;
-//        if (abs_x < abs_y){
-//            // Transpose to Octant VIII (maintaining left to right point order):
-//            int temp = p1->x;
-//            p1->x = p2->y;
-//            p2->y = temp;
-//            temp = p1->y;
-//            p1->y = p2->x;
-//            p2->x = temp;
-
-//            unsigned int colorTemp = p1->color;
-//            p1->color = p2->color;
-//            p2->color = colorTemp;
-
-//            isOctIII_VII = true;
-//        }
-
-//        // Draw the line:
-//        int dx = p2->x - p1->x;
-//        int two_dx = 2 * dx;
-//        int two_dy = 2 * (p1->y - p2->y); // Swapped order
-//        int two_dy_minus_two_dx = two_dy - two_dx;
-//        int error = two_dy - dx;
-//        int y = p1->y;
-//        for (int x = p1->x; x <= p2->x; x++){ // DRAWING LOOP
-//            if (isOctIII_VII)
-//                    drawable->setPixel(y, x, getLerpColor(p1, p2, x, y));
-//            else {
-//                    drawable->setPixel(x, y, getLerpColor(p1, p2, x, y));
-//            }
-
-//            if (error >= 0){
-//                error += two_dy_minus_two_dx;
-//                y--; // y--
-//            }
-//            else{
-//                error += two_dy;
-//            }
-//        } // End for
-//    } // End octants III, VII, IV, VIII
-
-//    // Update the screen:
-//    drawable->updateScreen();
-//}
-
-
-
-
-
 
 // Draw a polygon. Calls the rasterize Polygon helper function
 // If thePolygon vertices are all not the same color, the color will be LERP'd
@@ -824,7 +662,7 @@ void Renderer::gouraudShadePolygon(Polygon* thePolygon){
         normalVector viewVector(-thePolygon->vertices[i].x, -thePolygon->vertices[i].y, -thePolygon->vertices[i].z);
         viewVector.normalize();
 
-        thePolygon->vertices[i].color = lightPointInCameraSpace(&thePolygon->vertices[i], viewVector, thePolygon->isAffectedByAmbientLight(), thePolygon->getSpecularExponent(), thePolygon->getSpecularCoefficient());
+        thePolygon->vertices[i].color = lightPointInCameraSpace(&thePolygon->vertices[i], &viewVector, thePolygon->isAffectedByAmbientLight(), thePolygon->getSpecularExponent(), thePolygon->getSpecularCoefficient());
     }
 }
 
@@ -961,11 +799,6 @@ void Renderer::drawPerPxLitScanlineIfVisible(Vertex* start, Vertex* end, bool do
         // Only bother drawing if we know we're in front of the current z-buffer value:
         if ( isVisible(x, y_rounded, correctZ) ){
 
-
-            if (x == 568 && y_rounded == 585)
-                cout << "BREAK";
-
-
             // Calculate the current pixel position, as a vertex in camera space:
             Vertex currentPosition(x, y_rounded, correctZ);        // Create a vertex representing the current point on the scanline
 
@@ -988,7 +821,7 @@ void Renderer::drawPerPxLitScanlineIfVisible(Vertex* start, Vertex* end, bool do
             viewVector.normalize();
 
             // Calculate the lit pixel value, apply distance fog then set it:
-            currentPosition.color = recursivelyLightPointInCS(&currentPosition, viewVector, doAmbient, specularExponent, specularCoefficient, currentScene->numRayBounces);
+            currentPosition.color = recursivelyLightPointInCS(&currentPosition, &viewVector, doAmbient, specularExponent, specularCoefficient, currentScene->numRayBounces);
 
             if (currentMesh->isDepthFogged) {
                 setPixel(x, y_rounded, correctZ, getDistanceFoggedColor( currentPosition.color, correctZ ) );
@@ -1004,36 +837,29 @@ void Renderer::drawPerPxLitScanlineIfVisible(Vertex* start, Vertex* end, bool do
 }
 
 // Recursively ray trace a point's lighting. Calls the recursive helper function
-unsigned int Renderer::recursivelyLightPointInCS(Vertex* currentPosition, normalVector viewVector, bool doAmbient, double specularExponent, double specularCoefficient, int bounceRays){
+unsigned int Renderer::recursivelyLightPointInCS(Vertex* currentPosition, normalVector* viewVector, bool doAmbient, double specularExponent, double specularCoefficient, int bounceRays){
     // Light the initial point:
     unsigned int initialColor = lightPointInCameraSpace(currentPosition, viewVector, doAmbient, specularExponent, specularCoefficient);
 
     // Handle ray tracing:
     if (bounceRays > 0){
-
-        // Calculate the bounce direction:
-        normalVector bounceDirection = currentPosition->normal;
-        bounceDirection *= 2;
-        bounceDirection *= (currentPosition->normal.dotProduct(viewVector));
-        bounceDirection -= viewVector;
-        bounceDirection.normalize();
-        // ^^ COMBINE THESE CALCULATIONS!!!!!!!!!!!! ^^^^^^^^^^^^^^^^ (MAKE INTO A FUNCTION!!!)
+        // Calculate the bounce direction: Points from initial point towards the (potential) intersection
+        normalVector bounceDirection = reflectOutVector(&(currentPosition->normal), viewVector);
 
         // Add the intial points' color and its reflective component:
         return addColors(   initialColor,
                             multiplyColorChannels(
                                     recursiveLightHelper(currentPosition, &bounceDirection, doAmbient, specularExponent, specularCoefficient, bounceRays - 1),
                                     1.0, currentPolygon->getReflectivity(), currentPolygon->getReflectivity(), currentPolygon->getReflectivity()
-
                             )
                          );
-
     }
     else
         return initialColor;
 }
 
 // Recursive helper function for ray tracing
+// Note: inBounceDirection is a normalized vector that points from a face towards a potential point of intersection
 unsigned int Renderer::recursiveLightHelper(Vertex* currentPosition, normalVector* inBounceDirection, bool doAmbient, double specularExponent, double specularCoefficient, int bounceRays){
 
     // Find an intersection point, if it exists:
@@ -1074,6 +900,7 @@ unsigned int Renderer::recursiveLightHelper(Vertex* currentPosition, normalVecto
 
                                     // Make sure the intersection is nearest, and keep it if it is
                                     double currentHitDistance = (*intersectionResult - *currentPosition).length();
+
                                     if (currentHitDistance < hitDistance){ // Store the new closest hit
                                         hitDistance = currentHitDistance;
                                         hitPoly = &currentVisibleMesh.faces[j];
@@ -1096,17 +923,16 @@ unsigned int Renderer::recursiveLightHelper(Vertex* currentPosition, normalVecto
     // If we've found bounced light intersection points, calculate their contribution and add it to the final color:
     if (hitPoly != nullptr){
 
+        // Reverse the recieved bounce direction to make it a view vector from the previous point
+        inBounceDirection->reverse();
+
         // Light the intersection point:
-        closestIntersection.color = lightPointInCameraSpace(&closestIntersection, *inBounceDirection, hitPoly->isAffectedByAmbientLight(), hitPoly->getSpecularExponent(), hitPoly->getSpecularCoefficient());
+        closestIntersection.color = lightPointInCameraSpace(&closestIntersection, inBounceDirection, hitPoly->isAffectedByAmbientLight(), hitPoly->getSpecularExponent(), hitPoly->getSpecularCoefficient());
 
         if (bounceRays > 1){
+
             // Calculate new bounce direction:
-            normalVector nextBounceDirection = closestIntersection.normal;
-            nextBounceDirection *= 2;
-            nextBounceDirection *= (closestIntersection.normal.dotProduct(*inBounceDirection));
-            nextBounceDirection -= *inBounceDirection;
-            nextBounceDirection.normalize();
-            // ^^ COMBINE THESE CALCULATIONS!!!!!!!!!!!! ^^^^^^^^^^^^^^^^ (MAKE INTO A FUNCTION!!!)
+            normalVector nextBounceDirection = reflectOutVector(&closestIntersection.normal, inBounceDirection);
 
             closestIntersection.color = addColors(  closestIntersection.color,
                                                     recursiveLightHelper(&closestIntersection, &nextBounceDirection, doAmbient, specularExponent, specularCoefficient, bounceRays - 1)
@@ -1120,13 +946,12 @@ unsigned int Renderer::recursiveLightHelper(Vertex* currentPosition, normalVecto
     } // End hitPoly check
 
     // We failed to hit anything: Return the scene's background color
-    return currentScene->backgroundColor;
-
+    return currentScene->environmentColor;
 }
 
 // Light a given point in camera space
 // Precondition: viewVector is normalized
-unsigned int Renderer::lightPointInCameraSpace(Vertex* currentPosition, normalVector viewVector, bool doAmbient, double specularExponent, double specularCoefficient) {
+unsigned int Renderer::lightPointInCameraSpace(Vertex* currentPosition, normalVector* viewVector, bool doAmbient, double specularExponent, double specularCoefficient) {
 
     // Running light totals:
     unsigned int ambientValue = 0;
@@ -1173,34 +998,30 @@ unsigned int Renderer::lightPointInCameraSpace(Vertex* currentPosition, normalVe
                 greenTotalDiffuseIntensity += greenDiffuseIntensity;
                 blueTotalDiffuseIntensity += blueDiffuseIntensity;
 
-                // Calculate the spec component:
-                double redSpecIntensity = specularCoefficient;
-                double greenSpecIntensity = specularCoefficient;
-                double blueSpecIntensity = specularCoefficient;
-                // ^^^^^^^^ TO DO:  WRAP THESE CALCULATIONS INTO A SIMPLER " if (viewDotReflection > 0) " STATEMENT BELOW !!!!!! ^^^^^^^^^^^^^
-
                 // Calculate the reflection vector:
-                normalVector reflectionVector = currentPosition->normal;
-                reflectionVector *= 2 * currentNormalDotLightDirection;
-                reflectionVector = reflectionVector - lightDirection;
-                reflectionVector.normalize();
-                // ^^^^^^^^ TO DO: SIMPLIFY THIS CALCULATION!!!!!!!! ^^^^^^^^^^^^^^^ OR BREAK IT INTO A FUNCTION!!!!!!!!
+                normalVector reflectionVector = reflectOutVector(&(currentPosition->normal), &lightDirection);
 
                 // Calculate the cosine of the angle between the view vector and the reflection vector:
-                double viewDotReflection = viewVector.dotProduct(reflectionVector);
-                if (viewDotReflection < 0) // Clamp the value to be >=0
-                    viewDotReflection = 0;
+                double viewDotReflection = viewVector->dotProduct(reflectionVector);
 
-                viewDotReflection = pow(viewDotReflection, specularExponent );
+                if (viewDotReflection > 0){
 
-                redSpecIntensity *= (currentScene->theLights[i].redIntensity * attenuationFactor * viewDotReflection);
-                greenSpecIntensity *= (currentScene->theLights[i].greenIntensity * attenuationFactor * viewDotReflection);
-                blueSpecIntensity *= (currentScene->theLights[i].blueIntensity * attenuationFactor * viewDotReflection);
+                    // Calculate the spec component:
+                    double redSpecIntensity = specularCoefficient;
+                    double greenSpecIntensity = specularCoefficient;
+                    double blueSpecIntensity = specularCoefficient;
 
-                // Add the final diffuse/spec values to the running totals:
-                redTotalSpecIntensity += redSpecIntensity;
-                greenTotalSpecIntensity += greenSpecIntensity;
-                blueTotalSpecIntensity += blueSpecIntensity;
+                    viewDotReflection = pow(viewDotReflection, specularExponent );
+
+                    redSpecIntensity *= (currentScene->theLights[i].redIntensity * attenuationFactor * viewDotReflection);
+                    greenSpecIntensity *= (currentScene->theLights[i].greenIntensity * attenuationFactor * viewDotReflection);
+                    blueSpecIntensity *= (currentScene->theLights[i].blueIntensity * attenuationFactor * viewDotReflection);
+
+                    // Add the final diffuse/spec values to the running totals:
+                    redTotalSpecIntensity += redSpecIntensity;
+                    greenTotalSpecIntensity += greenSpecIntensity;
+                    blueTotalSpecIntensity += blueSpecIntensity;
+                }
 
             } // End ifShadowed check
         } // end if surface normal check
@@ -1231,19 +1052,15 @@ bool Renderer::isShadowed(Vertex currentPosition, normalVector* lightDirection, 
         // Loop through each face of the current mesh's bounding box
         for (int i = 0; i < currentVisibleMesh.boundingBoxFaces.size(); i++){
 
+                    // Find an intersection point with the bounding box, if it exists:
+            if (    ( getPolyPlaneIntersectionPoint(&currentPosition, lightDirection, &currentVisibleMesh.boundingBoxFaces[i].vertices[0], &currentVisibleMesh.boundingBoxFaces[i].faceNormal, intersectionResult ) )
 
-            // TO DO: Combine into a single "if" statement:
-
-
-            // Find an intersection point with the bounding box, if it exists:
-            if ( getPolyPlaneIntersectionPoint(&currentPosition, lightDirection, &currentVisibleMesh.boundingBoxFaces[i].vertices[0], &currentVisibleMesh.boundingBoxFaces[i].faceNormal, intersectionResult ) ){
-
-                // Ensure the intersection is between the currentPosition and the light:
-                if ( (*intersectionResult - currentPosition).length() < lightDistance ){
+                    // Ensure the intersection is between the currentPosition and the light:
+                 && ( (*intersectionResult - currentPosition).length() < lightDistance )
 
                     // Ensure the intersection point hit the bounding box
-                    if ( pointIsInsidePoly( &currentVisibleMesh.boundingBoxFaces[i], intersectionResult ) ){
-
+                 && ( pointIsInsidePoly( &currentVisibleMesh.boundingBoxFaces[i], intersectionResult ) )
+                ) {
                         // We have a bounding box intersection hit! Loop through each visible face in the current mesh and find an actual intersection point:
                         for (int j = 0; j < currentVisibleMesh.faces.size(); j++){
 
@@ -1269,11 +1086,10 @@ bool Renderer::isShadowed(Vertex currentPosition, normalVector* lightDirection, 
                             } // End current face checking
                         } // End visible face checking loop
 
-                        break; // Don't bother checking any more of the bounding box faces, already checked all of the visible faces once.
+                        break; // Exit the bounding box loop: Don't bother checking any more bounding box faces, as we've already checked all of the visible faces once.
 
-                    } // End bounding box inside check
-                } // End bounding box intersection between light and position check
-            } // End bounding box intersection check
+                    } // End if
+
         } // End bounding box face loop
     } // End mesh loop
 
@@ -1321,6 +1137,7 @@ bool Renderer::getPolyPlaneFrontFaceIntersectionPoint(Vertex* currentPosition, n
         *intersectionResult = (*currentPosition + (*currentDirection * distance));
 
         // TO DO: INTERPOLATE THE CORRECT NORMAL AND COLOR FOR THE INTERSECTION POINT!!!!
+
         intersectionResult->color = planePoint->color;
         // ^^^^^^TO DO: INTERPOLATE THIS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -1515,9 +1332,15 @@ void Renderer::transformCamera(TransformationMatrix cameraMovement){
     screenToPerspective = screenToPerspective.getInverse();
 }
 
-// Calculate attenuation factor for bounced light contributions
-double Renderer::getBounceLightAttenuationFactor(double pointDistance){
-    return (1.0 /((double) (currentScene->attenuationA + (currentScene->attenuationB * pointDistance) ) ));
+// Calculate a reflection of vector pointing away from a surface
+normalVector Renderer::reflectOutVector(normalVector* faceNormal, normalVector* outVector){
+
+    normalVector bounceDirection( *faceNormal );
+    bounceDirection *= 2 * (faceNormal->dotProduct( *outVector ) );
+    bounceDirection -= *outVector;
+    bounceDirection.normalize();
+
+    return bounceDirection;
 }
 
 // Visually debug lights:

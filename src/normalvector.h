@@ -54,6 +54,9 @@ public:
     // Transform the normal by a transformation matrix
     void transform(TransformationMatrix* theMatrix);
 
+    // Reverse the direction of this vector
+    void reverse();
+
 
     // Normal vector attributes:
     //**************************

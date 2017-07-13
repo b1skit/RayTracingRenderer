@@ -3,8 +3,8 @@
 ambient 0.3 0.3 0.3
 depth 1 6 0 0 0
 raytrace 0
-rayattenuation 1 0.5
 #noshadows
+environment 0 0 0
 
 phong
 reflectivity 0.5

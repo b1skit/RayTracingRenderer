@@ -3,6 +3,7 @@ phong
 ambient .25 .25 .3
 depth 1 40 0.0 0.0 0.0
 raytrace 1
+environment 0 0 0
 
 #wire
 

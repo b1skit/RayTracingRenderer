@@ -193,7 +193,7 @@ vector<Mesh> FileInterpreter::getMeshHelper(string filename, bool currentIsWiref
                         usesAmbientLighting = true; // Update the ambient flag
                     }
 
-                    // Handle depth commands:
+                    // Handle depth fog commands:
                     else if (theIterator->compare("depth") == 0){
                         theIterator++;
                         isDepthFogged = true;
@@ -207,6 +207,17 @@ vector<Mesh> FileInterpreter::getMeshHelper(string filename, bool currentIsWiref
                         currentScene->fogBlueIntensity = stod(*theIterator++);
 
                         currentScene->fogColor = combineColorChannels(currentScene->fogRedIntensity, currentScene->fogGreenIntensity, currentScene->fogBlueIntensity);
+                    }
+
+                    // Handle environment commands:
+                    else if (theIterator->compare("environment") == 0){
+                        theIterator++;
+
+                        double redEnvironmentIntensity = stod(*theIterator++);
+                        double greenEnvironmentIntensity = stod(*theIterator++);
+                        double blueEnvironmentIntensity = stod(*theIterator++);
+
+                        currentScene->environmentColor = combineColorChannels(redEnvironmentIntensity, greenEnvironmentIntensity, blueEnvironmentIntensity);
                     }
 
                     // Handle light commands

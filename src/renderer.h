@@ -29,21 +29,11 @@ public:
     // Assumption: topLeft_ and botRight_ coords are valid, and in UI window space (ie. (0,0) is in the top left of the screen!)
     void drawRectangle(int topLeftX, int topLeftY, int botRightX, int botRightY, unsigned int color);
 
-    // Draw a line
-    // If theLine's p1.color != p2.color, the line color will be LERP'd. Updates the Z-Buffer.
-    void drawLine(Line theLine, ShadingModel theShadingModel, bool doAmbient, double specularCoefficient, double specularExponent);
-
-
-//    // Draw a line (Bresenham's Algorithm)
-//    void draw_lineBRES(Line theLine, unsigned int color, bool doLerp);
-
-
     // Render a scene
     void renderScene(Scene theScene);
 
     // Visually debug the renderer's collection of lights
     void debugLights();
-
 
 private:
     Drawable* drawable; // A drawable object, used to interface with QT framework
@@ -73,6 +63,10 @@ private:
     // A transformation matrix from screen space back to perspective space
     TransformationMatrix screenToPerspective;
 
+
+    // Draw a line
+    // If theLine's p1.color != p2.color, the line color will be LERP'd. Updates the Z-Buffer.
+    void drawLine(Line theLine, ShadingModel theShadingModel, bool doAmbient, double specularCoefficient, double specularExponent);
 
     // Draw a polygon. Calls the rasterize Polygon helper function
     // If thePolygon vertices are all not the same color, the color will be LERP'd
@@ -133,10 +127,10 @@ private:
     void gouraudShadePolygon(Polygon* thePolygon);
 
     // Light a given point in camera space
-    unsigned int lightPointInCameraSpace(Vertex* currentPosition, normalVector viewVector, bool doAmbient, double specularExponent, double specularCoefficient);
+    unsigned int lightPointInCameraSpace(Vertex* currentPosition, normalVector* viewVector, bool doAmbient, double specularExponent, double specularCoefficient);
 
     // Recursively ray trace a point's lighting
-    unsigned int recursivelyLightPointInCS(Vertex* currentPosition, normalVector viewVector, bool doAmbient, double specularExponent, double specularCoefficient, int bounceRays);
+    unsigned int recursivelyLightPointInCS(Vertex* currentPosition, normalVector* viewVector, bool doAmbient, double specularExponent, double specularCoefficient, int bounceRays);
 
     // Recursive helper function for ray tracing
     unsigned int recursiveLightHelper(Vertex* currentPosition, normalVector* viewVector, bool doAmbient, double specularExponent, double specularCoefficient, int bounceRays);
@@ -165,8 +159,9 @@ private:
     // Determine whether a point on a polygon's plane lies within the polygon
     bool pointIsInsidePoly(Polygon* thePolygon, Vertex* intersectionPoint);
 
-    // Calculate attenuation factor for bounced light contributions
-    double getBounceLightAttenuationFactor(double pointDistance);
+    // Calculate the reflection of vector pointing away from a surface
+    normalVector reflectOutVector(normalVector* faceNormal, normalVector* outVector);
+
 };
 
 #endif // MYRENDERER_H

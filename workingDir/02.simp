@@ -6,6 +6,7 @@ depth 1 35 0 0 0
 raytrace 0
 noshadows
 reflectivity 0
+environment 0 0 0
 
 # Camera
 {
