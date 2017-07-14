@@ -190,7 +190,7 @@ TransformationMatrix operator*(TransformationMatrix& lhs, TransformationMatrix& 
 }
 
 // Get inverse: Calculate this Matrix's inverse, and return int
-// Assumption: The matrix is non-singular
+// Pre-condition: The matrix is non-singular
 TransformationMatrix TransformationMatrix::getInverse(){
 
     // Create and initialize a cofactor matrix

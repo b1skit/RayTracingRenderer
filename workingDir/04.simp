@@ -1,8 +1,9 @@
 phong
 
 ambient .25 .25 .3
-depth 1 40 0.0 0.0 0.0
-raytrace 1
+depth 1 75 0.0 0.0 0.0
+raytrace 4
+#noshadows
 environment 0 0 0
 
 #wire
@@ -42,6 +43,9 @@ environment 0 0 0
 	
 	# Backdrop
 	{
+			translate 0 0 5
+			scale 10 10 10
+			
 			surface 0.7 0.7 0.7 
 			specular 0.6 12
 			reflectivity 0.2

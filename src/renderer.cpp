@@ -47,7 +47,7 @@ Renderer::~Renderer(){
 }
 
 // Draw a rectangle. Used for setting panel background colors only. Ignores z-buffer.
-// Assumption: topLeft_ and botRight_ coords are valid, and in UI window space (ie. (0,0) is in the top left of the screen!)
+// Pre-condition: topLeft_ and botRight_ coords are valid, and in UI window space (ie. (0,0) is in the top left of the screen!)
 void Renderer::drawRectangle(int topLeftX, int topLeftY, int botRightX, int botRightY, unsigned int color){
     // Draw the rectangle
     for (int x = topLeftX; x <= botRightX; x++){
@@ -107,7 +107,7 @@ void Renderer::drawLine(Line theLine, ShadingModel theShadingModel, bool doAmbie
                     currentPosition.color = getPerspCorrectLerpColor(&theLine.p1, &theLine.p2, ratio); // Get the (perspective correct) base color
 
                     // Create a view vector: Points from the face towards the camera
-                    normalVector viewVector(-currentPosition.x, -currentPosition.y, -currentPosition.z);
+                    NormalVector viewVector(-currentPosition.x, -currentPosition.y, -currentPosition.z);
                     viewVector.normalize();
 
                     // Calculate the lit pixel value, apply distance fog then attempt to set it:
@@ -202,7 +202,7 @@ void Renderer::drawLine(Line theLine, ShadingModel theShadingModel, bool doAmbie
                         currentPosition.color = getPerspCorrectLerpColor(&theLine.p1, &theLine.p2, ratio); // Get the (perspective correct) base color
 
                         // Create a view vector: Points from the face towards the camera
-                        normalVector viewVector(-currentPosition.x, -currentPosition.y, -currentPosition.z);
+                        NormalVector viewVector(-currentPosition.x, -currentPosition.y, -currentPosition.z);
                         viewVector.normalize();
 
                         currentPosition.color = lightPointInCameraSpace(&currentPosition, &viewVector, doAmbient, specularExponent, specularCoefficient);
@@ -261,7 +261,7 @@ void Renderer::drawLine(Line theLine, ShadingModel theShadingModel, bool doAmbie
                         currentPosition.color = getPerspCorrectLerpColor(&theLine.p1, &theLine.p2, ratio); // Get the (perspective correct) base color
 
                         // Create a view vector: Points from the face towards the camera
-                        normalVector viewVector(-currentPosition.x, -currentPosition.y, -currentPosition.z);
+                        NormalVector viewVector(-currentPosition.x, -currentPosition.y, -currentPosition.z);
                         viewVector.normalize();
 
                         // Calculate the lit pixel value, apply distance fog then attempt to set it:
@@ -371,7 +371,7 @@ void Renderer::drawPolygon(Polygon thePolygon, bool isWireframe){
 }
 
 // Rasterize a polygon
-// Assumption: Received polygon is a triange, is in screen space, and all 3 vertices have been rounded to integer coordinates
+// Pre-condition: Received polygon is a triange, is in screen space, and all 3 vertices have been rounded to integer coordinates
 void Renderer::rasterizePolygon(Polygon* thePolygon){
 
     // Get the vertices from the polygon:
@@ -449,10 +449,10 @@ void Renderer::rasterizePolygon(Polygon* thePolygon){
         if (thePolygon->getShadingModel() == phong){
 
             Vertex lhs(xLeft_rounded, (double)y, leftCorrectZ, getPerspCorrectLerpColor(topLeftVertex, botLeftVertex, leftRatio));
-            lhs.normal = normalVector(topLeftVertex->normal, topLeftVertex->z, botLeftVertex->normal, botLeftVertex->z, y, topLeftVertex->y, botLeftVertex->y);
+            lhs.normal = NormalVector(topLeftVertex->normal, topLeftVertex->z, botLeftVertex->normal, botLeftVertex->z, y, topLeftVertex->y, botLeftVertex->y);
 
             Vertex rhs(xRight_rounded, (double)y, rightCorrectZ, getPerspCorrectLerpColor(topRightVertex, botRightVertex, rightRatio));
-            rhs.normal = normalVector(topRightVertex->normal, topRightVertex->z, botRightVertex->normal, botRightVertex->z, y, topRightVertex->y, botRightVertex->y);
+            rhs.normal = NormalVector(topRightVertex->normal, topRightVertex->z, botRightVertex->normal, botRightVertex->z, y, topRightVertex->y, botRightVertex->y);
 
             drawPerPxLitScanlineIfVisible( &lhs, &rhs, thePolygon->isAffectedByAmbientLight(), thePolygon->getSpecularCoefficient(), thePolygon->getSpecularExponent());
         }
@@ -524,7 +524,7 @@ void Renderer::rasterizePolygon(Polygon* thePolygon){
 }
 
 // Light a Polygon using flat shading
-// Assumption: All vertices have a valid normal
+// Pre-condition: All vertices have a valid normal
 void Renderer::flatShadePolygon(Polygon* thePolygon){
 
     unsigned int* ambientValues = new unsigned int[ thePolygon->getVertexCount() ];
@@ -560,13 +560,13 @@ void Renderer::flatShadePolygon(Polygon* thePolygon){
     Vertex faceCenter = thePolygon->getFaceCenter();
 
     // Calculate the average of the normals:
-    normalVector faceNormal = thePolygon->getNormalAverage();
+    NormalVector faceNormal = thePolygon->getNormalAverage();
 
     // Loop through each light:
     for (unsigned int i = 0; i < currentScene->theLights.size(); i++){
 
         // Get the (normalized) light direction vector: Points from the face towards the light
-        normalVector lightDirection(currentScene->theLights[i].position.x - faceCenter.x, currentScene->theLights[i].position.y - faceCenter.y, currentScene->theLights[i].position.z - faceCenter.z);
+        NormalVector lightDirection(currentScene->theLights[i].position.x - faceCenter.x, currentScene->theLights[i].position.y - faceCenter.y, currentScene->theLights[i].position.z - faceCenter.z);
         lightDirection.normalize();
 
         // Get the cosine of the angle between the face normal and the light direction
@@ -593,14 +593,11 @@ void Renderer::flatShadePolygon(Polygon* thePolygon){
             double blueSpecIntensity = thePolygon->getSpecularCoefficient();
 
             // Create a view vector: Points from the face towards the camera
-            normalVector viewVector(-faceCenter.x, -faceCenter.y, -faceCenter.z);
+            NormalVector viewVector(-faceCenter.x, -faceCenter.y, -faceCenter.z);
             viewVector.normalize();
 
             // Calculate the reflection vector:
-            normalVector reflectionVector = faceNormal;
-            reflectionVector *= 2 * faceNormalDotLightDirection;
-            reflectionVector = reflectionVector - lightDirection;
-            reflectionVector.normalize();
+            NormalVector reflectionVector = reflectOutVector(&faceNormal, &lightDirection);
 
             // Calculate the cosine of the angle between the view vector and the reflection vector:
             double viewDotReflection = viewVector.dotProduct(reflectionVector);
@@ -659,7 +656,7 @@ void Renderer::gouraudShadePolygon(Polygon* thePolygon){
     for (int i = 0; i < thePolygon->getVertexCount(); i++){
 
         // Create a view vector: Points from the face towards the camera
-        normalVector viewVector(-thePolygon->vertices[i].x, -thePolygon->vertices[i].y, -thePolygon->vertices[i].z);
+        NormalVector viewVector(-thePolygon->vertices[i].x, -thePolygon->vertices[i].y, -thePolygon->vertices[i].z);
         viewVector.normalize();
 
         thePolygon->vertices[i].color = lightPointInCameraSpace(&thePolygon->vertices[i], &viewVector, thePolygon->isAffectedByAmbientLight(), thePolygon->getSpecularExponent(), thePolygon->getSpecularCoefficient());
@@ -729,7 +726,7 @@ void Renderer::renderScene(Scene theScene){
 }
 
 // Draw a scanline, with consideration to the Z-Buffer
-// Assumption: start and end vertices are in left to right order, and have been pre-rounded to integer coordinates
+// Pre-condition: start and end vertices are in left to right order, and have been pre-rounded to integer coordinates
 // Note: LERP's if start->color != end->color. Does NOT update the screen!
 void Renderer::drawScanlineIfVisible(Vertex* start, Vertex* end){
 
@@ -817,7 +814,7 @@ void Renderer::drawPerPxLitScanlineIfVisible(Vertex* start, Vertex* end, bool do
             currentPosition.color = getPerspCorrectLerpColor(start, end, ratio); // Get the (perspective correct) base color
 
             // Create a view vector: Points from the face towards the camera
-            normalVector viewVector(-currentPosition.x, -currentPosition.y, -currentPosition.z);
+            NormalVector viewVector(-currentPosition.x, -currentPosition.y, -currentPosition.z);
             viewVector.normalize();
 
             // Calculate the lit pixel value, apply distance fog then set it:
@@ -837,14 +834,14 @@ void Renderer::drawPerPxLitScanlineIfVisible(Vertex* start, Vertex* end, bool do
 }
 
 // Recursively ray trace a point's lighting. Calls the recursive helper function
-unsigned int Renderer::recursivelyLightPointInCS(Vertex* currentPosition, normalVector* viewVector, bool doAmbient, double specularExponent, double specularCoefficient, int bounceRays){
+unsigned int Renderer::recursivelyLightPointInCS(Vertex* currentPosition, NormalVector* viewVector, bool doAmbient, double specularExponent, double specularCoefficient, int bounceRays){
     // Light the initial point:
     unsigned int initialColor = lightPointInCameraSpace(currentPosition, viewVector, doAmbient, specularExponent, specularCoefficient);
 
     // Handle ray tracing:
     if (bounceRays > 0){
         // Calculate the bounce direction: Points from initial point towards the (potential) intersection
-        normalVector bounceDirection = reflectOutVector(&(currentPosition->normal), viewVector);
+        NormalVector bounceDirection = reflectOutVector(&(currentPosition->normal), viewVector);
 
         // Add the intial points' color and its reflective component:
         return addColors(   initialColor,
@@ -860,7 +857,7 @@ unsigned int Renderer::recursivelyLightPointInCS(Vertex* currentPosition, normal
 
 // Recursive helper function for ray tracing
 // Note: inBounceDirection is a normalized vector that points from a face towards a potential point of intersection
-unsigned int Renderer::recursiveLightHelper(Vertex* currentPosition, normalVector* inBounceDirection, bool doAmbient, double specularExponent, double specularCoefficient, int bounceRays){
+unsigned int Renderer::recursiveLightHelper(Vertex* currentPosition, NormalVector* inBounceDirection, bool doAmbient, double specularExponent, double specularCoefficient, int bounceRays){
 
     // Find an intersection point, if it exists:
     Vertex* intersectionResult;
@@ -895,18 +892,21 @@ unsigned int Renderer::recursiveLightHelper(Vertex* currentPosition, normalVecto
                         // Find an actual intersection point, if it exists:
                         if ( getPolyPlaneFrontFaceIntersectionPoint(currentPosition, inBounceDirection, &currentVisibleMesh.faces[j].vertices[0], &currentVisibleMesh.faces[j].faceNormal, intersectionResult ) ){
 
-                                // Check if the intersection point is inside of the polygon
-                                if( pointIsInsidePoly( &currentVisibleMesh.faces[j], intersectionResult ) ){ // We've found an intersection!
+                            // Check if the intersection point is inside of the polygon
+                            if( pointIsInsidePoly( &currentVisibleMesh.faces[j], intersectionResult ) // We've found an intersection!
+                                    // Ensure the intersection is not a self intersection, or intersecting a shared edge
+                                    && (currentMesh !=  &currentVisibleMesh   ||   !haveSharedEdge(currentPolygon, &currentVisibleMesh.faces[j]) )
+                              )
+                            {
+                                // Make sure the intersection is nearest, and keep it if it is
+                                double currentHitDistance = (*intersectionResult - *currentPosition).length();
 
-                                    // Make sure the intersection is nearest, and keep it if it is
-                                    double currentHitDistance = (*intersectionResult - *currentPosition).length();
-
-                                    if (currentHitDistance < hitDistance){ // Store the new closest hit
-                                        hitDistance = currentHitDistance;
-                                        hitPoly = &currentVisibleMesh.faces[j];
-                                        closestIntersection = *intersectionResult;
-                                    }
+                                if (currentHitDistance < hitDistance){ // Store the new closest hit
+                                    hitDistance = currentHitDistance;
+                                    hitPoly = &currentVisibleMesh.faces[j];
+                                    closestIntersection = *intersectionResult;
                                 }
+                            }
                         }
                     } // End of visible face intersection check
 
@@ -923,6 +923,9 @@ unsigned int Renderer::recursiveLightHelper(Vertex* currentPosition, normalVecto
     // If we've found bounced light intersection points, calculate their contribution and add it to the final color:
     if (hitPoly != nullptr){
 
+        // Update the closestIntersection with the interpolated normal and color:
+        setInterpolatedIntersectionValues(&closestIntersection, hitPoly);
+
         // Reverse the recieved bounce direction to make it a view vector from the previous point
         inBounceDirection->reverse();
 
@@ -932,7 +935,7 @@ unsigned int Renderer::recursiveLightHelper(Vertex* currentPosition, normalVecto
         if (bounceRays > 1){
 
             // Calculate new bounce direction:
-            normalVector nextBounceDirection = reflectOutVector(&closestIntersection.normal, inBounceDirection);
+            NormalVector nextBounceDirection = reflectOutVector(&closestIntersection.normal, inBounceDirection);
 
             closestIntersection.color = addColors(  closestIntersection.color,
                                                     recursiveLightHelper(&closestIntersection, &nextBounceDirection, doAmbient, specularExponent, specularCoefficient, bounceRays - 1)
@@ -951,7 +954,7 @@ unsigned int Renderer::recursiveLightHelper(Vertex* currentPosition, normalVecto
 
 // Light a given point in camera space
 // Precondition: viewVector is normalized
-unsigned int Renderer::lightPointInCameraSpace(Vertex* currentPosition, normalVector* viewVector, bool doAmbient, double specularExponent, double specularCoefficient) {
+unsigned int Renderer::lightPointInCameraSpace(Vertex* currentPosition, NormalVector* viewVector, bool doAmbient, double specularExponent, double specularCoefficient) {
 
     // Running light totals:
     unsigned int ambientValue = 0;
@@ -967,7 +970,7 @@ unsigned int Renderer::lightPointInCameraSpace(Vertex* currentPosition, normalVe
     for (unsigned int i = 0; i < currentScene->theLights.size(); i++){
 
         // Get the (normalized) light direction vector: Points from the face towards the light
-        normalVector lightDirection(currentScene->theLights[i].position.x - currentPosition->x, currentScene->theLights[i].position.y - currentPosition->y, currentScene->theLights[i].position.z - currentPosition->z);
+        NormalVector lightDirection(currentScene->theLights[i].position.x - currentPosition->x, currentScene->theLights[i].position.y - currentPosition->y, currentScene->theLights[i].position.z - currentPosition->z);
         lightDirection.normalize();
 
         // Get the cosine of the angle between the face normal and the light direction
@@ -976,10 +979,10 @@ unsigned int Renderer::lightPointInCameraSpace(Vertex* currentPosition, normalVe
         // Ensure the light is within 90 degrees about the surface normal, and is not shaded by any other polygons in the scene:
         if (currentNormalDotLightDirection > 0) {
 
-            double lightDistance = normalVector(currentScene->theLights[i].position.x - currentPosition->x, currentScene->theLights[i].position.y - currentPosition->y, currentScene->theLights[i].position.z - currentPosition->z).length();
+            double lightDistance = NormalVector(currentScene->theLights[i].position.x - currentPosition->x, currentScene->theLights[i].position.y - currentPosition->y, currentScene->theLights[i].position.z - currentPosition->z).length();
 
             // Calculate light value if scene or current point is unshadowed
-            if (currentScene->noRayShadows || !isShadowed(*currentPosition, &lightDirection, lightDistance) ){
+            if (currentScene->noRayShadows || !isShadowed(currentPosition, &lightDirection, lightDistance) ){
 
                 double attenuationFactor = currentScene->theLights[i].getAttenuationFactor(lightDistance);
 
@@ -999,7 +1002,7 @@ unsigned int Renderer::lightPointInCameraSpace(Vertex* currentPosition, normalVe
                 blueTotalDiffuseIntensity += blueDiffuseIntensity;
 
                 // Calculate the reflection vector:
-                normalVector reflectionVector = reflectOutVector(&(currentPosition->normal), &lightDirection);
+                NormalVector reflectionVector = reflectOutVector(&(currentPosition->normal), &lightDirection);
 
                 // Calculate the cosine of the angle between the view vector and the reflection vector:
                 double viewDotReflection = viewVector->dotProduct(reflectionVector);
@@ -1036,12 +1039,7 @@ unsigned int Renderer::lightPointInCameraSpace(Vertex* currentPosition, normalVe
 
 // Determine whether a current position is shadowed by some polygon in the scene that lies between it and a light
 // Precondition: All Polygons in the scene must have at least 3 vertices, and all meshes must have pre-calcualted bounding boxes
-bool Renderer::isShadowed(Vertex currentPosition, normalVector* lightDirection, double lightDistance){
-
-    // TO DO: CHECK IF LIGHT IS INSIDE OF BOUNDING BOX!!!!!!!!!!!!
-
-    // Shift the current position along its normal slightly, to avoid self intersection or intersection with polys that share an edge
-    currentPosition += currentPosition.normal * 0.1;
+bool Renderer::isShadowed(Vertex* currentPosition, NormalVector* lightDirection, double lightDistance){
 
     // Allocate a vertex to hold any intersection results we find:
     Vertex* intersectionResult = new Vertex(); // Modified if getPolyPlaneIntersectionPoint() finds a point of intersection
@@ -1053,10 +1051,10 @@ bool Renderer::isShadowed(Vertex currentPosition, normalVector* lightDirection, 
         for (int i = 0; i < currentVisibleMesh.boundingBoxFaces.size(); i++){
 
                     // Find an intersection point with the bounding box, if it exists:
-            if (    ( getPolyPlaneIntersectionPoint(&currentPosition, lightDirection, &currentVisibleMesh.boundingBoxFaces[i].vertices[0], &currentVisibleMesh.boundingBoxFaces[i].faceNormal, intersectionResult ) )
+            if (    ( getPolyPlaneIntersectionPoint(currentPosition, lightDirection, &currentVisibleMesh.boundingBoxFaces[i].vertices[0], &currentVisibleMesh.boundingBoxFaces[i].faceNormal, intersectionResult ) )
 
                     // Ensure the intersection is between the currentPosition and the light:
-                 && ( (*intersectionResult - currentPosition).length() < lightDistance )
+                 && ( (*intersectionResult - *currentPosition).length() < lightDistance )
 
                     // Ensure the intersection point hit the bounding box
                  && ( pointIsInsidePoly( &currentVisibleMesh.boundingBoxFaces[i], intersectionResult ) )
@@ -1068,22 +1066,26 @@ bool Renderer::isShadowed(Vertex currentPosition, normalVector* lightDirection, 
                             if ( &currentVisibleMesh.faces[j] == currentPolygon )
                                 continue;
 
-                            // Find an actual intersection point, if it exists:
-                            if ( getPolyPlaneBackFaceIntersectionPoint(&currentPosition, lightDirection, &currentVisibleMesh.faces[j].vertices[0], &currentVisibleMesh.faces[j].faceNormal, intersectionResult ) ){
+                                // Find an actual intersection point, if it exists:
+                            if ( ( getPolyPlaneBackFaceIntersectionPoint(currentPosition, lightDirection, &currentVisibleMesh.faces[j].vertices[0], &currentVisibleMesh.faces[j].faceNormal, intersectionResult ) )
 
                                 // Ensure the intersection is between the currentPosition and the light:
-                                if ( (*intersectionResult - currentPosition).length() < lightDistance ){
+                                && ( (*intersectionResult - *currentPosition).length() < lightDistance )
 
-                                    // Check if the intersection point is inside of the polygon
-                                    if( pointIsInsidePoly( &currentVisibleMesh.faces[j], intersectionResult ) ){ // We've found an intersection!
+                                   // Check if the intersection point is inside of the polygon
+                                && ( pointIsInsidePoly( &currentVisibleMesh.faces[j], intersectionResult ) )
 
-                                        // Cleanup:
-                                        delete intersectionResult;
+                                    // Check to make sure we're not self intersecting, or intersecting with a shared edge
+                                 && (currentMesh !=  &currentVisibleMesh   ||   !haveSharedEdge(currentPolygon, &currentVisibleMesh.faces[j]) )
 
-                                        return true;
-                                    }
-                                }
-                            } // End current face checking
+                                 ){ // We've found an intersection!
+
+                                    // Cleanup:
+                                    delete intersectionResult;
+
+                                    return true;
+
+                            } // End current face checking ifs
                         } // End visible face checking loop
 
                         break; // Exit the bounding box loop: Don't bother checking any more bounding box faces, as we've already checked all of the visible faces once.
@@ -1101,7 +1103,7 @@ bool Renderer::isShadowed(Vertex currentPosition, normalVector* lightDirection, 
 
 // Find the intersection point of a ray and the plane of a polygon. Used for finding intersections between shadow rays and faces shadowing a point.
 // Return: True if the ray intersects, false otherwise. Modifies result Vertex to be the point of intersection, leaves it unchanged otherwise. Does not bother updating intersection point normal.
-bool Renderer::getPolyPlaneBackFaceIntersectionPoint(Vertex* currentPosition, normalVector* currentDirection, Vertex* planePoint, normalVector* planeNormal, Vertex* intersectionResult){
+bool Renderer::getPolyPlaneBackFaceIntersectionPoint(Vertex* currentPosition, NormalVector* currentDirection, Vertex* planePoint, NormalVector* planeNormal, Vertex* intersectionResult){
 
     double currentDirectionDotPlaneNormal = currentDirection->dotProduct(*planeNormal);
 
@@ -1121,8 +1123,8 @@ bool Renderer::getPolyPlaneBackFaceIntersectionPoint(Vertex* currentPosition, no
 
 
 // Find the intersection point of a ray and the plane of a polygon. Used to find intersections of bounced reflection rays with other polys
-// Return: True if the ray intersects, false otherwise. Modifies result Vertex to be the point of intersection, leaves it unchanged otherwise
-bool Renderer::getPolyPlaneFrontFaceIntersectionPoint(Vertex* currentPosition, normalVector* currentDirection, Vertex* planePoint, normalVector* planeNormal, Vertex* intersectionResult){
+// Return: True if the ray intersects, false otherwise. Modifies result Vertex to be the point of intersection, leaves it unchanged otherwise. Note: The intersection point still needs an interpolated normal and color
+bool Renderer::getPolyPlaneFrontFaceIntersectionPoint(Vertex* currentPosition, NormalVector* currentDirection, Vertex* planePoint, NormalVector* planeNormal, Vertex* intersectionResult){
 
     double currentDirectionDotPlaneNormal = currentDirection->dotProduct(*planeNormal);
 
@@ -1136,14 +1138,6 @@ bool Renderer::getPolyPlaneFrontFaceIntersectionPoint(Vertex* currentPosition, n
     if (distance > 0){
         *intersectionResult = (*currentPosition + (*currentDirection * distance));
 
-        // TO DO: INTERPOLATE THE CORRECT NORMAL AND COLOR FOR THE INTERSECTION POINT!!!!
-
-        intersectionResult->color = planePoint->color;
-        // ^^^^^^TO DO: INTERPOLATE THIS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-        intersectionResult->normal = *planeNormal; // Copy the plane normal as the normal for the intersection point (TEMPORARY!)
-        // ^^^^^ TO DO: Interpolate this normal !!!!!!!!!!!!
-
         return true;
     }
 
@@ -1152,7 +1146,7 @@ bool Renderer::getPolyPlaneFrontFaceIntersectionPoint(Vertex* currentPosition, n
 
 // Find the intersection point of a ray and the plane of a polygon. Does not consider whether front or back face is being hit. Used for bounding box checks.
 // Return: True if the ray intersects, false otherwise. Modifies result Vertex to be the point of intersection, leaves it unchanged otherwise
-bool Renderer::getPolyPlaneIntersectionPoint(Vertex* currentPosition, normalVector* currentDirection, Vertex* planePoint, normalVector* planeNormal, Vertex* intersectionResult){
+bool Renderer::getPolyPlaneIntersectionPoint(Vertex* currentPosition, NormalVector* currentDirection, Vertex* planePoint, NormalVector* planeNormal, Vertex* intersectionResult){
 
     double currentDirectionDotPlaneNormal = currentDirection->dotProduct(*planeNormal);
 
@@ -1171,7 +1165,6 @@ bool Renderer::getPolyPlaneIntersectionPoint(Vertex* currentPosition, normalVect
     return false; // The intersection was behind the ray
 }
 
-
 // Determine whether a point on a polygon's plane lies within the polygon
 bool Renderer::pointIsInsidePoly(Polygon* thePolygon, Vertex* intersectionPoint){
 
@@ -1179,7 +1172,7 @@ bool Renderer::pointIsInsidePoly(Polygon* thePolygon, Vertex* intersectionPoint)
     bool isInside = true;
     for (int i = 0; i < thePolygon->getVertexCount() - 1; i++){
 
-        normalVector innerNormal(thePolygon->vertices[i].x - thePolygon->vertices[i+1].x, thePolygon->vertices[i].y - thePolygon->vertices[i+1].y, thePolygon->vertices[i].z - thePolygon->vertices[i+1].z);
+        NormalVector innerNormal(thePolygon->vertices[i].x - thePolygon->vertices[i+1].x, thePolygon->vertices[i].y - thePolygon->vertices[i+1].y, thePolygon->vertices[i].z - thePolygon->vertices[i+1].z);
 
         innerNormal = innerNormal.crossProduct(thePolygon->faceNormal);
 
@@ -1190,7 +1183,7 @@ bool Renderer::pointIsInsidePoly(Polygon* thePolygon, Vertex* intersectionPoint)
     }
 
     if (isInside){ // Only bother checking the last edge if there's a chance the point is inside the polygon:
-        normalVector innerNormal(thePolygon->vertices[thePolygon->getVertexCount() - 1].x - thePolygon->vertices[0].x, thePolygon->vertices[thePolygon->getVertexCount() - 1].y - thePolygon->vertices[0].y, thePolygon->vertices[thePolygon->getVertexCount() - 1].z - thePolygon->vertices[0].z);
+        NormalVector innerNormal(thePolygon->vertices[thePolygon->getVertexCount() - 1].x - thePolygon->vertices[0].x, thePolygon->vertices[thePolygon->getVertexCount() - 1].y - thePolygon->vertices[0].y, thePolygon->vertices[thePolygon->getVertexCount() - 1].z - thePolygon->vertices[0].z);
 
         innerNormal = innerNormal.crossProduct(thePolygon->faceNormal);
 
@@ -1212,7 +1205,7 @@ unsigned int Renderer::blendPixelValues(int x, int y, unsigned int color, float 
 }
 
 // Override: Lerp between the color values of 2 points (Perspective correct: Takes Z-Depth into account)
-// Assumption: Recieved points are ordered left to right
+// Pre-condition: Recieved points are ordered left to right
 // Return: An unsigned int color value, calculated based on a LERP of the current position between the 2 points
 unsigned int Renderer::getPerspCorrectLerpColor(Vertex* p1, Vertex* p2, double ratio) const {
     // Handle solidly colored objects:
@@ -1230,7 +1223,7 @@ unsigned int Renderer::getPerspCorrectLerpColor(Vertex* p1, Vertex* p2, double r
 }
 
 // Calculate fogged pixel value for a given pixel on a line between 2 points
-// Assumption: Ambient lighting has already been applied to the vertex color values. All points/coords are in screen space
+// Pre-condition: Ambient lighting has already been applied to the vertex color values. All points/coords are in screen space
 unsigned int Renderer::getFogPixelValue(Vertex* p1, Vertex* p2, double ratio, double correctZ) {
 
     // Apply distance fog to the base lerped color, and return the final value:
@@ -1238,7 +1231,7 @@ unsigned int Renderer::getFogPixelValue(Vertex* p1, Vertex* p2, double ratio, do
 }
 
 // Calculate interpolated pixel and depth fog value
-// Assumption: Z is in camera space
+// Pre-condition: Z is in camera space
 unsigned int Renderer::getDistanceFoggedColor(unsigned int pixelColor, double correctZ){
 
     // Handle objects too close for fog:
@@ -1265,7 +1258,7 @@ void Renderer::resetDepthBuffer(){
 }
 
 // Set a pixel on the raster
-// Assumption: Point is a valid coordinate on the raster canvas and has been previously checked against the z-buffer
+// Pre-condition: Point is a valid coordinate on the raster canvas and has been previously checked against the z-buffer
 void Renderer::setPixel(int x, int y, double z, unsigned int color){
 
     // Flip the Y coordinate:
@@ -1280,10 +1273,7 @@ void Renderer::setPixel(int x, int y, double z, unsigned int color){
 
 // Check if a pixel coordinate is in front of the current z-buffer depth
 bool Renderer::isVisible(int x, int y, double z){
-
     return ( getScaledZVal( z ) < ZBuffer[x][yRes - y]);
-
-//    return ( x >= 0 && x < xRes && y >= 0 && y < yRes && getScaledZVal( z ) < ZBuffer[x][yRes - y]); // DEBUG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 }
 
 // Get a scaled z-buffer value for a given Z
@@ -1333,14 +1323,138 @@ void Renderer::transformCamera(TransformationMatrix cameraMovement){
 }
 
 // Calculate a reflection of vector pointing away from a surface
-normalVector Renderer::reflectOutVector(normalVector* faceNormal, normalVector* outVector){
+NormalVector Renderer::reflectOutVector(NormalVector* faceNormal, NormalVector* outVector){
 
-    normalVector bounceDirection( *faceNormal );
+    NormalVector bounceDirection( *faceNormal );
     bounceDirection *= 2 * (faceNormal->dotProduct( *outVector ) );
     bounceDirection -= *outVector;
     bounceDirection.normalize();
 
     return bounceDirection;
+}
+
+// Update a raytracing intersection point with interpolated normals and color values
+void Renderer::setInterpolatedIntersectionValues(Vertex* intersectionPoint, Polygon* hitPoly){
+
+    // Find our position between the edges of the polygon:
+    Vertex* topLeftVertex = hitPoly->getHighest();
+    Vertex* topRightVertex = topLeftVertex; // Start edge traversal at the same point
+
+    Vertex* botLeftVertex = hitPoly->getNext(topLeftVertex->vertexNumber); // Get the next/left vertex (using counter-clockwise ordering)
+    Vertex* botRightVertex = hitPoly->getPrev(topRightVertex->vertexNumber); // Get the prev/right vertex
+
+    // Handle multiple "top" vertices with the same y coordinate - Slide down the edge
+    int count = hitPoly->getVertexCount(); // Track how many times we've moved, to prevent infinite loops when all vertices have the same y-coord.
+    while (topLeftVertex->y == botLeftVertex->y && count > 0){
+        count--;
+        topLeftVertex = botLeftVertex;
+        botLeftVertex = hitPoly->getNext(botLeftVertex->vertexNumber);
+    }
+    count = hitPoly->getVertexCount();
+    while (topRightVertex->y == botRightVertex->y && count > 0){
+        count--;
+        topRightVertex = botRightVertex;
+        botRightVertex = hitPoly->getPrev(botRightVertex->vertexNumber);
+    }
+
+    // Move the pointers to encompass the correct edge:
+    count = hitPoly->getVertexCount();
+    while (!(topLeftVertex->y >= intersectionPoint->y && botLeftVertex->y <= intersectionPoint->y) && count > 0){
+        count--;
+        topLeftVertex = botLeftVertex;
+        botLeftVertex = hitPoly->getNext(botLeftVertex->vertexNumber);
+    }
+    count = hitPoly->getVertexCount();
+    while (!(topRightVertex->y >= intersectionPoint->y && botRightVertex->y <= intersectionPoint->y) && count > 0){
+        count--;
+        topRightVertex = botRightVertex;
+        botRightVertex = hitPoly->getPrev(botRightVertex->vertexNumber);
+    }
+
+    // Find how far along each edge we are, as a ratio:
+    double leftRatio = (intersectionPoint->y - topLeftVertex->y)/(double)(botLeftVertex->y - topLeftVertex->y); // How far from top to bot we are
+    double rightRatio = (intersectionPoint->y - topRightVertex->y)/(double)(botRightVertex->y - topRightVertex->y);
+
+    // Calculate normals on the edges:
+    NormalVector leftNml;
+    leftNml.xn = ((1 - leftRatio) * topLeftVertex->normal.xn) + (leftRatio * botLeftVertex->normal.xn);
+    leftNml.yn = ((1 - leftRatio) * topLeftVertex->normal.yn) + (leftRatio * botLeftVertex->normal.yn);
+    leftNml.zn = ((1 - leftRatio) * topLeftVertex->normal.zn) + (leftRatio * botLeftVertex->normal.zn);
+    leftNml.normalize();
+
+    NormalVector rightNml;
+    rightNml.xn = ((1 - rightRatio) * topRightVertex->normal.xn) + (rightRatio * botRightVertex->normal.xn);
+    rightNml.yn = ((1 - rightRatio) * topRightVertex->normal.yn) + (rightRatio * botRightVertex->normal.yn);
+    rightNml.zn = ((1 - rightRatio) * topRightVertex->normal.zn) + (rightRatio * botRightVertex->normal.zn);
+    rightNml.normalize();
+
+    // Calculate edge colors:
+    unsigned int leftColor = addColors(
+                                        multiplyColorChannels(topLeftVertex->color, 1 - leftRatio ),
+                                        multiplyColorChannels(botLeftVertex->color, leftRatio)
+                );
+
+    unsigned int rightColor = addColors(
+                                        multiplyColorChannels(topRightVertex->color, 1 - rightRatio ),
+                                        multiplyColorChannels(botRightVertex->color, rightRatio)
+                );
+
+    // Calculate the x positions along the polygon edges:
+
+    double leftX, rightX;
+    double leftYDiff = botLeftVertex->y - topLeftVertex->y;
+    double rightYDiff = botRightVertex->y - topRightVertex->y;
+
+    if (leftYDiff != 0){
+        leftX = ((intersectionPoint->y - topLeftVertex->y) * ((botLeftVertex->x - topLeftVertex->x)/leftYDiff) + topLeftVertex->x);
+    }
+    else
+        leftX = botLeftVertex->x;
+
+    if (rightYDiff != 0){
+        rightX = ((intersectionPoint->y - topRightVertex->y) * ((botRightVertex->x - topRightVertex->x)/rightYDiff) + topRightVertex->x);
+    }
+    else
+        rightX = botRightVertex->x;
+
+    // Calculate how far along the face the intersection point is, as a ratio:
+    double pointRatio;
+    double xDiff = rightX - leftX;
+    if (xDiff != 0)
+        pointRatio = (intersectionPoint->x - leftX)/(double)(xDiff);
+    else
+        pointRatio = 0;
+
+
+    // Set the normal:
+    intersectionPoint->normal.xn = ((1 - pointRatio) * leftNml.xn) + (pointRatio * rightNml.xn);
+    intersectionPoint->normal.yn = ((1 - pointRatio) * leftNml.yn) + (pointRatio * rightNml.yn);
+    intersectionPoint->normal.zn = ((1 - pointRatio) * leftNml.zn) + (pointRatio * rightNml.zn);
+    intersectionPoint->normal.normalize();
+
+    // Set the color:
+    intersectionPoint->color = addColors(
+                                        multiplyColorChannels(leftColor, 1 - pointRatio ),
+                                        multiplyColorChannels(rightColor, pointRatio )
+    );
+
+}
+
+// Check if 2 polygons share an edge
+bool Renderer::haveSharedEdge(Polygon* poly1, Polygon* poly2){
+    int count = 0;
+    for (int i = 0; i < poly1->getVertexCount(); i++){
+        for (int j = 0; j < poly2->getVertexCount(); j++){
+            if (poly1->vertices[i] == poly2->vertices[j]){
+                count++;
+                if (count >= 2)
+                    return true;
+
+                break;      // No need to keep checking
+            }
+        }
+    }
+    return false;
 }
 
 // Visually debug lights:

@@ -106,7 +106,7 @@ void Client::nextPage() {
 
 
 
-    Scene scene2 = clientFileInterpreter.buildSceneFromFile("./debug.simp");
+    Scene scene2 = clientFileInterpreter.buildSceneFromFile("./04.simp");
     clientRenderer->renderScene(scene2);
 
 

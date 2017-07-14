@@ -36,6 +36,9 @@ public:
     // Destructor;
     ~Polygon();
 
+    // Remove all vertices from this polygon's vertice array
+    void clearVertices();
+
     // Add a vertex to the polygon.
     // PreCondition: Vertices are always added in a Counter Clockwise order (vertices[i+1] = CCW, vertices[i-1] = CW
     void addVertex(Vertex newPoint);
@@ -85,7 +88,7 @@ public:
     bool isInDepth(double hither, double yon);
 
     // Triangulate this polygon
-    // Assumption: The polygon has >=4 vertices
+    // Pre-condition: The polygon has >=4 vertices
     // Return: A mesh containing triangular faces only. Every triangle will contain the first vertex
     vector<Polygon>* getTriangulatedFaces();
 
@@ -138,11 +141,11 @@ public:
     Vertex getFaceCenter();
 
     // Get the (normalized) face normal of this polygon
-    // Assumption: The polygon is a triangle
-    normalVector getFaceNormal();
+    // Pre-condition: The polygon is a triangle
+    NormalVector getFaceNormal();
 
     // Get the average of the normals of this polygon
-    normalVector getNormalAverage();
+    NormalVector getNormalAverage();
 
 
     // Debug this polygon
@@ -153,7 +156,7 @@ public:
 
     Vertex* vertices = nullptr; // An array of points that describe this polygon
 
-    normalVector faceNormal;    // The pre-computed face normal of this polygon
+    NormalVector faceNormal;    // The pre-computed face normal of this polygon
 
 private:
     unsigned int vertexArraySize; // Size of the vertex array in this polygon
@@ -168,13 +171,13 @@ private:
 
 
     // Check if a vertex is in the positive half space of a plane. Used to clip polygons.
-    bool inside(Vertex V, Vertex P, normalVector n);
+    bool inside(Vertex V, Vertex P, NormalVector n);
 
     // Calculate a vector intersection with a plane. Used to clip polygons.
-    Vertex intersection(Vertex C, Vertex D, Vertex P, normalVector n, bool doPerspectiveCorrect);
+    Vertex intersection(Vertex C, Vertex D, Vertex P, NormalVector n, bool doPerspectiveCorrect);
 
     // Helper function: Clips polygons using Sutherland-Hodgman 2D clipping algorithm
-    Polygon clipHelper(Polygon source, Vertex P, normalVector n, bool doPerspectiveCorrect);
+    Polygon clipHelper(Polygon source, Vertex P, NormalVector n, bool doPerspectiveCorrect);
 };
 
 #endif // POLYGON_H

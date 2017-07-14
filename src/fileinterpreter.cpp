@@ -445,7 +445,7 @@ vector<Mesh> FileInterpreter::getMeshHelper(string filename, bool currentIsWiref
                         newFace.setReflectivity(theReflectivity);
 
                         // Set all .simp object polygon normals to be equivalent to face normals
-                        normalVector faceNormal = newFace.getFaceNormal();
+                        NormalVector faceNormal = newFace.getFaceNormal();
                         for (int i = 0; i < newFace.getVertexCount(); i++){
                             newFace.vertices[i].normal = faceNormal;
                         }
@@ -645,8 +645,8 @@ vector<Polygon> FileInterpreter::getPolysFromObj(string filename){
     theVertices.emplace_back( Vertex() ); // Dummy vertex: All vertices from index 1 onward are valid!
 
     // Use a vector of Vertex's to hold our normals: Bit of a workaround with a tiny memory overhead but good enough for now.
-    vector<normalVector> theNormals; // We burn the first index with a dummy vertex to maintain vertex # to vector index equivalence
-    theNormals.emplace_back( normalVector() ); // Dummy vertex: All vertices from index 1 onward are valid!
+    vector<NormalVector> theNormals; // We burn the first index with a dummy vertex to maintain vertex # to vector index equivalence
+    theNormals.emplace_back( NormalVector() ); // Dummy vertex: All vertices from index 1 onward are valid!
 
     ifstream* input = new ifstream(); // File reading object
     input->open(filename);
@@ -708,7 +708,7 @@ vector<Polygon> FileInterpreter::getPolysFromObj(string filename){
                 else if(theIterator->compare("vn") == 0){
                     theIterator++;
 
-                    normalVector newNormal;
+                    NormalVector newNormal;
                     newNormal.xn = stod(*theIterator++);
                     newNormal.yn = stod(*theIterator++);
                     newNormal.zn = stod(*theIterator++);
@@ -753,7 +753,7 @@ vector<Polygon> FileInterpreter::getPolysFromObj(string filename){
                                 // Handle vn trailing vt, if it exists: f v/vt/vn
                                 if (theIterator != currentLineTokens.end() && theIterator->compare("/") == 0){ // Another slash: must be vn
                                     theIterator++; // Move past the slash
-                                    normalVector newNormal;
+                                    NormalVector newNormal;
                                     index = stoi( *theIterator++ );
                                     if (index < 1)
                                         newNormal = theNormals[ theNormals.size() + index]; // Add our negative value to the size to get the correct offset
@@ -767,7 +767,7 @@ vector<Polygon> FileInterpreter::getPolysFromObj(string filename){
                             else { // IS a slash: must be a vn: f v//vn
                                 theIterator++; // Move past the "/" character
 
-                                normalVector newNormal;
+                                NormalVector newNormal;
                                 index = stoi( *theIterator++ );
                                 if (index < 1)
                                     newNormal = theNormals[ theNormals.size() + index]; // Add our negative value to the size to get the correct offset
@@ -785,7 +785,7 @@ vector<Polygon> FileInterpreter::getPolysFromObj(string filename){
 
 
                     // Check each vertex to make sure it has a valid normal. Set it to the face normal if it does not
-                    normalVector faceNormal = newFace.getFaceNormal();
+                    NormalVector faceNormal = newFace.getFaceNormal();
                     for (int i = 0; i < newFace.getVertexCount(); i++){
                         if (newFace.vertices[i].normal.isZero() ) {
                             newFace.vertices[i].normal = faceNormal; // Set 0,0,0 normals to be the face normal

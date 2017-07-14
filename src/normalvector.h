@@ -6,23 +6,23 @@
 
 #include "transformationmatrix.h"
 
-class normalVector
+class NormalVector
 {
 public:
     // Default constructor
-    normalVector();
+    NormalVector();
 
     // XYZ Constructor
-    normalVector(double newX, double newY, double newZ);
+    NormalVector(double newX, double newY, double newZ);
 
     // Copy Constructor
-    normalVector(const normalVector& rhs);
+    NormalVector(const NormalVector& rhs);
 
     // Interpolation constructor: Builds an interpolated normal vector based on current between start and end
-    normalVector(const normalVector& lhs, double lhsZ, const normalVector& rhs, double rhsZ, double current, double start, double end);
+    NormalVector(const NormalVector& lhs, double lhsZ, const NormalVector& rhs, double rhsZ, double current, double start, double end);
 
     // Overloaded assignment operator
-    normalVector& operator=(const normalVector& rhs);
+    NormalVector& operator=(const NormalVector& rhs);
 
     // Normalize the vector
     void normalize();
@@ -31,22 +31,22 @@ public:
     double length();
 
     // Get the cross product of this and another vector
-    normalVector crossProduct(const normalVector& rhs);
+    NormalVector crossProduct(const NormalVector& rhs);
 
     // Get the dot product of this and another vector
-    double dotProduct(const normalVector& rhs);
+    double dotProduct(const NormalVector& rhs);
 
     // Overloaded scalar multiplication operator
-    normalVector& operator*=(const double rhs);
+    NormalVector& operator*=(const double rhs);
 
     // Overloaded scalar multiplication operator
-    normalVector operator*(double scalar);
+    NormalVector operator*(double scalar);
 
     // Overloaded subtraction operator
-    normalVector operator-(const normalVector& rhs);
+    NormalVector operator-(const NormalVector& rhs);
 
     // Overloaded -= operator
-    normalVector& operator-=(const normalVector& rhs);
+    NormalVector& operator-=(const NormalVector& rhs);
 
     // Determine if this normal is (0, 0, 0)
     bool isZero();

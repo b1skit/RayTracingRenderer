@@ -28,8 +28,6 @@ int main(int argc, char *argv[])
     {
         Client client(sheet, argv[1]);  // the client gets a (Drawable *)
         window.setPageTurner(&client);  // the window must be given a (PageTurner *)
-
-        window.setPageTurner(&client);  // the window must be given a (PageTurner *)
     }
     else {
         Client client(sheet);           // the client gets a (Drawable *)

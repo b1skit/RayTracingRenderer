@@ -115,13 +115,13 @@ void Mesh::generateBoundingBox(){
     Polygon left, right, front, back, top, bottom;
 
     Vertex frontLeftTop(xMin, yMax, zMin);
-    Vertex frontLeftBot(xMin, yMin, zMin);
+    Vertex frontLeftBot(xMin, yMin, zMin); // Mins
     Vertex frontRightTop(xMax, yMax, zMin);
     Vertex frontRightBot(xMax, yMin, zMin);
 
     Vertex backLeftTop(xMin, yMax, zMax);
     Vertex backLeftBot(xMin, yMin, zMax);
-    Vertex backRightTop(xMax, yMax, zMax);
+    Vertex backRightTop(xMax, yMax, zMax); // Maxs
     Vertex backRightBot(xMax, yMin, zMax);
 
     left.addVertex( backLeftTop );
@@ -134,16 +134,6 @@ void Mesh::generateBoundingBox(){
     right.addVertex( backRightBot );
     right.addVertex( backRightTop );
 
-    front.addVertex( frontLeftTop );
-    front.addVertex( frontLeftBot );
-    front.addVertex( frontRightBot );
-    front.addVertex( frontRightTop );
-
-    back.addVertex( backRightTop );
-    back.addVertex( backRightBot );
-    back.addVertex( backLeftBot );
-    back.addVertex( backLeftTop );
-
     top.addVertex( backLeftTop );
     top.addVertex( frontLeftTop );
     top.addVertex( frontRightTop );
@@ -153,6 +143,16 @@ void Mesh::generateBoundingBox(){
     bottom.addVertex( backLeftBot );
     bottom.addVertex( backRightBot );
     bottom.addVertex( frontRightBot );
+
+    front.addVertex( frontLeftTop );
+    front.addVertex( frontLeftBot );
+    front.addVertex( frontRightBot );
+    front.addVertex( frontRightTop );
+
+    back.addVertex( backRightTop );
+    back.addVertex( backRightBot );
+    back.addVertex( backLeftBot );
+    back.addVertex( backLeftTop );
 
     // Generate face normals for each face of the bounding box:
     left.faceNormal = left.getFaceNormal();
@@ -165,10 +165,11 @@ void Mesh::generateBoundingBox(){
     // Add the faces to the bounding box:
     boundingBoxFaces.emplace_back(left);
     boundingBoxFaces.emplace_back(right);
-    boundingBoxFaces.emplace_back(front);
-    boundingBoxFaces.emplace_back(back);
     boundingBoxFaces.emplace_back(top);
     boundingBoxFaces.emplace_back(bottom);
+    boundingBoxFaces.emplace_back(front);
+    boundingBoxFaces.emplace_back(back);
+
 }
 
 // Debug this mesh

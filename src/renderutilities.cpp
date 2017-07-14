@@ -158,7 +158,7 @@ double extractColorChannel(unsigned int color, int channel){
 }
 
 // Calculate a perspective correct linear interpolation of some value
-// Assumption: Ratio is [0, 1]
+// Pre-condition: Ratio is [0, 1]
 double getPerspCorrectLerpValue(double startVal, double startZ, double endVal, double endZ, double ratio){
 
     double oneMinusRatio = 1 - ratio;

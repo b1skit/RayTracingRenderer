@@ -26,7 +26,7 @@ public:
     ~Renderer();
 
     // Draw a rectangle. Used for setting panel background colors only. Ignores z-buffer.
-    // Assumption: topLeft_ and botRight_ coords are valid, and in UI window space (ie. (0,0) is in the top left of the screen!)
+    // Pre-condition: topLeft_ and botRight_ coords are valid, and in UI window space (ie. (0,0) is in the top left of the screen!)
     void drawRectangle(int topLeftX, int topLeftY, int botRightX, int botRightY, unsigned int color);
 
     // Render a scene
@@ -80,7 +80,7 @@ private:
     void drawMesh(Mesh* theMesh);
 
     // Draw a scanline, with consideration to the Z-Buffer.
-    // Assumption: start and end vertices are in left to right order
+    // Pre-condition: start and end vertices are in left to right order
     // Note: LERP's if start.color != end.color. Does NOT update the screen!
     void drawScanlineIfVisible(Vertex* start, Vertex* end);
 
@@ -104,14 +104,14 @@ private:
     unsigned int getPerspCorrectLerpColor(Vertex* p1, Vertex* p2, double ratio) const;
 
     // Calculate a lighting value for a given pixel on a line between 2 points
-    // Assumption: Ambient lighting has already been applied to the vertex color values
+    // Pre-condition: Ambient lighting has already been applied to the vertex color values
     unsigned int getFogPixelValue(Vertex* p1, Vertex* p2, double ratio, double correctZ);
 
     // Calculate interpolated pixel and depth fog value
     unsigned int getDistanceFoggedColor(unsigned int pixelColor, double correctZ);
 
     // Set a pixel on the raster
-    // Assumption: Point is a valid coordinate on the raster canvas and has been previously checked against the z-buffer
+    // Pre-condition: Point is a valid coordinate on the raster canvas and has been previously checked against the z-buffer
     void setPixel(int x, int y, double z, unsigned int color);
 
     // Draw a polygon using opacity
@@ -119,21 +119,21 @@ private:
     void rasterizePolygon(Polygon* thePolygon);
 
     // Light a Polygon using flat shading
-    // Assumption: All vertices have a valid normal
+    // Pre-condition: All vertices have a valid normal
     void flatShadePolygon(Polygon* thePolygon);
 
     // Light a Polygon using gouraud shading
-    // Assumption: All vertices have a valid normal
+    // Pre-condition: All vertices have a valid normal
     void gouraudShadePolygon(Polygon* thePolygon);
 
     // Light a given point in camera space
-    unsigned int lightPointInCameraSpace(Vertex* currentPosition, normalVector* viewVector, bool doAmbient, double specularExponent, double specularCoefficient);
+    unsigned int lightPointInCameraSpace(Vertex* currentPosition, NormalVector* viewVector, bool doAmbient, double specularExponent, double specularCoefficient);
 
     // Recursively ray trace a point's lighting
-    unsigned int recursivelyLightPointInCS(Vertex* currentPosition, normalVector* viewVector, bool doAmbient, double specularExponent, double specularCoefficient, int bounceRays);
+    unsigned int recursivelyLightPointInCS(Vertex* currentPosition, NormalVector* viewVector, bool doAmbient, double specularExponent, double specularCoefficient, int bounceRays);
 
     // Recursive helper function for ray tracing
-    unsigned int recursiveLightHelper(Vertex* currentPosition, normalVector* viewVector, bool doAmbient, double specularExponent, double specularCoefficient, int bounceRays);
+    unsigned int recursiveLightHelper(Vertex* currentPosition, NormalVector* viewVector, bool doAmbient, double specularExponent, double specularCoefficient, int bounceRays);
 
     // Check if a pixel coordinate is in front of the current z-buffer depth
     bool isVisible(int x, int y, double z);
@@ -142,26 +142,31 @@ private:
     int getScaledZVal(double correctZ);
 
     // Determine whether a current position is shadowed by some polygon in the scene that lies between it and a light
-    bool isShadowed(Vertex currentPosition, normalVector* lightDirection, double lightDistance);
+    bool isShadowed(Vertex* currentPosition, NormalVector* lightDirection, double lightDistance);
 
     // Find the intersection point of a ray and the plane of a polygon
     // Return: True if the ray intersects, false otherwise. Modifies result Vertex to be the point of intersection, leaves it unchanged otherwise
-    bool getPolyPlaneBackFaceIntersectionPoint(Vertex* currentPosition, normalVector* currentDirection, Vertex* planePoint, normalVector* planeNormal, Vertex* result);
+    bool getPolyPlaneBackFaceIntersectionPoint(Vertex* currentPosition, NormalVector* currentDirection, Vertex* planePoint, NormalVector* planeNormal, Vertex* result);
 
     // Find the intersection point of a ray and the plane of a polygon
     // Return: True if the ray intersects, false otherwise. Modifies result Vertex to be the point of intersection, leaves it unchanged otherwise
-    bool getPolyPlaneFrontFaceIntersectionPoint(Vertex* currentPosition, normalVector* currentDirection, Vertex* planePoint, normalVector* planeNormal, Vertex* result);
+    bool getPolyPlaneFrontFaceIntersectionPoint(Vertex* currentPosition, NormalVector* currentDirection, Vertex* planePoint, NormalVector* planeNormal, Vertex* result);
 
     // Find the intersection point of a ray and the plane of a polygon
     // Return: True if the ray intersects, false otherwise. Modifies result Vertex to be the point of intersection, leaves it unchanged otherwise
-    bool getPolyPlaneIntersectionPoint(Vertex* currentPosition, normalVector* currentDirection, Vertex* planePoint, normalVector* planeNormal, Vertex* result);
+    bool getPolyPlaneIntersectionPoint(Vertex* currentPosition, NormalVector* currentDirection, Vertex* planePoint, NormalVector* planeNormal, Vertex* result);
 
     // Determine whether a point on a polygon's plane lies within the polygon
     bool pointIsInsidePoly(Polygon* thePolygon, Vertex* intersectionPoint);
 
     // Calculate the reflection of vector pointing away from a surface
-    normalVector reflectOutVector(normalVector* faceNormal, normalVector* outVector);
+    NormalVector reflectOutVector(NormalVector* faceNormal, NormalVector* outVector);
 
+    // Update a raytracing intersection point with interpolated normals and color values
+    void setInterpolatedIntersectionValues(Vertex* intersectionPoint, Polygon* hitPoly);
+
+    // Check if two polygons share an edge
+    bool haveSharedEdge(Polygon* poly1, Polygon* poly2);
 };
 
 #endif // MYRENDERER_H

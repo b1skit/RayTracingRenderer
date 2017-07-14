@@ -43,19 +43,19 @@ public:
     Vertex operator-(const Vertex& rhs) const;
 
     // Overloaded compound addition operator: Perform componenent-wise addition of a vertex and a normal
-    Vertex& operator+=(const normalVector& rhs);
+    Vertex& operator+=(const NormalVector& rhs);
 
     // Overloaded addition operator: Perform componenent-wise addition of 2 vertices
     Vertex operator+(const Vertex& rhs) const;
 
     // Overloaded addition operator: Perform componenent-wise addition of 2 vertices
-    Vertex operator+(const normalVector& rhs) const;
+    Vertex operator+(const NormalVector& rhs) const;
 
     // Multiply the components of this vertex by a scalar
     Vertex operator*(double scale);
 
     // Perform a dot product: Vertex vector dot product normal vector.
-    double dot(normalVector theNormal);
+    double dot(NormalVector theNormal);
 
     // Get the vector length of this vertex (ie its distance from the origin)
     double length();
@@ -83,7 +83,7 @@ public:
     unsigned int vertexNumber; // This vertex's index in its containing polygon vertex array
 
     // Vertex normal:
-    normalVector normal;
+    NormalVector normal;
 
 //    // Texture coordinates: Not currently used
 //    double xt;

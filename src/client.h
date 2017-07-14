@@ -24,13 +24,6 @@ public:
     // Command Line Constructor:
     Client(Drawable *drawable, string filename);
 
-
-
-    // Destructor
-    // TBC!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
-
     // Turn the window's page
     void nextPage();
 

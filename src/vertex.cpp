@@ -122,7 +122,7 @@ Vertex Vertex::operator-(const Vertex& rhs) const {
 }
 
 // Overloaded compound addition operator: Perform componenent-wise addition of a vertex and a normal
-Vertex& Vertex::operator+=(const normalVector& rhs){
+Vertex& Vertex::operator+=(const NormalVector& rhs){
     this->x += rhs.xn;
     this->y += rhs.yn;
     this->z += rhs.zn;
@@ -141,7 +141,7 @@ Vertex Vertex::operator+(const Vertex& rhs) const{
 }
 
 // Overloaded addition operator: Perform componenent-wise addition of 2 vertices
-Vertex Vertex::operator+(const normalVector& rhs) const{
+Vertex Vertex::operator+(const NormalVector& rhs) const{
     Vertex result = (*this);
     result.x += rhs.xn;
     result.y += rhs.yn;
@@ -162,7 +162,7 @@ Vertex Vertex::operator*(double scale){
 }
 
 // Perform a dot product: Vertex vector dot normal vector.
-double Vertex::dot(normalVector theNormal){
+double Vertex::dot(NormalVector theNormal){
     double result = 0;
     result += this->x * theNormal.xn;
     result += this->y * theNormal.yn;

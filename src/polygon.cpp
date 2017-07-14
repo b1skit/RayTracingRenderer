@@ -103,6 +103,19 @@ Polygon::~Polygon(){
     delete[] vertices;
 }
 
+// Remove all vertices from this polygon's vertice array
+void Polygon::clearVertices(){
+    if (vertices == nullptr)
+        return;
+
+    delete[] vertices;
+
+    vertexArraySize = 3; // Allocate 3 vertices (for a triangle)
+
+    vertices = new Vertex[vertexArraySize];
+    currentVertices = 0;
+}
+
 // Add a vertex to the polygon.
 // PreCondition: Vertices are always added in a Counter Clockwise order (vertices[i+1] = CCW, vertices[i-1] = CW
 void Polygon::addVertex(Vertex newPoint){
@@ -272,12 +285,12 @@ bool Polygon::isInFrustum(double xLow, double xHigh, double yLow, double yHigh){
 // Note: Algorithm modified from "Computer Graphics: Principals and Practice" Volume 3
 void Polygon::clipHitherYon(double hither, double yon){
     Vertex hitherPlane(0, 0, hither);
-    normalVector hitherNormal(0, 0, 1);
+    NormalVector hitherNormal(0, 0, 1);
 
     *this = clipHelper(*this, hitherPlane, hitherNormal, false);
 
     Vertex yonPlane(0, 0, yon);
-    normalVector yonNormal(0, 0, -1);
+    NormalVector yonNormal(0, 0, -1);
 
     if (this->currentVertices > 1) // Only try to clip if we've got at least 2 vertices left
         *this = clipHelper(*this, yonPlane, yonNormal, false);
@@ -298,15 +311,15 @@ void Polygon::clipToScreen(double xLow, double xHigh, double yLow, double yHigh)
     // Clip to each edge of the view plane, in turn
     for (int i = 0; i < 3; i++){
         if (this->currentVertices > 2)
-            *this = clipHelper(*this, boundaryPlane[i], normalVector(boundaryPlane[i].y - boundaryPlane[i + 1].y, boundaryPlane[i + 1].x - boundaryPlane[i].x, 0 ), true );
+            *this = clipHelper(*this, boundaryPlane[i], NormalVector(boundaryPlane[i].y - boundaryPlane[i + 1].y, boundaryPlane[i + 1].x - boundaryPlane[i].x, 0 ), true );
 
     }
     if (this->currentVertices > 2)
-        *this = clipHelper(*this, boundaryPlane[3], normalVector(boundaryPlane[3].y - boundaryPlane[0].y, boundaryPlane[0].x - boundaryPlane[3].x, 0 ), true );
+        *this = clipHelper(*this, boundaryPlane[3], NormalVector(boundaryPlane[3].y - boundaryPlane[0].y, boundaryPlane[0].x - boundaryPlane[3].x, 0 ), true );
 }
 
 // Helper function: Clips polygons using Sutherland-Hodgman 2D clipping algorithm
-Polygon Polygon::clipHelper(Polygon source, Vertex planePoint, normalVector planeNormal, bool doPerspectiveCorrect){
+Polygon Polygon::clipHelper(Polygon source, Vertex planePoint, NormalVector planeNormal, bool doPerspectiveCorrect){
 
     // Create a result Polygon, and copy the source's key attributes
     Polygon result;
@@ -349,12 +362,12 @@ Polygon Polygon::clipHelper(Polygon source, Vertex planePoint, normalVector plan
 }
 
 // Check if a vertex is in the positive half space of a plane. Used to clip polygons.
-bool Polygon::inside(Vertex theVertex, Vertex thePlane, normalVector planeNormal){
+bool Polygon::inside(Vertex theVertex, Vertex thePlane, NormalVector planeNormal){
     return (theVertex - thePlane).dot(planeNormal) >= 0; // Compare vector pointing from plane towards point against the face normal
 }
 
 // Calculate a vector intersection with a plane. Used to clip polygons.
-Vertex Polygon::intersection(Vertex prevVertex, Vertex currentVertex, Vertex planePoint, normalVector planeNormal, bool doPerspectiveCorrect){
+Vertex Polygon::intersection(Vertex prevVertex, Vertex currentVertex, Vertex planePoint, NormalVector planeNormal, bool doPerspectiveCorrect){
 
     // Vector from current to previous vertex
     Vertex distance = currentVertex - prevVertex;
@@ -422,7 +435,7 @@ int Polygon::getVertexCount(){
 }
 
 // Triangulate this polygon
-// Assumption: The polygon has >=4 vertices
+// Pre-condition: The polygon has >=4 vertices
 // Return: A mesh containing triangular faces only. Every triangle will contain the first vertex
 vector<Polygon>* Polygon::getTriangulatedFaces(){
     vector<Polygon>* result = new vector<Polygon>(); // Create an empty mesh object to contain our resulting faces
@@ -439,15 +452,8 @@ vector<Polygon>* Polygon::getTriangulatedFaces(){
     int index = 1;
     int lastIndex = currentVertices - 1;
     while (index < lastIndex){
-        Polygon newFace; // Create a new empty polygon, and copy the essential drawing attributes into it
-        newFace.isAmbientLit = this->isAmbientLit;
-
-        newFace.theShadingModel = this->theShadingModel;
-        newFace.specularCoefficient = this->specularCoefficient;
-        newFace.specularExponent = this->specularExponent;
-        newFace.reflectivity = this->reflectivity;
-
-        newFace.faceNormal = this->faceNormal;
+        Polygon newFace(*this); // Copy the existing polygon to copy its essential drawing attributes
+        newFace.clearVertices();    // Remove the vertices from the copy
 
         newFace.addVertex(v1); // Add the common vertex
 
@@ -533,12 +539,12 @@ Vertex Polygon::getFaceCenter(){
 }
 
 // Get the (normalized) face normal of this polygon
-// Assumption: The polygon is a triangle (ie. vertex_i != vertex_j)
-normalVector Polygon::getFaceNormal(){
+// Pre-condition: The polygon is a triangle (ie. vertex_i != vertex_j)
+NormalVector Polygon::getFaceNormal(){
 
     // Calculate vectors originating at vertex 0, and pointing towards vertices 1 & 2
-    normalVector lhs(vertices[1].x - vertices[0].x, vertices[1].y - vertices[0].y, vertices[1].z - vertices[0].z);  // 0 to 1
-    normalVector rhs(vertices[2].x - vertices[0].x, vertices[2].y - vertices[0].y, vertices[2].z - vertices[0].z);  // 0 to 2
+    NormalVector lhs(vertices[1].x - vertices[0].x, vertices[1].y - vertices[0].y, vertices[1].z - vertices[0].z);  // 0 to 1
+    NormalVector rhs(vertices[2].x - vertices[0].x, vertices[2].y - vertices[0].y, vertices[2].z - vertices[0].z);  // 0 to 2
 
     // Perform a cross product, and normalize the result:
     lhs = lhs.crossProduct(rhs);
@@ -548,8 +554,8 @@ normalVector Polygon::getFaceNormal(){
 }
 
 // Get the average of the normals of this polygon
-normalVector Polygon::getNormalAverage(){
-    normalVector average;
+NormalVector Polygon::getNormalAverage(){
+    NormalVector average;
 
     for (unsigned int i = 0; i < currentVertices; i++){
         average.xn += vertices[i].normal.xn;

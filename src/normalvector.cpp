@@ -10,28 +10,28 @@
 using std::cout;
 
 // Default constructor
-normalVector::normalVector(){
+NormalVector::NormalVector(){
     xn = 0;
     yn = 0;
     zn = 0;
 }
 
 // XYZ Constructor
-normalVector::normalVector(double newX, double newY, double newZ){
+NormalVector::NormalVector(double newX, double newY, double newZ){
     xn = newX;
     yn = newY;
     zn = newZ;
 }
 
 // Copy Constructor
-normalVector::normalVector(const normalVector& rhs){
+NormalVector::NormalVector(const NormalVector& rhs){
     this->xn = rhs.xn;
     this->yn = rhs.yn;
     this->zn = rhs.zn;
 }
 
 // Interpolation constructor: Builds an interpolated normal vector based on current position between start and end positions
-normalVector::normalVector(const normalVector& lhs, double lhsZ, const normalVector& rhs, double rhsZ, double current, double start, double end){
+NormalVector::NormalVector(const NormalVector& lhs, double lhsZ, const NormalVector& rhs, double rhsZ, double current, double start, double end){
 
     double ratio;
     if (end - start == 0)
@@ -48,7 +48,7 @@ normalVector::normalVector(const normalVector& lhs, double lhsZ, const normalVec
 }
 
 // Overloaded assignment operator
-normalVector& normalVector::operator=(const normalVector& rhs){
+NormalVector& NormalVector::operator=(const NormalVector& rhs){
     if (this == &rhs)
         return *this;
 
@@ -60,7 +60,7 @@ normalVector& normalVector::operator=(const normalVector& rhs){
 }
 
 // Normalize the vector
-void normalVector::normalize(){
+void NormalVector::normalize(){
     // Calcualte the inverse of the length of the vector
     double inverseLength = 1 / length();
 
@@ -71,13 +71,13 @@ void normalVector::normalize(){
 }
 
 // Get the length of this normal vector
-double normalVector::length(){
+double NormalVector::length(){
     return sqrt( (xn * xn) + (yn * yn) + (zn * zn));
 }
 
 // Get the cross product of this and another vector
-normalVector normalVector::crossProduct(const normalVector& rhs){
-    return normalVector( // Note: We reverse the "standard" cross product order here, in order to reverse the resulting vector so that it works with our left handed coordinate system
+NormalVector NormalVector::crossProduct(const NormalVector& rhs){
+    return NormalVector( // Note: We reverse the "standard" cross product order here, in order to reverse the resulting vector so that it works with our left handed coordinate system
                 ( (this->zn * rhs.yn) - (this->yn * rhs.zn) ),
                 ( (this->xn * rhs.zn) - (this->zn * rhs.xn) ),
                 ( (this->yn * rhs.xn) - (this->xn * rhs.yn) )
@@ -85,7 +85,7 @@ normalVector normalVector::crossProduct(const normalVector& rhs){
 }
 
 // Get the dot product of this and another vector
-double normalVector::dotProduct(const normalVector& rhs){
+double NormalVector::dotProduct(const NormalVector& rhs){
     double result = 0;
     result += this->xn * rhs.xn;
     result += this->yn * rhs.yn;
@@ -95,7 +95,7 @@ double normalVector::dotProduct(const normalVector& rhs){
 }
 
 // Overloaded scalar multiplication operator
-normalVector& normalVector::operator*=(const double rhs){
+NormalVector& NormalVector::operator*=(const double rhs){
 
     this->xn *= rhs;
     this->yn *= rhs;
@@ -105,8 +105,8 @@ normalVector& normalVector::operator*=(const double rhs){
 }
 
 // Overloaded scalar multiplication operator
-normalVector normalVector::operator*(double scalar){
-    normalVector result(*this);
+NormalVector NormalVector::operator*(double scalar){
+    NormalVector result(*this);
 
     result.xn = this->xn * scalar;
     result.yn = this->yn * scalar;
@@ -116,8 +116,8 @@ normalVector normalVector::operator*(double scalar){
 }
 
 // Overloaded subtraction operator
-normalVector normalVector::operator-(const normalVector& rhs){
-    normalVector newNormal(*this);
+NormalVector NormalVector::operator-(const NormalVector& rhs){
+    NormalVector newNormal(*this);
     newNormal.xn -= rhs.xn;
     newNormal.yn -= rhs.yn;
     newNormal.zn -= rhs.zn;
@@ -126,7 +126,7 @@ normalVector normalVector::operator-(const normalVector& rhs){
 }
 
 // Overloaded -= operator
-normalVector& normalVector::operator-=(const normalVector& rhs){
+NormalVector& NormalVector::operator-=(const NormalVector& rhs){
     this->xn -= rhs.xn;
     this->yn -= rhs.yn;
     this->zn -= rhs.zn;
@@ -135,12 +135,12 @@ normalVector& normalVector::operator-=(const normalVector& rhs){
 }
 
 // Determine if this normal is (0, 0, 0)
-bool normalVector::isZero(){
+bool NormalVector::isZero(){
     return (xn == 0 && yn == 0 && zn == 0);
 }
 
 // Transform the normal by a transformation matrix
-void normalVector::transform(TransformationMatrix* theMatrix){
+void NormalVector::transform(TransformationMatrix* theMatrix){
 
     // Copy our coordinate into an array (4-vector), to simplify our calculations
     double coords[4];
@@ -169,13 +169,13 @@ void normalVector::transform(TransformationMatrix* theMatrix){
 }
 
 // Reverse the direction of this vector
-void normalVector::reverse(){
+void NormalVector::reverse(){
     xn *= -1;
     yn *= -1;
     zn *= -1;
 }
 
 // Debug this object
-void normalVector::debug(){
+void NormalVector::debug(){
     cout << "normal: (" << xn << ", " << yn << ", " << zn << ")\n";
 }
