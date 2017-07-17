@@ -59,4 +59,4 @@ Alternatively, if you would like to run the program directly using the compiled 
 7) Run the compiled qtqt.exe, passing a .simp file as an argument. Do NOT include the ".simp" extension in the filename.
   -> Eg. To load the "page1.simp" file, you would use the following command:
 		
-			qtqt.exe mySimpFile
+			qtqt.exe page1
