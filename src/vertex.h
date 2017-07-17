@@ -90,12 +90,6 @@ public:
 //    double yt;
 //    double zt;
 
-
-//    // Check if another vertex is within a certain threshold
-//    bool isClose(Vertex otherPoint);
-
-
-
 private:
     static const unsigned int DEFAULT_COLOR = 0xffffffff; // Default color for all vertices, if none is assigned
     double w; // Common divisor

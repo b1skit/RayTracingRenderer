@@ -1,10 +1,11 @@
 phong
 
 ambient .25 .25 .3
-depth 1 75 0.0 0.0 0.0
-raytrace 4
+depth 1 75 .25 .25 .3
+environment .25 .25 .3
+
+raytrace 5
 #noshadows
-environment 0 0 0
 
 #wire
 
@@ -75,7 +76,7 @@ environment 0 0 0
 	{
 			surface 0.7 0.7 0 
 			specular 0.6 12
-			reflectivity 0.5
+			reflectivity 0.80
 
 			obj "lightScene_D"
 	}
@@ -93,7 +94,7 @@ environment 0 0 0
 	{
 			surface 0.75 0.25 0.45 
 			specular 0.4 10
-			reflectivity 0.5
+			reflectivity 0.55
 			
 			obj "lightScene_F"
 	}
@@ -138,7 +139,7 @@ environment 0 0 0
 	{
 			surface 0.7 0 0 
 			specular 8 75
-			reflectivity 0.5
+			reflectivity 0.65
 
 			obj "lightScene_K"
 	}
@@ -148,16 +149,16 @@ environment 0 0 0
 	
 			surface 1 1 1 
 			specular 1 200
-			reflectivity 0.5
+			reflectivity 0.6
 
 			obj "lightScene_L"
 	}
 	
 	# Small sphere
 	{
-			surface 0 0 0 
+			surface 0.05 0.05 0.05
 			specular 1 200
-			reflectivity 0.5
+			reflectivity 0.75
 
 			obj "lightScene_M"
 	}

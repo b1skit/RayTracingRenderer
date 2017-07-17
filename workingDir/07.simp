@@ -1,120 +1,49 @@
 phong
-ambient 0.75 0.75 0.75
-depth 1 200 0 0 0
-raytrace 0
-environment 0 0 0
+ambient 0.22 0.22 0.22
+depth 1 250 0.5 0.5 0.5
+environment 0.22 0.22 0.22
 
-#wire
+raytrace 1
+#noshadows
 
 # Default Camera
 {
-	translate 0 0 -5
-	camera -1, -1, 1, 1, 1, 200
+	translate 0 1.4 -3.6
+	rotate X -19
+	camera -1, -1, 1, 1, 0.1, 300
 }
 
-# Meshes
+
+
+# Key Light
 {
-	scale 1.5 1.5 1.5
-	
-	# Cube 1
-	{
-		rotate Z 0
-		translate 0 1.8  0
-		rotate X 17
-		rotate Y 26
-		
-		specular 1 10
-		reflectivity 0.5
-		
-		obj "unitCubeColored"
-	}
-
-	# Cube 2
-	{
-		rotate Z 60
-		translate 0 1.8  0
-		rotate X 35
-		rotate Y 19
-		
-		specular 1 10
-		reflectivity 0.5		
-		
-		obj "unitCubeColored"
-	}
-
-	# Cube 3
-	{
-		rotate Z 120
-		translate 0 1.8  0
-		rotate X 42
-		rotate Y 63
-		
-		specular 1 10
-		reflectivity 0.5
-		
-		obj "unitCubeColored"
-	}
-
-	# Cube 4
-	{
-		rotate Z 180
-		translate 0 1.8  0
-		rotate X 84
-		rotate Y 99
-		
-		specular 1 10
-		reflectivity 0.5
-		
-		obj "unitCubeColored"
-	}
-
-	# Cube 5
-	{
-		rotate Z 240
-		translate 0 1.8  0
-		rotate X 160
-		rotate Y 122
-		
-		specular 1 10
-		reflectivity 0.5
-		
-		obj "unitCubeColored"
-	}
-
-	# Cube 6
-	{
-		rotate Z 300
-		translate 0 1.8  0
-		rotate X 150
-		rotate Y 45
-		
-		specular 1 10
-		reflectivity 0.5
-		
-		obj "unitCubeColored"
-	}
-	
-	# Cube 6
-	{
-		rotate X 225
-		rotate Y 315
-		
-		specular 1 10
-		reflectivity 0.5
-		
-		obj "unitCubeColored"
-	}
-	
-	# Backdrop
-	{
-		
-		translate 0 0 2
-		scale 11 11 1
-		rotate X 90
-		
-		specular 1 10
-		reflectivity 0.5
-		
-		obj "unitPlaneColored"
-	}
+	translate 27 9 -10
+	light 20 20 20 1 1
 }
+
+
+# Car
+{
+	translate 0.5 0 -1
+	scale 1.3 1.3 1.3
+	rotate Y 223
+	
+	surface 0.8 0.8 0.8
+	specular 1 100
+	reflectivity 0.75
+	
+	obj "car"
+}
+
+# Backdrop
+{
+	
+	scale 5000 500 500
+	
+	surface 0.3 0.3 0.3
+	specular 0.1 2
+	reflectivity 0.4
+	
+	obj lightscene_A
+}
+

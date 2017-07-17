@@ -130,10 +130,10 @@ private:
     unsigned int lightPointInCameraSpace(Vertex* currentPosition, NormalVector* viewVector, bool doAmbient, double specularExponent, double specularCoefficient);
 
     // Recursively ray trace a point's lighting
-    unsigned int recursivelyLightPointInCS(Vertex* currentPosition, NormalVector* viewVector, bool doAmbient, double specularExponent, double specularCoefficient, int bounceRays);
+    unsigned int recursivelyLightPointInCS(Vertex* currentPosition, NormalVector* viewVector, bool doAmbient, double specularExponent, double specularCoefficient, int bounceRays, bool isEndPoint);
 
     // Recursive helper function for ray tracing
-    unsigned int recursiveLightHelper(Vertex* currentPosition, NormalVector* viewVector, bool doAmbient, double specularExponent, double specularCoefficient, int bounceRays);
+    unsigned int recursiveLightHelper(Vertex* currentPosition, NormalVector* viewVector, bool doAmbient, double specularExponent, double specularCoefficient, int bounceRays, bool isEndPoint);
 
     // Check if a pixel coordinate is in front of the current z-buffer depth
     bool isVisible(int x, int y, double z);
@@ -142,7 +142,7 @@ private:
     int getScaledZVal(double correctZ);
 
     // Determine whether a current position is shadowed by some polygon in the scene that lies between it and a light
-    bool isShadowed(Vertex* currentPosition, NormalVector* lightDirection, double lightDistance);
+    bool isShadowed(Vertex currentPosition, NormalVector* lightDirection, double lightDistance);
 
     // Find the intersection point of a ray and the plane of a polygon
     // Return: True if the ray intersects, false otherwise. Modifies result Vertex to be the point of intersection, leaves it unchanged otherwise
@@ -167,6 +167,9 @@ private:
 
     // Check if two polygons share an edge
     bool haveSharedEdge(Polygon* poly1, Polygon* poly2);
+
+    // Check if the angle between 2 polygon faces that share an edge is greater than 180 degrees
+    bool isFaceReflexAngle(Polygon* currentPoly, Polygon* hitPoly);
 };
 
 #endif // MYRENDERER_H

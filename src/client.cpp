@@ -81,41 +81,24 @@ void Client::nextPage() {
     clientRenderer->drawRectangle(PANEL_BORDER_WIDTH, PANEL_BORDER_WIDTH, xRes - PANEL_BORDER_WIDTH - 1, yRes - PANEL_BORDER_WIDTH - 1, 0xff000000);
 
 
-//    // Test/debug: Comment/Uncomment to test a single mesh
-//    high_resolution_clock::time_point t1 = high_resolution_clock::now();
+    // Test/debug: Comment/Uncomment to test a single mesh
+    high_resolution_clock::time_point t1 = high_resolution_clock::now();
 
-//    Scene theScene = clientFileInterpreter.buildSceneFromFile("./debug.simp");
+    Scene theScene = clientFileInterpreter.buildSceneFromFile("./07.simp");
 
-//    high_resolution_clock::time_point t2 = high_resolution_clock::now();
-//    auto duration = duration_cast<microseconds>( t2 - t1 ).count();
-//    cout << "File read in " << duration << "ms\n";
+    high_resolution_clock::time_point t2 = high_resolution_clock::now();
+    auto duration = duration_cast<microseconds>( t2 - t1 ).count();
+    cout << "File read in " << duration << "ms\n";
 
-//    t1 = high_resolution_clock::now();
+    t1 = high_resolution_clock::now();
 
-//    clientRenderer->renderScene(theScene);
+    clientRenderer->renderScene(theScene);
 
-//    t2 = high_resolution_clock::now();
-//    duration = duration_cast<microseconds>( t2 - t1 ).count();
-//    cout << "Mesh drawn in " << duration << "ms\n";
+    t2 = high_resolution_clock::now();
+    duration = duration_cast<microseconds>( t2 - t1 ).count();
+    cout << "Mesh drawn in " << duration << "ms\n";
 
-//    // End Test/debug
-
-
-
-
-
-
-
-    Scene scene2 = clientFileInterpreter.buildSceneFromFile("./04.simp");
-    clientRenderer->renderScene(scene2);
-
-
-
-
-
-
-
-
+    // End Test/debug
 
 
 
