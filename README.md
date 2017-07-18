@@ -1,4 +1,4 @@
-A Ray=tracing 3D Renderer written in C++
+A Ray-tracing 3D Renderer written in C++
 -------------------------------------
 By Adam Badke: www.AdamBadke.com
 -------------------------------------
