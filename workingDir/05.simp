@@ -42,7 +42,7 @@ raytrace 5
 		surface 0.89 0.56 0.51
 		specular 1 150
 		reflectivity 0.5
-        obj "unitSphere_20"
+        obj "unitSphere"
 }
 
 # Small center yellow Sphere
@@ -53,7 +53,7 @@ raytrace 5
 		surface 0.95 0.93 0.31
 		specular 1 150
 		reflectivity 0.5
-        obj "unitSphere_20"
+        obj "unitSphere"
 }
 
 # Large back right Sphere
@@ -64,7 +64,7 @@ raytrace 5
 		surface 1 0.55 0.71
 		specular 1 150
 		reflectivity 0.5
-        obj "unitSphere_20"
+        obj "unitSphere"
 }
 
 
@@ -76,7 +76,7 @@ raytrace 5
 		surface 0.89 0.56 0.51
 		specular 1 150
 		reflectivity 0.5
-        obj "unitSphere_20"
+        obj "unitSphere"
 }
 
 # Large back left Sphere
@@ -87,7 +87,7 @@ raytrace 5
 		surface 1 0.55 0.71
 		specular 1 150
 		reflectivity 0.5
-        obj "unitSphere_20"
+        obj "unitSphere"
 }
 
 # Medium front left pink Sphere
@@ -98,7 +98,7 @@ raytrace 5
 		surface 1 0.55 0.71
 		specular 1 150
 		reflectivity 0.5
-        obj "unitSphere_20"
+        obj "unitSphere"
 }
 
 # Back left yellow Sphere
@@ -109,7 +109,7 @@ raytrace 5
 		surface 0.95 0.93 0.31
 		specular 1 150
 		reflectivity 0.5
-        obj "unitSphere_20"
+        obj "unitSphere"
 }
 
 # Far Back right blue Sphere
@@ -120,5 +120,5 @@ raytrace 5
 		surface 0.18 0.31 0.68
 		specular 1 150
 		reflectivity 0.5
-        obj "unitSphere_20"
+        obj "unitSphere"
 }

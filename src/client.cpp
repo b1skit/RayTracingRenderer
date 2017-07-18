@@ -81,96 +81,97 @@ void Client::nextPage() {
     clientRenderer->drawRectangle(PANEL_BORDER_WIDTH, PANEL_BORDER_WIDTH, xRes - PANEL_BORDER_WIDTH - 1, yRes - PANEL_BORDER_WIDTH - 1, 0xff000000);
 
 
-    // Test/debug: Comment/Uncomment to test a single mesh
-    high_resolution_clock::time_point t1 = high_resolution_clock::now();
+//    // Test/debug: Comment/Uncomment to test a single mesh
 
-    Scene theScene = clientFileInterpreter.buildSceneFromFile("./07.simp");
+//    high_resolution_clock::time_point t1 = high_resolution_clock::now();
 
-    high_resolution_clock::time_point t2 = high_resolution_clock::now();
-    auto duration = duration_cast<microseconds>( t2 - t1 ).count();
-    cout << "File read in " << duration << "ms\n";
+//    Scene theScene = clientFileInterpreter.buildSceneFromFile("./05.simp");
 
-    t1 = high_resolution_clock::now();
+//    high_resolution_clock::time_point t2 = high_resolution_clock::now();
+//    auto duration = duration_cast<microseconds>( t2 - t1 ).count();
+//    cout << "File read in " << duration << "ms\n";
 
-    clientRenderer->renderScene(theScene);
+//    t1 = high_resolution_clock::now();
 
-    t2 = high_resolution_clock::now();
-    duration = duration_cast<microseconds>( t2 - t1 ).count();
-    cout << "Mesh drawn in " << duration << "ms\n";
+//    clientRenderer->renderScene(theScene);
 
-    // End Test/debug
+//    t2 = high_resolution_clock::now();
+//    duration = duration_cast<microseconds>( t2 - t1 ).count();
+//    cout << "Mesh drawn in " << duration << "ms\n";
 
-
-
-//    // Handle command line mode:
-//    if (commandLineMode){
-//        Scene cmdLineScene = clientFileInterpreter.buildSceneFromFile("./" + filename + ".simp");
-//        clientRenderer->renderScene(cmdLineScene);
-//    }
-//    else{ // Handle standard mode:
-
-//        Scene theScene;
-//        high_resolution_clock::time_point t1, t2;
-
-//        t1 = high_resolution_clock::now();
-
-//        // Load the appropriate mesh:
-//        switch(pageNumber % 7) {
-//        case 0:{ // Page 1:
-//            theScene = clientFileInterpreter.buildSceneFromFile("./01.simp");
-//        }
-//            break;
-
-//        case 1:{ // Page 2:
-//            theScene = clientFileInterpreter.buildSceneFromFile("./02.simp");
-//        }
-//            break;
-
-//        case 2:{ // Page 3:
-//            theScene = clientFileInterpreter.buildSceneFromFile("./03.simp");
-//            }
-//            break;
-
-//        case 3:{ // Page 4:
-//            theScene = clientFileInterpreter.buildSceneFromFile("./04.simp");
-//        }
-//            break;
-
-//        case 4:{ // Page 5:
-//            theScene = clientFileInterpreter.buildSceneFromFile("./05.simp");
-//        }
-//            break;
-
-//        case 5: { // Page 6:
-//            theScene = clientFileInterpreter.buildSceneFromFile("./06.simp");
-//            }
-//            break;
-
-//        case 6: { // Page 7:
-//            theScene = clientFileInterpreter.buildSceneFromFile("./07.simp");
-//            }
-//            break;
-
-//        default: // We should never reach this state!
-//            // Draw bright pink boxes to highlight error state
-//            clientRenderer->drawRectangle(50, 50, 700, 700, 0xffff00ea);
-//            break;
-
-//        } // End switch
-
-//        t2 = high_resolution_clock::now();
-//        auto duration = duration_cast<microseconds>( t2 - t1 ).count();
-//        cout << "File read in:\t" << duration << "ms\n";
+//    // End Test/debug
 
 
-//        // Draw the mesh:
-//        t1 = high_resolution_clock::now();
-//        clientRenderer->renderScene(theScene);
-//        t2 = high_resolution_clock::now();
-//        duration = duration_cast<microseconds>( t2 - t1 ).count();
-//        cout << "Mesh drawn in:\t" << duration << "ms\n\n";
 
-//    } // End "commandLineMode" else
+    // Handle command line mode:
+    if (commandLineMode){
+        Scene cmdLineScene = clientFileInterpreter.buildSceneFromFile("./" + filename + ".simp");
+        clientRenderer->renderScene(cmdLineScene);
+    }
+    else{ // Handle standard mode:
+
+        Scene theScene;
+        high_resolution_clock::time_point t1, t2;
+
+        t1 = high_resolution_clock::now();
+
+        // Load the appropriate mesh:
+        switch(pageNumber % 7) {
+        case 0:{ // Page 1:
+            theScene = clientFileInterpreter.buildSceneFromFile("./01.simp");
+        }
+            break;
+
+        case 1:{ // Page 2:
+            theScene = clientFileInterpreter.buildSceneFromFile("./02.simp");
+        }
+            break;
+
+        case 2:{ // Page 3:
+            theScene = clientFileInterpreter.buildSceneFromFile("./03.simp");
+            }
+            break;
+
+        case 3:{ // Page 4:
+            theScene = clientFileInterpreter.buildSceneFromFile("./04.simp");
+        }
+            break;
+
+        case 4:{ // Page 5:
+            theScene = clientFileInterpreter.buildSceneFromFile("./05.simp");
+        }
+            break;
+
+        case 5: { // Page 6:
+            theScene = clientFileInterpreter.buildSceneFromFile("./06.simp");
+            }
+            break;
+
+        case 6: { // Page 7:
+            theScene = clientFileInterpreter.buildSceneFromFile("./07.simp");
+            }
+            break;
+
+        default: // We should never reach this state!
+            // Draw bright pink boxes to highlight error state
+            clientRenderer->drawRectangle(50, 50, 700, 700, 0xffff00ea);
+            break;
+
+        } // End switch
+
+        t2 = high_resolution_clock::now();
+        auto duration = duration_cast<microseconds>( t2 - t1 ).count();
+        cout << "File read in:\t" << duration << "ms\n";
+
+
+        // Draw the mesh:
+        t1 = high_resolution_clock::now();
+        clientRenderer->renderScene(theScene);
+        t2 = high_resolution_clock::now();
+        duration = duration_cast<microseconds>( t2 - t1 ).count();
+        cout << "Mesh drawn in:\t" << duration << "ms\n\n";
+
+    } // End "commandLineMode" else
 
     pageNumber++; // Increment the page number
 }
