@@ -1,0 +1,134 @@
+# This scene renders spheres to demonstrate reflections
+
+ambient 0.55 0.44 0.47
+depth 1 50  0 0 0
+environment 0 0 0
+
+raytrace 5
+
+#noshadows
+
+# Default Camera
+{
+    translate 0 7.5 -25
+	rotate X -9
+	
+	camera -0.5, -0.5, 0.5, 0.5, 1, 200
+}
+
+#Key Light
+{
+        translate -10 20 -5
+        light 100 100 100 0.1 3
+}
+
+# Backdrop Plane
+{
+	translate 0 0 -100
+	scale 5000 500 500
+	
+	surface 0.2 0.2 0.2
+	specular 0.1 2
+	reflectivity 0.2
+	
+	obj "unitPlane"
+}
+
+# Large right red sphere
+{
+        translate 7.3 5 5
+		scale 10 10 10
+
+		surface 1 0 0
+		specular 1 175
+		reflectivity 0.25
+        obj "unitSphere"
+}
+
+# Large front left blue sphere
+{
+        translate -7.7 3 -2.5
+		scale 6 6 6
+
+		surface 0.02 0.02 0.66
+		specular 1 175
+		reflectivity 0.1
+        obj "unitSphere"
+}
+
+# Large left purple sphere
+{
+        translate -8.5 3.7 8.5
+		scale 7.4 7.4 7.4
+
+		surface 0.3 0 0.61
+		specular 1 175
+		reflectivity 0.25
+        obj "unitSphere"
+}
+
+# Small back center blue sphere
+{
+        translate 1.5 3 9.5
+		scale 6 6 6
+
+		surface 0.02 0.02 0.66
+		specular 1 175
+		reflectivity 0.1
+        obj "unitSphere"
+}
+
+# center grey sphere
+{
+        translate -0.65 2.5 0
+		scale 5 5 5
+
+		surface 0.6 0.6 0.6
+		specular 1 175
+		reflectivity 0.1
+        obj "unitSphere"
+}
+
+# center small green sphere
+{
+        translate -2.9 1.5 4
+		scale 3 3 3
+
+		surface 0 0.41 0
+		specular 1 175
+		reflectivity 0.15
+        obj "unitSphere"
+}
+
+# center small red sphere
+{
+        translate -6.2 2 2
+		scale 4 4 4
+
+		surface 1 0 0
+		specular 1 175
+		reflectivity 0.25
+        obj "unitSphere"
+}
+
+# right small green sphere
+{
+        translate 9.5 2.15 -4
+		scale 4.3 4.3 4.3
+
+		surface 0 0.41 0
+		specular 1 175
+		reflectivity 0.15
+        obj "unitSphere"
+}
+
+# center small purple sphere
+{
+        translate 3.6 1.85 -4
+		scale 3.7 3.7 3.7
+
+		surface 0.3 0 0.61
+		specular 1 175
+		reflectivity 0.25
+        obj "unitSphere"
+}

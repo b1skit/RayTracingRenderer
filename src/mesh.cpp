@@ -19,7 +19,6 @@ Mesh::Mesh(){
 Mesh::Mesh(const Mesh &existingMesh){
     faces = existingMesh.faces;
     isWireframe = existingMesh.isWireframe;
-    isDepthFogged = existingMesh.isDepthFogged;
 
     boundingBoxFaces = existingMesh.boundingBoxFaces;
 }
@@ -28,7 +27,6 @@ Mesh::Mesh(const Mesh &existingMesh){
 Mesh& Mesh::operator=(const Mesh& rhs){
     this->faces = rhs.faces;
     this->isWireframe = rhs.isWireframe;
-    this->isDepthFogged = rhs.isDepthFogged;
 
     this->boundingBoxFaces = rhs.boundingBoxFaces;
 

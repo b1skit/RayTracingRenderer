@@ -207,6 +207,7 @@ vector<Mesh> FileInterpreter::getMeshHelper(string filename, bool currentIsWiref
                         currentScene->fogBlueIntensity = stod(*theIterator++);
 
                         currentScene->fogColor = combineColorChannels(currentScene->fogRedIntensity, currentScene->fogGreenIntensity, currentScene->fogBlueIntensity);
+                        currentScene->isDepthFogged = true;
                     }
 
                     // Handle environment commands:
@@ -476,7 +477,6 @@ vector<Mesh> FileInterpreter::getMeshHelper(string filename, bool currentIsWiref
 
                             // Set the mesh flags:
                             newMesh.isWireframe = isWireframe;
-                            newMesh.isDepthFogged = isDepthFogged;
 
                             // Add the mesh
                             extractedMeshes.emplace_back( newMesh );
@@ -509,7 +509,6 @@ vector<Mesh> FileInterpreter::getMeshHelper(string filename, bool currentIsWiref
 
         // Set the mesh flags:
         newMesh.isWireframe = isWireframe;
-        newMesh.isDepthFogged = isDepthFogged;
 
         extractedMeshes.emplace_back( newMesh );
     }

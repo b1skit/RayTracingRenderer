@@ -1,34 +1,39 @@
-# This scene renders a grid of cubes
+# This scene renders a grid of shapes
 phong
-depth 0 150 0 0 0
-ambient 0.25 0.25 0.25
-raytrace 0
+depth -10 150 0 0 0
+
+#ambient 0.25 0.25 0.25
+
+ambient 0.375 0.4 0.44
 environment 0 0 0
 
+raytrace 0
 #noshadows
 
-reflectivity 0
-
-#wire
+wire
 
 # Camera
 {
-	translate 0 25 42
-	rotate Y -55
-	rotate X -25
+	translate 4 35 50
+	rotate Y -57
+	rotate X -35
 	camera  -1 -1 1 1 0.1 500
 }
 
 # Light
 {
-        translate -50 120 -200
+        translate -150 200 -200
         light 10 10 10 0.01 0.02
 }
 
 # Ground plane
 {
-	specular 0.3 8
+	specular 0.3 80
 	scale 2000 1 2000
+	
+	surface 0.74 0.8 0.88
+	reflectivity 0.1
+	
 	obj "unitPlane"
 }
 

@@ -1,60 +1,50 @@
 {
    	translate 0 0 0
- 	surface 1 0.4 0.4
-	specular 0.3 8
+		
    	file "cubeRow"
 }
 {
 	translate 20 0 0
- 	surface 0.85 1 0.4
-	specular 0.3 8
-	file "cubeRow"
+	
+	file "sphereRow"
 }
 {
 	translate 40 0 0
- 	surface 0.2 1 0.4 
-	specular 0.3 8
-	file "cubeRow"
+	
+	file "pyramidRow"
 }
 {
 	translate 60 0 0
- 	surface 0.4 0.9 1 
-	specular 0.3 8
+	
 	file "cubeRow"
 }
 {
 	translate 80 0 0
- 	surface 0.4 0.4 1.0 
-	specular 0.3 8
-	file "cubeRow"
+	
+	file "sphereRow"
 }
 {
 	translate 100 0 0
- 	surface 0.9 0.4 1.0 
-	specular 0.3 8
-	file "cubeRow"
+	
+	file "pyramidRow"
 }
 {
 	translate 120 0 0
- 	surface 1 0.4 0.4 
-	specular 0.3 8
+		
 	file "cubeRow"
 }
 {
 	translate 140 0 0
- 	surface 0.85 1 0.4 
-	specular 0.3 8
-	file "cubeRow"
+	
+	file "sphereRow"
 }
 {
 	translate 160 0 0
- 	surface 0.2 1 0.4 
-	specular 0.3 8
-	file "cubeRow"
+	
+	file "pyramidRow"
 }
 {
 	translate 180 0 0
- 	surface 0.4 0.9 1 
-	specular 0.3 8
+	
 	file "cubeRow"
 }

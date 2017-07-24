@@ -1,50 +1,110 @@
 {
-	translate 0 0 10
-	scale 10 10 10
-	obj "unitCube"
+	translate 0 5 10
+	scale 11 11 11
+	rotate Y -5
+	
+	surface 0.9 0 0
+	specular 0.3 64
+	reflectivity 0.15
+		
+	obj "unitCubeCentered"
 }
 {
-	translate 0 0 190
-	scale 10 10 10
-	obj "unitCube"
+	translate 0 5 30
+	scale 11 11 11
+	rotate Y -10
+	
+	surface 1 0.4 0.2
+	specular 0.3 64
+	reflectivity 0.15
+		
+	obj "unitCubeCentered"
 }
 {
-	translate 0 0 30
-	scale 10 10 10
-	obj "unitCube"
+	translate 0 5 50
+	scale 11 11 11
+	rotate Y -15
+	
+	surface 1 0.8 0
+	specular 0.3 64
+	reflectivity 0.15
+		
+	obj "unitCubeCentered"
 }
 {
-	translate 0 0 50
-	scale 10 10 10
-	obj "unitCube"
+	translate 0 5 70
+	scale 11 11 11
+	rotate Y -20
+	
+	surface 1 1 0.2
+	specular 0.3 64
+	reflectivity 0.15
+	
+	obj "unitCubeCentered"
 }
 {
-	translate 0 0 70
-	scale 10 10 10
-	obj "unitCube"
+	translate 0 5 90
+	scale 11 11 11
+	rotate Y -25
+	
+	surface 0.6 1 0.4
+	specular 0.3 64
+	reflectivity 0.15
+	
+	obj "unitCubeCentered"
 }
 {
-	translate 0 0 90
-	scale 10 10 10
-	obj "unitCube"
+	translate 0 5 110
+	scale 11 11 11
+	rotate Y -30
+	
+	surface 0 0.6 0
+	specular 0.3 64
+	reflectivity 0.15	
+	
+	obj "unitCubeCentered"
 }
 {
-	translate 0 0 110
-	scale 10 10 10
-	obj "unitCube"
+	translate 0 5 130
+	scale 11 11 11
+	rotate Y -35
+	
+	surface 0 0.7 0.9
+	specular 0.3 64
+	reflectivity 0.15
+	
+	obj "unitCubeCentered"
 }
 {
-	translate 0 0 130
-	scale 10 10 10
-	obj "unitCube"
+	translate 0 5 150
+	scale 11 11 11
+	rotate Y -40
+	
+	surface 0 0 0.8
+	specular 0.3 64
+	reflectivity 0.15
+	
+	obj "unitCubeCentered"
 }
 {
-	translate 0 0 150
-	scale 10 10 10
-	obj "unitCube"
+	translate 0 5 170
+	scale 11 11 11
+	rotate Y -45
+	
+	surface 0.2 0 0.4
+	specular 0.3 64
+	reflectivity 0.15
+	
+	obj "unitCubeCentered"
 }
 {
-	translate 0 0 170
-	scale 10 10 10
-	obj "unitCube"
+	translate 0 5 190
+	scale 11 11 11
+	rotate Y -50
+	
+	surface 0.5 0 0.7
+	specular 0.3 64
+	reflectivity 0.15
+	
+	obj "unitCubeCentered"
 }

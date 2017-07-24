@@ -25,7 +25,6 @@ public:
     // Calculate the attenuation of this light to a point, as a ratio
     double getAttenuationFactor(double distance);
 
-
     // Light attributes:
     Vertex position; // This lights position, as a point in space
 

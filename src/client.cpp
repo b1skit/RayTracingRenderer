@@ -71,21 +71,12 @@ void Client::nextPage() {
     std::cout << "Page #" << pageNumber << std::endl;
 
 
-    // Panel setup:
-    //*************
-
-    // Draw white background
-    clientRenderer->drawRectangle(0, 0, xRes - 1, yRes - 1, 0xffffffff);
-
-    // Draw black panel:
-    clientRenderer->drawRectangle(PANEL_BORDER_WIDTH, PANEL_BORDER_WIDTH, xRes - PANEL_BORDER_WIDTH - 1, yRes - PANEL_BORDER_WIDTH - 1, 0xff000000);
-
 
 //    // Test/debug: Comment/Uncomment to test a single mesh
 
 //    high_resolution_clock::time_point t1 = high_resolution_clock::now();
 
-//    Scene theScene = clientFileInterpreter.buildSceneFromFile("./05.simp");
+//    Scene theScene = clientFileInterpreter.buildSceneFromFile("./04.simp");
 
 //    high_resolution_clock::time_point t2 = high_resolution_clock::now();
 //    auto duration = duration_cast<microseconds>( t2 - t1 ).count();
@@ -116,7 +107,7 @@ void Client::nextPage() {
         t1 = high_resolution_clock::now();
 
         // Load the appropriate mesh:
-        switch(pageNumber % 7) {
+        switch(pageNumber % 9) {
         case 0:{ // Page 1:
             theScene = clientFileInterpreter.buildSceneFromFile("./01.simp");
         }
@@ -149,6 +140,16 @@ void Client::nextPage() {
 
         case 6: { // Page 7:
             theScene = clientFileInterpreter.buildSceneFromFile("./07.simp");
+            }
+            break;
+
+        case 7: { // Page 8:
+            theScene = clientFileInterpreter.buildSceneFromFile("./08.simp");
+            }
+            break;
+
+        case 8: { // Page 9:
+            theScene = clientFileInterpreter.buildSceneFromFile("./09.simp");
             }
             break;
 

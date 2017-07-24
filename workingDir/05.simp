@@ -1,14 +1,12 @@
 # This scene renders spheres to demonstrate reflections
 
 ambient 0.55 0.44 0.47
-depth 1 350 0.86 0.88 0.95
-environment 0.75 0.62 0.69
+depth 1 298 0.86 0.88 0.95
+environment 0.62 0.69 0.96
 
 raytrace 5
 
 #noshadows
-#gouraud
-#wire
 
 # Default Camera
 {
@@ -20,18 +18,19 @@ raytrace 5
 #Key Light
 {
         translate -300 350 10
-        light 5 4.9 4.85 0.01 0.01
+        #light 5 4.9 4.85 0.01 0.01
+		light 70 68.9 68.85 0.1 0.1
 }
 
 # Backdrop Plane
 {
         translate 2.55 0 150
-        scale 5000 300 300
+        scale 5000 800 800
 
 		surface 1 1 1
 		specular 0.5 0.8
 		reflectivity 0
-        obj "lightscene_A"
+		obj "unitPlane"
 }
 
 # Large center orange Sphere
@@ -39,31 +38,33 @@ raytrace 5
         translate 0 5.25 0
 		scale 10.5 10.5 10.5
 
-		surface 0.89 0.56 0.51
-		specular 1 150
-		reflectivity 0.5
+		#surface 0.89 0.56 0.51
+		surface 0.89 0.48 0.42
+		specular 1 165
+		reflectivity 0.15
         obj "unitSphere"
 }
 
 # Small center yellow Sphere
 {
-        translate -3.5 1.25 -6.7
+        translate -3.5 1.6 -6.7
 		scale 3.2 3.2 3.2
 
 		surface 0.95 0.93 0.31
-		specular 1 150
-		reflectivity 0.5
+		specular 1 165
+		reflectivity 0.15
         obj "unitSphere"
 }
 
-# Large back right Sphere
+# Large back right pink Sphere
 {
         translate 14 7 6.5
 		scale 14 14 14
 
-		surface 1 0.55 0.71
-		specular 1 150
-		reflectivity 0.5
+		#surface 1 0.55 0.71
+		surface 1 0.44 0.64
+		specular 1 165
+		reflectivity 0.15
         obj "unitSphere"
 }
 
@@ -73,20 +74,22 @@ raytrace 5
         translate 8.2 3.5 -6.5
 		scale 7 7 7
 
-		surface 0.89 0.56 0.51
-		specular 1 150
-		reflectivity 0.5
+		#surface 0.89 0.56 0.51
+		surface 0.89 0.48 0.42
+		specular 1 165
+		reflectivity 0.15
         obj "unitSphere"
 }
 
-# Large back left Sphere
+# Large back left pink Sphere
 {
         translate -16.6 6.5 0
 		scale 13 13 13
 
-		surface 1 0.55 0.71
-		specular 1 150
-		reflectivity 0.5
+		#surface 1 0.55 0.71
+		surface 1 0.44 0.64
+		specular 1 165
+		reflectivity 0.15
         obj "unitSphere"
 }
 
@@ -95,9 +98,10 @@ raytrace 5
         translate -9.5 3 -6
 		scale 6 6 6
 
-		surface 1 0.55 0.71
-		specular 1 150
-		reflectivity 0.5
+		#surface 1 0.55 0.71
+		surface 1 0.44 0.64
+		specular 1 165
+		reflectivity 0.15
         obj "unitSphere"
 }
 
@@ -107,8 +111,8 @@ raytrace 5
 		scale 6 6 6
 
 		surface 0.95 0.93 0.31
-		specular 1 150
-		reflectivity 0.5
+		specular 1 165
+		reflectivity 0.15
         obj "unitSphere"
 }
 
@@ -118,7 +122,7 @@ raytrace 5
 		scale 20 20 20
 
 		surface 0.18 0.31 0.68
-		specular 1 150
-		reflectivity 0.5
+		specular 1 165
+		reflectivity 0.15
         obj "unitSphere"
 }

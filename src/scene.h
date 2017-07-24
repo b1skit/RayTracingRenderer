@@ -46,6 +46,7 @@ public:
     double fogGreenIntensity = 0;
     double fogBlueIntensity = 0;
     unsigned int fogColor = 0xff000000; // Combined color, assembled from the recieved fog intensities. Default to black.
+    bool isDepthFogged = false; // Whether or not this scene uses atmospheric fog. Default = false
 
     unsigned int environmentColor = 0xff000000;  // Default background color
 

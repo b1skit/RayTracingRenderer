@@ -13,7 +13,7 @@ Window361::Window361()
     layout->addWidget(nextPageButton, 0, 1);
     setLayout(layout);
 
-    setWindowTitle(tr("361 Window"));
+    setWindowTitle(tr("Raytrace 3D Renderer"));
 }
 Drawable *Window361::getDrawable() {
     return renderArea;

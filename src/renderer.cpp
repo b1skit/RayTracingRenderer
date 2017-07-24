@@ -113,13 +113,13 @@ void Renderer::drawLine(Line theLine, ShadingModel theShadingModel, bool doAmbie
                     // Calculate the lit pixel value, apply distance fog then attempt to set it:
                     currentPosition.color = lightPointInCameraSpace(&currentPosition, &viewVector, doAmbient, specularExponent, specularCoefficient);
 
-                    if (currentMesh->isDepthFogged)
+                    if (currentScene->isDepthFogged)
                         setPixel((int)theLine.p1.x, y, correctZ, getDistanceFoggedColor( currentPosition.color, correctZ ) );
                     else
                         setPixel((int)theLine.p1.x, y, correctZ, currentPosition.color );
                 }
                 else{
-                    if (currentMesh->isDepthFogged)
+                    if (currentScene->isDepthFogged)
                         setPixel((int)theLine.p1.x, (int)y, correctZ, getFogPixelValue(&theLine.p1, &theLine.p2, ratio, correctZ) );
                     else
                         setPixel((int)theLine.p1.x, (int)y, correctZ, getPerspCorrectLerpColor(&theLine.p1, &theLine.p2, ratio) );
@@ -207,13 +207,13 @@ void Renderer::drawLine(Line theLine, ShadingModel theShadingModel, bool doAmbie
 
                         currentPosition.color = lightPointInCameraSpace(&currentPosition, &viewVector, doAmbient, specularExponent, specularCoefficient);
 
-                        if (currentMesh->isDepthFogged) // Calculate the lit pixel value, apply distance fog then attempt to set it:
+                        if (currentScene->isDepthFogged) // Calculate the lit pixel value, apply distance fog then attempt to set it:
                             setPixel(round_x, y, correctZ, getDistanceFoggedColor( currentPosition.color, correctZ ) );
                         else
                             setPixel(round_x, y, correctZ, currentPosition.color );
                     }
                     else{
-                        if (currentMesh->isDepthFogged)
+                        if (currentScene->isDepthFogged)
                             setPixel(round_x, y, correctZ, getFogPixelValue(&theLine.p1, &theLine.p2, ratio, correctZ) );
                         else
                             setPixel(round_x, y, correctZ, getPerspCorrectLerpColor(&theLine.p1, &theLine.p2, ratio) );
@@ -267,13 +267,13 @@ void Renderer::drawLine(Line theLine, ShadingModel theShadingModel, bool doAmbie
                         // Calculate the lit pixel value, apply distance fog then attempt to set it:
                         currentPosition.color = lightPointInCameraSpace(&currentPosition, &viewVector, doAmbient, specularExponent, specularCoefficient);
 
-                        if (currentMesh->isDepthFogged)
+                        if (currentScene->isDepthFogged)
                             setPixel(x, round_y, correctZ, getDistanceFoggedColor( currentPosition.color, correctZ ) );
                         else
                             setPixel(x, round_y, correctZ, currentPosition.color );
                     }
                     else{
-                        if (currentMesh->isDepthFogged)
+                        if (currentScene->isDepthFogged)
                             setPixel(x, round_y, correctZ, getFogPixelValue(&theLine.p1, &theLine.p2, ratio, correctZ) );
                         else
                             setPixel(x, round_y, correctZ, getPerspCorrectLerpColor(&theLine.p1, &theLine.p2, ratio) );
@@ -695,6 +695,9 @@ void Renderer::renderScene(Scene theScene){
     // Store a pointer to the current scene (for accessing various render settings)
     currentScene = &theScene;
 
+    // Fill the canvas with the depth fog color:
+    drawRectangle(0, 0, xRes - 1, yRes - 1, currentScene->fogColor);
+
     // Transform the render camera (also resets depth buffer):
     transformCamera(theScene.cameraMovement);
 
@@ -754,7 +757,7 @@ void Renderer::drawScanlineIfVisible(Vertex* start, Vertex* end){
         double correctZ = getPerspCorrectLerpValue(start->z, start->z, end->z, end->z, ratio);
 
         if (isVisible(x, y_rounded, correctZ) ){
-            if (currentMesh->isDepthFogged)
+            if (currentScene->isDepthFogged)
                 setPixel(x, y_rounded, correctZ, getFogPixelValue(start, end, ratio, correctZ) );
             else
                 setPixel(x, y_rounded, correctZ, getPerspCorrectLerpColor(start, end, ratio) );
@@ -820,11 +823,8 @@ void Renderer::drawPerPxLitScanlineIfVisible(Vertex* start, Vertex* end, bool do
             // Calculate the lit pixel value, apply distance fog then set it:
             currentPosition.color = recursivelyLightPointInCS(&currentPosition, &viewVector, doAmbient, specularExponent, specularCoefficient, currentScene->numRayBounces, x == x_start || x == x_end);
 
-            if (currentMesh->isDepthFogged) {
-                setPixel(x, y_rounded, correctZ, getDistanceFoggedColor( currentPosition.color, correctZ ) );
-            } else {
-                setPixel(x, y_rounded, correctZ, currentPosition.color);
-            }
+            // Set the pixel value
+            setPixel(x, y_rounded, correctZ, currentPosition.color);
         }
 
         ratio += ratioDiff;
@@ -846,11 +846,8 @@ unsigned int Renderer::recursivelyLightPointInCS(Vertex* currentPosition, Normal
         // Add the intial points' color and its reflective component:
         return addColors(   initialColor,
                             multiplyColorChannels(
-                                                    multiplyColorChannels(
-                                                            recursiveLightHelper(currentPosition, &bounceDirection, doAmbient, specularExponent, specularCoefficient, bounceRays - 1, isEndPoint),
-                                                            initialColor
-                                                    ),
-                                                    1.0, currentPolygon->getReflectivity(), currentPolygon->getReflectivity(), currentPolygon->getReflectivity()
+                                    recursiveLightHelper(currentPosition, &bounceDirection, doAmbient, specularExponent, specularCoefficient, bounceRays - 1, isEndPoint),
+                                    1.0, currentPolygon->getReflectivity(), currentPolygon->getReflectivity(), currentPolygon->getReflectivity()
                             )
                          );
     }
@@ -941,14 +938,11 @@ unsigned int Renderer::recursiveLightHelper(Vertex* currentPosition, NormalVecto
             // Calculate new bounce direction:
             NormalVector nextBounceDirection = reflectOutVector(&closestIntersection.normal, inBounceDirection);
 
-
             return addColors(  closestIntersection.color,
-
-                               multiplyColorChannels( closestIntersection.color,
-                                                       multiplyColorChannels(   recursiveLightHelper(&closestIntersection, &nextBounceDirection, doAmbient, specularExponent, specularCoefficient, bounceRays - 1, false),
-                                                                                1.0, hitPoly->getReflectivity(), hitPoly->getReflectivity(), hitPoly->getReflectivity() )
-                                )
+                                   multiplyColorChannels(   recursiveLightHelper(&closestIntersection, &nextBounceDirection, doAmbient, specularExponent, specularCoefficient, bounceRays - 1, false),
+                                                            1.0, hitPoly->getReflectivity(), hitPoly->getReflectivity(), hitPoly->getReflectivity() )
                              );
+
         }
         // No more recursive calls to make: Return the intersection color
         else
@@ -1038,11 +1032,20 @@ unsigned int Renderer::lightPointInCameraSpace(Vertex* currentPosition, NormalVe
         } // end if surface normal check
     } // End lights loop
 
-    return addColors(     ambientValue,
-                          addColors(
-                              multiplyColorChannels( currentPosition->color, 1.0, redTotalDiffuseIntensity, greenTotalDiffuseIntensity, blueTotalDiffuseIntensity ),
-                              combineColorChannels( redTotalSpecIntensity, greenTotalSpecIntensity, blueTotalSpecIntensity ) )
-                          );
+    if (currentScene->isDepthFogged && currentPolygon->getShadingModel() == phong){
+        return getDistanceFoggedColor( addColors(     ambientValue,
+                                                  addColors(
+                                                      multiplyColorChannels( currentPosition->color, 1.0, redTotalDiffuseIntensity, greenTotalDiffuseIntensity, blueTotalDiffuseIntensity ),
+                                                      combineColorChannels( redTotalSpecIntensity, greenTotalSpecIntensity, blueTotalSpecIntensity ) )
+                                                  ),
+                                   currentPosition->z);
+    }
+    else
+        return addColors(     ambientValue,
+                              addColors(
+                                  multiplyColorChannels( currentPosition->color, 1.0, redTotalDiffuseIntensity, greenTotalDiffuseIntensity, blueTotalDiffuseIntensity ),
+                                  combineColorChannels( redTotalSpecIntensity, greenTotalSpecIntensity, blueTotalSpecIntensity ) )
+                        );
 }
 
 // Determine whether a current position is shadowed by some polygon in the scene that lies between it and a light
@@ -1085,9 +1088,6 @@ bool Renderer::isShadowed(Vertex currentPosition, NormalVector* lightDirection, 
 
                                    // Check if the intersection point is inside of the polygon
                                 && ( pointIsInsidePoly( &currentVisibleMesh.faces[j], intersectionResult ) )
-
-                                    // Check to make sure we're not self intersecting, or intersecting with a shared edge
-//                                && (currentMesh !=  &currentVisibleMesh   ||   !haveSharedEdge(currentPolygon, &currentVisibleMesh.faces[j]) )
 
                                  ){ // We've found an intersection!
 

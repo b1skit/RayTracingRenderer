@@ -1,10 +1,10 @@
+#Lerp demonstration
+
 phong
 ambient 0.75 0.75 0.75
 depth 1 200 0 0 0
 raytrace 0
 environment 0 0 0
-
-#wire
 
 # Default Camera
 {

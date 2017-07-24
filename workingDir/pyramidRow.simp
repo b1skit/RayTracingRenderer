@@ -1,0 +1,110 @@
+{
+	translate 0 5 10
+	scale 15 15 15
+	rotate Y 12
+	
+	surface 0.9 0 0
+	specular 0.3 64
+	reflectivity 0.15
+		
+	obj "unitPyramid"
+}
+{
+	translate 0 5 30
+	scale 15 15 15
+	rotate Y 24
+	
+	surface 1 0.4 0.2
+	specular 0.3 64
+	reflectivity 0.15
+		
+	obj "unitPyramid"
+}
+{
+	translate 0 5 50
+	scale 15 15 15
+	rotate Y 36
+	
+	surface 1 0.8 0
+	specular 0.3 64
+	reflectivity 0.15
+		
+	obj "unitPyramid"
+}
+{
+	translate 0 5 70
+	scale 15 15 15
+	rotate Y 48
+	
+	surface 1 1 0.2
+	specular 0.3 64
+	reflectivity 0.15
+	
+	obj "unitPyramid"
+}
+{
+	translate 0 5 90
+	scale 15 15 15
+	rotate Y 60
+	
+	surface 0.6 1 0.4
+	specular 0.3 64
+	reflectivity 0.15
+	
+	obj "unitPyramid"
+}
+{
+	translate 0 5 110
+	scale 15 15 15
+	rotate Y 72
+	
+	surface 0 0.6 0
+	specular 0.3 64
+	reflectivity 0.15	
+	
+	obj "unitPyramid"
+}
+{
+	translate 0 5 130
+	scale 15 15 15
+	rotate Y 84
+	
+	surface 0 0.7 0.9
+	specular 0.3 64
+	reflectivity 0.15
+	
+	obj "unitPyramid"
+}
+{
+	translate 0 5 150
+	scale 15 15 15
+	rotate Y 96
+	
+	surface 0 0 0.8
+	specular 0.3 64
+	reflectivity 0.15
+	
+	obj "unitPyramid"
+}
+{
+	translate 0 5 170
+	scale 15 15 15
+	rotate Y 108
+	
+	surface 0.2 0 0.4
+	specular 0.3 64
+	reflectivity 0.15
+	
+	obj "unitPyramid"
+}
+{
+	translate 0 5 190
+	scale 15 15 15
+	rotate Y 120
+	
+	surface 0.5 0 0.7
+	specular 0.3 64
+	reflectivity 0.15
+	
+	obj "unitPyramid"
+}
