@@ -36,16 +36,11 @@ public:
     // Debug this mesh
     void debug();
 
-
     // Mesh attributes:
+    //*****************
     vector<Polygon> faces; // This mesh's collection of faces
     vector<Polygon> boundingBoxFaces;    // A collection of 6 faces that make up a bounding box surrounding this polygon
-
     bool isWireframe = false; // Whether or not this mesh's polygons are to be rendered in wireframe, or filled
-
-private:
-
-
 };
 
 #endif // MESH_H

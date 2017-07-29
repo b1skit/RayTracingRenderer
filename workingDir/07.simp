@@ -1,3 +1,5 @@
+#This scene renders a car object
+
 phong
 ambient 0.22 0.22 0.22
 depth 1 250 0.5 0.5 0.5

@@ -9,7 +9,6 @@
 #include <cmath>
 
 using std::vector;
-
 using std::cout;
 
 // Constructor

@@ -25,7 +25,6 @@ private:
 
 private slots:
     void nextPageClicked();
-
 };
 
 #endif // WINDOW_H

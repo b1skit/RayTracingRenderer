@@ -68,9 +68,6 @@ public:
 
     // Debug this object
     void debug();
-
-private:
-
 };
 
 #endif // NORMALVECTOR_H

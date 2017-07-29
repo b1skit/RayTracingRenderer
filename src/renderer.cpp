@@ -4,10 +4,9 @@
 #include "renderer.h"
 #include "renderutilities.h"
 
+// STL includes:
 #include <cmath>
 #include <iostream>
-
-// STL includes:
 #include "math.h"               // The STL math library
 
 using std::round;
@@ -646,7 +645,6 @@ void Renderer::flatShadePolygon(Polygon* thePolygon){
     delete [] redSpecTotals;
     delete [] greenSpecTotals;
     delete [] blueSpecTotals;
-
 }
 
 // Light a Polygon using gouraud shading

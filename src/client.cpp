@@ -11,27 +11,16 @@
 #include <cstdlib>              // Used for the rand() function
 #include <ctime>                // Used to seed the rand() function
 #include <iostream>
-
-
-// FOR DEBUG ONLY:
-#include "vertex.h"
-#include "polygon.h"
-// ^FOR DEBUG ONLY^
-
-
-
 #include <chrono>
+
 using std::chrono::high_resolution_clock;
 using std::chrono::duration_cast;
 using std::chrono::microseconds;
-
-
 using std::cout;
-
 
 // Default constructor
 Client::Client(){
-    // Do nothing. This constructor should not be called.
+    // Do nothing
 }
 
 // Constructor
@@ -76,7 +65,7 @@ void Client::nextPage() {
 
 //    high_resolution_clock::time_point t1 = high_resolution_clock::now();
 
-//    Scene theScene = clientFileInterpreter.buildSceneFromFile("./04.simp");
+//    Scene theScene = clientFileInterpreter.buildSceneFromFile("./03.simp");
 
 //    high_resolution_clock::time_point t2 = high_resolution_clock::now();
 //    auto duration = duration_cast<microseconds>( t2 - t1 ).count();

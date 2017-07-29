@@ -1,3 +1,4 @@
+# This scene renders the Stanford bunny
 phong
 ambient .3 .3 .32
 depth 15 65 0.88 0.88 0.88

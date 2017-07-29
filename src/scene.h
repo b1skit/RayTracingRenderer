@@ -53,9 +53,6 @@ public:
     // Scene ray trace settings:
     int numRayBounces = 0;          // Default number of bounces when ray tracing. Default = 0 (ie. No ray tracing)
     bool noRayShadows = false;      // Whether or not to use shadow rays. Default = false (ie. Calculate shadows). Shadows can be disabled with "noshadows" command in the .simp file
-
-private:
-
 };
 
 #endif // SCENE_H

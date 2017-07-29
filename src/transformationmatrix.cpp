@@ -4,7 +4,6 @@
 #include "transformationmatrix.h"
 #include <iostream>
 
-
 #define _USE_MATH_DEFINES       // Allow use of M_PI (3.14159265358979323846)
 #include "math.h"
 

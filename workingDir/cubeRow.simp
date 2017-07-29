@@ -5,7 +5,7 @@
 	
 	surface 0.9 0 0
 	specular 0.3 64
-	reflectivity 0.15
+	reflectivity 0.1
 		
 	obj "unitCubeCentered"
 }
@@ -16,7 +16,7 @@
 	
 	surface 1 0.4 0.2
 	specular 0.3 64
-	reflectivity 0.15
+	reflectivity 0.1
 		
 	obj "unitCubeCentered"
 }
@@ -27,7 +27,7 @@
 	
 	surface 1 0.8 0
 	specular 0.3 64
-	reflectivity 0.15
+	reflectivity 0.1
 		
 	obj "unitCubeCentered"
 }
@@ -38,7 +38,7 @@
 	
 	surface 1 1 0.2
 	specular 0.3 64
-	reflectivity 0.15
+	reflectivity 0.1
 	
 	obj "unitCubeCentered"
 }
@@ -49,7 +49,7 @@
 	
 	surface 0.6 1 0.4
 	specular 0.3 64
-	reflectivity 0.15
+	reflectivity 0.1
 	
 	obj "unitCubeCentered"
 }
@@ -60,7 +60,7 @@
 	
 	surface 0 0.6 0
 	specular 0.3 64
-	reflectivity 0.15	
+	reflectivity 0.1	
 	
 	obj "unitCubeCentered"
 }
@@ -71,7 +71,7 @@
 	
 	surface 0 0.7 0.9
 	specular 0.3 64
-	reflectivity 0.15
+	reflectivity 0.1
 	
 	obj "unitCubeCentered"
 }
@@ -82,7 +82,7 @@
 	
 	surface 0 0 0.8
 	specular 0.3 64
-	reflectivity 0.15
+	reflectivity 0.1
 	
 	obj "unitCubeCentered"
 }
@@ -93,7 +93,7 @@
 	
 	surface 0.2 0 0.4
 	specular 0.3 64
-	reflectivity 0.15
+	reflectivity 0.1
 	
 	obj "unitCubeCentered"
 }
@@ -104,7 +104,7 @@
 	
 	surface 0.5 0 0.7
 	specular 0.3 64
-	reflectivity 0.15
+	reflectivity 0.1
 	
 	obj "unitCubeCentered"
 }

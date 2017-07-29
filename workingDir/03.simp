@@ -1,16 +1,14 @@
 # This scene renders a grid of shapes
-phong
+flat
 depth -10 150 0 0 0
 
-#ambient 0.25 0.25 0.25
-
-ambient 0.375 0.4 0.44
+ambient 0.3 0.32 0.352
 environment 0 0 0
 
 raytrace 0
 #noshadows
 
-wire
+#wire
 
 # Camera
 {
@@ -23,7 +21,7 @@ wire
 # Light
 {
         translate -150 200 -200
-        light 10 10 10 0.01 0.02
+        light 10 10 10 0.01 0.025
 }
 
 # Ground plane
@@ -32,7 +30,7 @@ wire
 	scale 2000 1 2000
 	
 	surface 0.74 0.8 0.88
-	reflectivity 0.1
+	reflectivity 0.08
 	
 	obj "unitPlane"
 }
