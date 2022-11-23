@@ -62,3 +62,5 @@ Alternative: Running the program directly using the compiled release executable:
   -> Eg. To load the "page1.simp" file, you would use the following command:
 		
 			qtqt.exe page1
+
+© 2017 Adam Badke. All rights reserved.
